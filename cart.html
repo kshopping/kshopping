@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>주문 진행중 / Order in Progress - K-Shopping</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background:#f7f7f7;
+      font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:#222;
+    }
+    main {
+      max-width:900px;
+      margin:0 auto;
+      padding:16px;
+    }
+    h1 { font-size:22px; margin-bottom:8px; }
+    .sub { font-size:13px; color:#777; margin-bottom:18px; }
+
+    .card {
+      background:#fff;
+      border-radius:10px;
+      padding:14px 16px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+      margin-bottom:16px;
+    }
+    .card-title { font-size:16px; font-weight:600; margin-bottom:6px; }
+    .card-sub { font-size:12px; color:#777; margin-bottom:10px; }
+
+    label { font-size:13px; display:block; margin:8px 0 4px; }
+    input, textarea {
+      width:100%;
+      border:1px solid #ddd;
+      border-radius:6px;
+      padding:8px 10px;
+      font-size:13px;
+    }
+    textarea { min-height:60px; resize:vertical; }
+
+    .method-options label { margin-bottom:4px; cursor:pointer; }
+
+    .btn-primary {
+      border:none;
+      background:#222;
+      color:#fff;
+      padding:10px 16px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .btn-secondary {
+      border:1px solid #ccc;
+      background:#fff;
+      color:#333;
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:500;
+      cursor:pointer;
+    }
+
+    .btn-primary:hover { background:#000; }
+    .btn-secondary:hover { background:#f5f5f5; }
+
+    .btn-row {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:8px;
+      font-size:13px;
+    }
+    th, td {
+      border-bottom:1px solid #eee;
+      padding:4px 2px;
+      text-align:left;
+    }
+    th { background:#fafafa; }
+    .text-right { text-align:right; }
+
+    .summary-footer {
+      margin-top:8px;
+      font-size:13px;
+    }
+
+    .cart-qty-btn {
+      border:1px solid #ccc;
+      background:#fff;
+      color:#333;
+      padding:2px 6px;
+      border-radius:4px;
+      font-size:11px;
+      cursor:pointer;
+    }
+    .cart-qty-input {
+      width:48px;
+      padding:3px 4px;
+      margin:0 2px;
+      font-size:12px;
+      text-align:right;
+    }
+    .cart-del-btn {
+      border:none;
+      background:#e74c3c;
+      color:#fff;
+      padding:4px 8px;
+      border-radius:4px;
+      font-size:11px;
+      cursor:pointer;
+    }
+
+    @media (max-width:600px){
+      .btn-row {
+        display:flex;
+        flex-direction:column-reverse;
+        gap:8px;
+      }
+    }
+  
+/* === Header from index.html (Genie copy) === */
+.ks-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eee;
+}
+.ks-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ks-header-spacer { height: 64px; }
+
+.ks-logo {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  margin-right: 12px;
+  white-space: nowrap;
+}
+.ks-logo-main {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.3px;
+}
+.ks-logo-sub {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #666;
+}
+.ks-logo-sub .kor {
+  margin-right: 4px;
+}
+.ks-logo-sub .eng {
+  font-size: 11px;
+  background: linear-gradient(90deg, #ff4d4f, #ff9800);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.ks-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.ks-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ks-icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+}
+.ks-icon-btn .cart-label {
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+.cart-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  background: #ff4d4f;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: 0.15s;
+}
+.cart-icon-wrapper:hover {
+  background: #e0242a;
+  transform: translateY(-1px);
+}
+.cart-icon-wrapper img {
+  width: 19px;
+  filter: invert(100%);
+}
+.ks-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: #222;
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+}
+
+</style>
+</head>
+
+<body>
+<header class="ks-header">
+  <div class="ks-header-inner">
+    <div class="ks-logo" onclick="location.href='index.html'">
+      <span class="ks-logo-main">K-Shopping</span>
+      <span class="ks-logo-sub">
+        <span class="kor">외국인을 위한 전문 쇼핑몰</span> /
+        <span class="eng">Global Shopping for Foreigners</span>
+      </span>
+    </div>
+
+    <nav class="ks-nav"></nav>
+
+   <div class="ks-actions">
+  <button class="ks-icon-btn" type="button">
+    <!-- 이 글씨는 관리자 이동 -->
+    <span onclick="goToAdmin()">관리자 / Admin</span>
+    <!-- 이 글씨는 장바구니 이동 -->
+    <span class="cart-label" onclick="goToCartPage()"> / 장바구니</span>
+  </button>
+
+  <!-- 동그란 아이콘도 장바구니로 이동 -->
+  <div class="cart-icon-wrapper" onclick="goToCartPage()">
+    <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart" />
+    <span class="ks-cart-badge" id="headerCartCount">0</span>
+  </div>
+</div>
+ 
+  </div>
+</header>
+<div class="ks-header-spacer"></div>
+
+<main>
+  <h1>주문 진행중 / Order in Progress</h1>
+  <p class="sub">
+    아래 주문 내용을 확인한 후, 주문자 정보를 입력해 주세요.<br>
+    Please review your order and fill in your information.
+  </p>
+
+  <!-- 전화 주문 안내 박스 -->
+  <section class="card" style="padding:0; border:none; background:transparent; box-shadow:none;">
+    <div style="
+      background:#e3f0ff;
+      border-left:5px solid #1e6fff;
+      padding:14px 16px;
+      border-radius:10px;
+      font-size:14px;
+      color:#333;
+      line-height:1.5;
+    ">
+      <div style="font-weight:600; margin-bottom:6px;">한국어가 어려우면 전화로 주문하세요.</div>
+      <div style="color:#444;">
+        If Korean is difficult, please order by phone.
+      </div>
+      <div style="margin-top:10px; font-size:20px; font-weight:700; color:#1e6fff;">
+        📞 고객센터 / Customer Service : 010-8640-8732
+      </div>
+    </div>
+  </section>
+
+  <!-- 주문 요약 (장바구니 역할) -->
+  <section class="card">
+    <div class="card-title">주문 상품 / Order Summary</div>
+    <div id="orderSummaryArea" style="font-size:13px;"></div>
+  </section>
+
+  <!-- 주문자 정보 폼 -->
+  <section class="card" id="methodForm">
+    <div class="card-title">주문자 정보 / Customer Information</div>
+
+    <label>이름 / Name (한국어 또는 영어) *</label>
+    <input id="name" placeholder="예: 김민수 또는 MINSU KIM" />
+
+    <label>연락처 / Phone (with country code) *</label>
+    <input id="phone" placeholder="예: 010-8640-8732 또는 +82 10-8640-8732" />
+
+    <label>주소 / Address *</label>
+    <textarea id="address"
+      placeholder="한국어 또는 영어로 배송지를 적어주세요. / Please write your shipping address in Korean or English."></textarea>
+
+    <label>요청사항 / Request message (선택)</label>
+    <textarea id="memo"
+      placeholder="배송 시 요청사항이나 추가 메모를 적어주세요. / Any requests or notes."></textarea>
+  </section>
+
+  <!-- 버튼 -->
+  <section class="card">
+    <div class="btn-row" style="display:flex;justify-content:space-between;gap:8px;">
+      <button type="button" class="btn-secondary" onclick="location.href='index.html'">
+        ← 계속 쇼핑하기 / Continue Shopping
+      </button>
+      <button type="button" class="btn-primary" onclick="submitOrder()">
+        주문 접수 / Submit Order
+      </button>
+    </div>
+  </section>
+</main>
+
+<script>
+  function calculateCartSummaryForHeader() {
+    const cart = loadCart();
+    const qty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
+    return { qty };
+  }
+
+  function updateHeaderCartCount() {
+    const badge = document.getElementById("headerCartCount");
+    if (!badge) return;
+    const { qty } = calculateCartSummaryForHeader();
+    badge.textContent = qty;
+    badge.style.visibility = qty > 0 ? "visible" : "hidden";
+  }
+
+  function goToCartPage() {
+    location.href = "cart.html";
+  }
+
+  function goToAdmin() {
+    const pw = prompt("관리자 비밀번호를 입력하세요:");
+    if (pw === "10010") location.href = "admin.html";
+    else if (pw !== null) alert("비밀번호가 올바르지 않습니다.");
+  }
+
+  function loadCart() {
+    try {
+      const saved = localStorage.getItem("cart");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  function formatPrice(num) {
+    return num.toLocaleString("ko-KR") + "원";
+  }
+
+  function changeCartQty(index, delta) {
+    const cart = loadCart();
+    if (!cart[index]) return;
+    let qty = (cart[index].qty || 1) + delta;
+    if (qty < 1) qty = 1;
+    cart[index].qty = qty;
+    saveCart(cart);
+    renderOrderSummary();
+  }
+
+  function setCartQty(index, value) {
+    const cart = loadCart();
+    if (!cart[index]) return;
+    let qty = parseInt(value, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    cart[index].qty = qty;
+    saveCart(cart);
+    renderOrderSummary();
+  }
+
+  function removeCartItem(index) {
+    const cart = loadCart();
+    if (!cart[index]) return;
+    cart.splice(index, 1);
+    saveCart(cart);
+    renderOrderSummary();
+  }
+
+  function renderOrderSummary() {
+    const cart = loadCart();
+    const area = document.getElementById("orderSummaryArea");
+
+    if (!cart || cart.length === 0) {
+      area.innerHTML = `
+        <p style="color:#777;">
+          장바구니에 담긴 상품이 없습니다. 먼저 상품을 담아 주세요.<br>
+          Your cart is empty. Please add items first.
+        </p>
+      `;
+      return;
+    }
+
+    let rows = "";
+    let totalQty = 0;
+    let subtotal = 0;
+
+    cart.forEach((item, index) => {
+      const qty   = item.qty || 1;
+      const price = item.priceSale || item.price || 0;
+      const line  = qty * price;
+      totalQty   += qty;
+      subtotal   += line;
+
+      rows += `
+        <tr>
+          <td>${item.name}</td>
+          <td class="text-right">
+            <button type="button" class="cart-qty-btn" onclick="changeCartQty(${index}, -1)">-</button>
+            <input type="number"
+                   class="cart-qty-input"
+                   min="1"
+                   value="${qty}"
+                   onchange="setCartQty(${index}, this.value)" />
+            <button type="button" class="cart-qty-btn" onclick="changeCartQty(${index}, 1)">+</button>
+          </td>
+          <td class="text-right">${formatPrice(price)}</td>
+          <td class="text-right">${formatPrice(line)}</td>
+          <td class="text-right">
+            <button type="button" class="cart-del-btn" onclick="removeCartItem(${index})">삭제</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    let shipping = 0;
+    const totalAmount = subtotal + shipping;
+
+    area.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>상품명 / Product</th>
+            <th class="text-right">수량 / Qty</th>
+            <th class="text-right">단가 / Price</th>
+            <th class="text-right">금액 / Amount</th>
+            <th class="text-right">삭제 / Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+
+      <div class="summary-footer">
+        총 수량 / Total Qty: <b>${totalQty}</b><br>
+        상품 합계 / Subtotal: <b>${formatPrice(subtotal)}</b><br>
+        배송비 / Shipping: <b>${shipping === 0 ? "0원 (또는 무료)" : formatPrice(shipping)}</b><br>
+        총 결제 예정 금액 / Total amount: <b>${formatPrice(totalAmount)}</b>
+      </div>
+    `;
+  }
+
+  function submitOrder() {
+    const cart = loadCart();
+    if (!cart || cart.length === 0) {
+      alert("장바구니에 상품이 없습니다.");
+      return;
+    }
+
+    const now = new Date();
+    const orderId = "KS" + now.getTime();
+
+    let totalQty = 0;
+    let subtotal = 0;
+    cart.forEach(item => {
+      const qty   = item.qty || 1;
+      const price = item.priceSale || item.price || 0;
+      totalQty += qty;
+      subtotal += qty * price;
+    });
+
+    let shipping = 0;
+    const totalAmount = subtotal + shipping;
+
+    const name    = document.getElementById("name").value.trim();
+    const phone   = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const memo    = document.getElementById("memo").value.trim();
+
+    if (!name)    { alert("이름을 입력해 주세요."); return; }
+    if (!phone)   { alert("연락처를 입력해 주세요."); return; }
+    if (!address) { alert("주소를 입력해 주세요."); return; }
+
+    const order = {
+      id: orderId,
+      date: now.toISOString(),
+      method: "form",
+      name,
+      phone,
+      address,
+      memo,
+      cart,
+      totalQty,
+      subtotal,
+      shipping,
+      totalAmount
+    };
+
+    localStorage.setItem("lastOrder", JSON.stringify(order));
+
+    const saved = localStorage.getItem("orders");
+    let orders = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(orders)) orders = [];
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    localStorage.removeItem("cart");
+    location.href = "order_complete.html";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateHeaderCartCount();
+    renderOrderSummary();
+    // 현재는 폼 입력 방식만 사용 (전화 주문 요청 방식은 향후 필요 시 구현)
+  });
+</script>
+</body>
+</html>
