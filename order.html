@@ -122,7 +122,7 @@
       }
     }
 
-    /* === Header (index.html 스타일 복사) === */
+    /* === Header === */
     .ks-header {
       position: sticky;
       top: 0;
@@ -244,13 +244,10 @@
 
     <div class="ks-actions">
       <button class="ks-icon-btn" type="button">
-        <!-- 이 글씨는 관리자 이동 -->
         <span onclick="goToAdmin()">관리자 / Admin</span>
-        <!-- 이 글씨는 장바구니 이동 -->
         <span class="cart-label" onclick="goToCartPage()"> / 장바구니</span>
       </button>
 
-      <!-- 동그란 아이콘도 장바구니로 이동 -->
       <div class="cart-icon-wrapper" onclick="goToCartPage()">
         <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart" />
         <span class="ks-cart-badge" id="headerCartCount">0</span>
@@ -267,7 +264,6 @@
     Please review your order and fill in your information.
   </p>
 
-  <!-- 전화 주문 안내 박스 -->
   <section class="card" style="padding:0; border:none; background:transparent; box-shadow:none;">
     <div style="
       background:#e3f0ff;
@@ -289,277 +285,148 @@
     </div>
   </section>
 
-  <!-- 주문 요약 (장바구니 역할) -->
   <section class="card">
     <div class="card-title">주문 상품 / Order Summary</div>
     <div id="orderSummaryArea" style="font-size:13px;"></div>
   </section>
 
-  <!-- 주문자 정보 폼 -->
   <section class="card" id="methodForm">
     <div class="card-title">주문자 정보 / Customer Information</div>
 
-    <label>이름 / Name (한국어 또는 영어) *</label>
-    <input id="name" placeholder="예: 김민수 또는 MINSU KIM" />
+    <label>이름 / Name *</label>
+    <input id="orderName" />
 
-    <label>연락처 / Phone (with country code) *</label>
-    <input id="phone" placeholder="예: 010-8640-8732 또는 +82 10-8640-8732" />
+    <label>연락처 / Phone *</label>
+    <input id="orderPhone" />
 
     <label>주소 / Address *</label>
-    <textarea id="address"
-      placeholder="한국어 또는 영어로 배송지를 적어주세요. / Please write your shipping address in Korean or English."></textarea>
+    <textarea id="orderAddress"></textarea>
 
-    <label>요청사항 / Request message (선택)</label>
-    <textarea id="memo"
-      placeholder="배송 시 요청사항이나 추가 메모를 적어주세요. / Any requests or notes."></textarea>
+    <label>요청사항 / Memo</label>
+    <textarea id="orderMemo"></textarea>
   </section>
 
-  <!-- 버튼 -->
   <section class="card">
-    <div class="btn-row" style="display:flex;justify-content:space-between;gap:8px;">
+    <div class="btn-row">
       <button type="button" class="btn-secondary" onclick="location.href='index.html'">
         ← 계속 쇼핑하기 / Continue Shopping
       </button>
-      <button type="button" class="btn-primary" onclick="submitOrder()">
+      <button type="button" class="btn-primary" id="submitOrderBtn">
         주문 접수 / Submit Order
       </button>
     </div>
   </section>
 </main>
 
-<script>
-  function loadCart() {
-    try {
-      const saved = localStorage.getItem("cart");
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
+<!-- 🔵 Supabase 연동 -->
+<script type="module">
+import { supabase } from "./js/supabaseClient.js";
+
+function loadCart() {
+  try {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function renderOrderSummary() {
+  const cart = loadCart();
+  const area = document.getElementById("orderSummaryArea");
+
+  if (!cart.length) {
+    area.innerHTML = `<p style="color:#777;">장바구니가 비었습니다.</p>`;
+    return;
   }
 
-  function saveCart(cart) {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }
+  let rows = "";
+  let qtyTotal = 0;
+  let subtotal = 0;
 
-  function calculateCartSummaryForHeader() {
-    const cart = loadCart();
-    const qty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
-    return { qty };
-  }
+  cart.forEach((it) => {
+    const price = it.priceSale || it.price;
+    const line = price * it.qty;
+    qtyTotal += it.qty;
+    subtotal += line;
 
-  function updateHeaderCartCount() {
-    const badge = document.getElementById("headerCartCount");
-    if (!badge) return;
-    const { qty } = calculateCartSummaryForHeader();
-    badge.textContent = qty;
-    badge.style.visibility = qty > 0 ? "visible" : "hidden";
-  }
-
-  function goToCartPage() {
-    location.href = "cart.html";
-  }
-
-  function goToAdmin() {
-    const pw = prompt("관리자 비밀번호를 입력하세요:");
-    // 🔐 비밀번호 100101로 통일
-    if (pw === "100101") location.href = "admin.html";
-    else if (pw !== null) alert("비밀번호가 올바르지 않습니다.");
-  }
-
-  function formatPrice(num) {
-    return num.toLocaleString("ko-KR") + "원";
-  }
-
-  // 🔹 admin에서 저장한 accountConfig에서 고객센터 번호 읽어오기
-  function loadCustomerServicePhone() {
-    const span = document.getElementById("csPhoneText");
-    if (!span) return;
-
-    let phone = "";
-    try {
-      const saved = localStorage.getItem("accountConfig");
-      if (saved) {
-        const acc = JSON.parse(saved);
-        phone = acc.customerPhone || "";
-      }
-    } catch (e) {
-      phone = "";
-    }
-
-    if (!phone) {
-      // 저장된 값이 없으면 기본값 유지
-      phone = span.textContent || "010-8640-8732";
-    }
-
-    span.textContent = phone;
-  }
-
-  function changeCartQty(index, delta) {
-    const cart = loadCart();
-    if (!cart[index]) return;
-    let qty = (cart[index].qty || 1) + delta;
-    if (qty < 1) qty = 1;
-    cart[index].qty = qty;
-    saveCart(cart);
-    renderOrderSummary();
-  }
-
-  function setCartQty(index, value) {
-    const cart = loadCart();
-    if (!cart[index]) return;
-    let qty = parseInt(value, 10);
-    if (isNaN(qty) || qty < 1) qty = 1;
-    cart[index].qty = qty;
-    saveCart(cart);
-    renderOrderSummary();
-  }
-
-  function removeCartItem(index) {
-    const cart = loadCart();
-    if (!cart[index]) return;
-    cart.splice(index, 1);
-    saveCart(cart);
-    renderOrderSummary();
-  }
-
-  function renderOrderSummary() {
-    const cart = loadCart();
-    const area = document.getElementById("orderSummaryArea");
-
-    if (!cart || cart.length === 0) {
-      area.innerHTML = `
-        <p style="color:#777;">
-          장바구니에 담긴 상품이 없습니다. 먼저 상품을 담아 주세요.<br>
-          Your cart is empty. Please add items first.
-        </p>
-      `;
-      return;
-    }
-
-    let rows = "";
-    let totalQty = 0;
-    let subtotal = 0;
-
-    cart.forEach((item, index) => {
-      const qty   = item.qty || 1;
-      const price = item.priceSale || item.price || 0;
-      const line  = qty * price;
-      totalQty   += qty;
-      subtotal   += line;
-
-      rows += `
-        <tr>
-          <td>${item.name}</td>
-          <td class="text-right">
-            <button type="button" class="cart-qty-btn" onclick="changeCartQty(${index}, -1)">-</button>
-            <input type="number"
-                   class="cart-qty-input"
-                   min="1"
-                   value="${qty}"
-                   onchange="setCartQty(${index}, this.value)" />
-            <button type="button" class="cart-qty-btn" onclick="changeCartQty(${index}, 1)">+</button>
-          </td>
-          <td class="text-right">${formatPrice(price)}</td>
-          <td class="text-right">${formatPrice(line)}</td>
-          <td class="text-right">
-            <button type="button" class="cart-del-btn" onclick="removeCartItem(${index})">삭제</button>
-          </td>
-        </tr>
-      `;
-    });
-
-    let shipping = 0;
-    const totalAmount = subtotal + shipping;
-
-    area.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>상품명 / Product</th>
-            <th class="text-right">수량 / Qty</th>
-            <th class="text-right">단가 / Price</th>
-            <th class="text-right">금액 / Amount</th>
-            <th class="text-right">삭제 / Remove</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-      <div class="summary-footer">
-        총 수량 / Total qty: <b>${totalQty}</b><br>
-        상품 합계 / Subtotal: <b>${formatPrice(subtotal)}</b><br>
-        배송비 / Shipping: <b>${shipping === 0 ? "0원 (또는 무료)" : formatPrice(shipping)}</b><br>
-        총 결제 예정 금액 / Total amount: <b>${formatPrice(totalAmount)}</b>
-      </div>
+    rows += `
+      <tr>
+        <td>${it.name}</td>
+        <td class="text-right">${it.qty}</td>
+        <td class="text-right">${price.toLocaleString()}원</td>
+        <td class="text-right">${line.toLocaleString()}원</td>
+      </tr>
     `;
-  }
-
-  function submitOrder() {
-    const cart = loadCart();
-    if (!cart || cart.length === 0) {
-      alert("장바구니에 상품이 없습니다.");
-      return;
-    }
-
-    const now = new Date();
-    const orderId = "KS" + now.getTime();
-
-    let totalQty = 0;
-    let subtotal = 0;
-    cart.forEach(item => {
-      const qty   = item.qty || 1;
-      const price = item.priceSale || item.price || 0;
-      totalQty += qty;
-      subtotal += qty * price;
-    });
-
-    let shipping = 0;
-    const totalAmount = subtotal + shipping;
-
-    const name    = document.getElementById("name").value.trim();
-    const phone   = document.getElementById("phone").value.trim();
-    const address = document.getElementById("address").value.trim();
-    const memo    = document.getElementById("memo").value.trim();
-
-    if (!name)    { alert("이름을 입력해 주세요."); return; }
-    if (!phone)   { alert("연락처를 입력해 주세요."); return; }
-    if (!address) { alert("주소를 입력해 주세요."); return; }
-
-    const cartData = loadCart();
-    const order = {
-      id: orderId,
-      date: now.toISOString(),
-      method: "form",
-      name,
-      phone,
-      address,
-      memo,
-      cart: cartData,
-      totalQty,
-      subtotal,
-      shipping,
-      totalAmount
-    };
-
-    localStorage.setItem("lastOrder", JSON.stringify(order));
-
-    const saved = localStorage.getItem("orders");
-    let orders = saved ? JSON.parse(saved) : [];
-    if (!Array.isArray(orders)) orders = [];
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    localStorage.removeItem("cart");
-    location.href = "order_complete.html";
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    updateHeaderCartCount();
-    renderOrderSummary();
-    loadCustomerServicePhone(); // 🔹 관리자에서 저장된 고객센터 번호 표시
   });
+
+  area.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>상품명</th>
+          <th class="text-right">수량</th>
+          <th class="text-right">가격</th>
+          <th class="text-right">합계</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="summary-footer">
+      총 수량: <b>${qtyTotal}</b><br>
+      상품 합계: <b>${subtotal.toLocaleString()}원</b>
+    </div>
+  `;
+}
+
+async function submitSupabaseOrder() {
+  const cart = loadCart();
+  if (!cart.length) {
+    alert("장바구니가 비었습니다.");
+    return;
+  }
+
+  const name = document.getElementById("orderName").value.trim();
+  const phone = document.getElementById("orderPhone").value.trim();
+  const address = document.getElementById("orderAddress").value.trim();
+  const memo = document.getElementById("orderMemo").value.trim();
+
+  if (!name) return alert("이름을 입력하세요.");
+  if (!phone) return alert("연락처를 입력하세요.");
+  if (!address) return alert("주소를 입력하세요.");
+
+  const orderId = "KS" + Date.now();
+  const total_qty = cart.reduce((s, it) => s + it.qty, 0);
+  const subtotal = cart.reduce((s, it) => s + (it.priceSale || it.price) * it.qty, 0);
+  const total = subtotal;
+
+  const { error } = await supabase.from("orders").insert([{
+    id: orderId,
+    name,
+    phone,
+    address,
+    memo,
+    items: cart,
+    total_qty,
+    subtotal,
+    total
+  }]);
+
+  if (error) {
+    console.error(error);
+    alert("주문 저장 중 오류 발생");
+    return;
+  }
+
+  localStorage.removeItem("cart");
+  location.href = `order_complete.html?id=${orderId}`;
+}
+
+document.getElementById("submitOrderBtn").addEventListener("click", submitSupabaseOrder);
+
+document.addEventListener("DOMContentLoaded", renderOrderSummary);
 </script>
+
 </body>
 </html>
+
 

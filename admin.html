@@ -5,7 +5,7 @@
   <title>K-Shopping 관리자 / Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 엑셀(XLSX) 라이브러리 -->
+  <!-- XLSX (엑셀 라이브러리) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -76,43 +76,16 @@
     textarea {
       width:100%;
       padding:4px 6px;
-      border:1px solid:#ccc;
+      border:1px solid #ccc;
       border-radius:4px;
       font-size:12px;
     }
-    input[readonly] { background:#f5f5f5; }
-    textarea { resize:vertical; min-height:60px; }
-
     input[type="number"] {
       width:110px;
       padding:4px 6px;
       border:1px solid #ccc;
       border-radius:4px;
       font-size:12px;
-      -moz-appearance:textfield;
-    }
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button{
-      -webkit-appearance:none;
-      margin:0;
-    }
-
-    .prod-name {
-      width:100%;
-      min-width:180px;
-    }
-
-    select {
-      width:100%;
-      padding:4px 6px;
-      border:1px solid #ccc;
-      border-radius:4px;
-      font-size:12px;
-    }
-
-    button {
-      font-family:inherit;
-      cursor:pointer;
     }
 
     .btn-primary {
@@ -123,6 +96,7 @@
       border-radius:999px;
       font-size:13px;
       font-weight:600;
+      cursor:pointer;
     }
     .btn-secondary {
       border:1px solid #ccc;
@@ -131,6 +105,7 @@
       padding:6px 12px;
       border-radius:999px;
       font-size:12px;
+      cursor:pointer;
     }
     .btn-danger {
       border:none;
@@ -139,14 +114,7 @@
       padding:5px 10px;
       border-radius:4px;
       font-size:11px;
-    }
-    .btn-small {
-      border:1px solid #aaa;
-      background:#fff;
-      color:#333;
-      padding:4px 8px;
-      border-radius:4px;
-      font-size:11px;
+      cursor:pointer;
     }
 
     .img-thumb {
@@ -156,51 +124,15 @@
       border-radius:4px;
       background:#eee;
     }
-
-    .table-actions {
-      display:flex;
-      gap:4px;
-      justify-content:center;
-    }
-
-    .flex-row {
-      display:flex;
-      gap:8px;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .field-inline {
-      display:flex;
-      gap:6px;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .field-inline label {
-      width:120px;
-      font-size:12px;
-      color:#555;
-    }
-
-    @media(max-width:800px){
-      table { font-size:11px; }
-      th,td { padding:4px 2px; }
-    }
-
-    .small-hint {
-      font-size:11px;
-      color:#999;
-      margin-top:2px;
-    }
   </style>
 </head>
+
 <body>
 <header>
   <div class="header-inner">
     <div class="header-title">
       <h1>K-Shopping 관리자 페이지</h1>
-      <small>상품 / 카테고리 / 배너 / 입금 계좌 / 주문 엑셀 출력</small>
+      <small>상품 / 카테고리 / 배너 / 계좌 / 주문관리(Supabase)</small>
     </div>
     <button type="button" class="btn-secondary" onclick="location.href='index.html'">
       메인으로 이동
@@ -209,12 +141,14 @@
 </header>
 
 <main>
-  <!-- 상품 관리 -->
+  <!-- ============================= -->
+  <!-- 상품 관리 / Product Management -->
+  <!-- ============================= -->
   <section class="card">
     <div class="card-title">상품 관리 / Product Management</div>
     <div class="card-sub">
-      상품 정보는 브라우저의 localStorage 에 저장됩니다.<br>
-      Product data is stored locally in your browser (practice only).
+      상품 데이터는 현재 localStorage 기반입니다.<br>
+      (차후 Supabase 연동 단계에서 서버 저장으로 업그레이드 예정)
     </div>
 
     <table>
@@ -223,13 +157,13 @@
           <th style="width:40px;">No.</th>
           <th style="width:80px;">이미지</th>
           <th style="min-width:180px;">상품명</th>
-          <th style="width:400px;">카테고리</th>
-          <th style="width:5px;">출고가</th>
-          <th style="width:5px;">특판가</th>
-          <th style="width:240px;">목록용 이미지 URL</th>
-          <th style="width:70px;">상세설명</th>
-          <th style="width:120px;">이미지 파일(대표)</th>
-          <th style="width:90px;">수정 / 삭제</th>
+          <th style="width:180px;">카테고리</th>
+          <th style="width:80px;">출고가</th>
+          <th style="width:80px;">특판가</th>
+          <th style="width:200px;">목록용 이미지 URL</th>
+          <th style="width:70px;">설명</th>
+          <th style="width:120px;">이미지 파일</th>
+          <th style="width:90px;">수정/삭제</th>
         </tr>
       </thead>
       <tbody id="productTableBody"></tbody>
@@ -241,61 +175,57 @@
     </div>
   </section>
 
-  <!-- 상세 설명 + 상세이미지 편집 영역 -->
+  <!-- ============================= -->
+  <!-- 상품 상세 설명 에디터 -->
+  <!-- ============================= -->
   <section class="card" id="detailEditorCard">
-    <div class="card-title">상세페이지 내용 입력 / Product Detail Description</div>
-    <div class="card-sub">
-      위 상품 목록의 연필 아이콘 또는 행을 클릭하면 선택된 상품의 상세내용이 아래에 표시됩니다.<br>
-      Click the pencil icon or row in the product table, then edit the description here.
-    </div>
+    <div class="card-title">상세페이지 설명 / Product Detail Description</div>
+    <div class="card-sub">위 상품 행을 클릭하거나 연필 버튼을 누르면 편집합니다.</div>
 
     <div class="field-inline">
-      <label>선택된 상품 / Selected product</label>
-      <div id="detailSelectedName" style="font-size:13px;color:#333;">(선택된 상품 없음)</div>
+      <label>선택된 상품</label>
+      <div id="detailSelectedName" style="font-size:13px;color:#333;">(선택 없음)</div>
     </div>
 
     <textarea id="detailEditor"
-      placeholder="상세페이지에 노출할 내용을 한국어 또는 영어로 입력하세요. / Write detailed description for detail page."></textarea>
+      placeholder="상세페이지 설명을 입력하세요."></textarea>
 
     <div class="field-inline" style="margin-top:8px;">
-      <label>상세페이지 이미지 URL</label>
-      <input id="detailImgUrlInput" type="text"
-             placeholder="예: images/detail1.png 또는 https://...">
+      <label>상세 이미지 URL</label>
+      <input id="detailImgUrlInput" type="text" placeholder="예: images/detail.png">
     </div>
 
     <div class="field-inline">
-      <label>상세페이지 이미지 파일</label>
+      <label>상세 이미지 파일</label>
       <div style="flex:1;">
-        <input id="detailImgFileInput" type="file" accept="image/*" />
+        <input id="detailImgFileInput" type="file" accept="image/*">
         <div class="small-hint">
-          파일을 선택하면 위 URL 칸에 자동으로 <code>images/파일명</code>이 입력됩니다.
-          (이미지는 프로젝트 <code>images</code> 폴더에 올려 주세요.)
+          파일 선택 시 자동으로 위 URL 칸에 <code>images/파일명</code> 입력됩니다.
         </div>
       </div>
     </div>
 
     <div class="flex-row" style="margin-top:8px;">
-      <button type="button" class="btn-secondary" onclick="clearDetailEditor()">
-        초기화 / Clear
-      </button>
-      <button type="button" class="btn-primary" onclick="saveDetailDescription()">
-        상세설명 저장 / Save Detail Description
-      </button>
+      <button type="button" class="btn-secondary" onclick="clearDetailEditor()">초기화</button>
+      <button type="button" class="btn-primary" onclick="saveDetailDescription()">상세설명 저장</button>
     </div>
   </section>
 
-  <!-- 카테고리 관리 -->
+  <!-- ============================= -->
+  <!-- 카테고리 관리 / Category Management -->
+  <!-- ============================= -->
   <section class="card">
     <div class="card-title">카테고리 관리 / Category Management</div>
     <div class="card-sub">
-      카테고리 ID 는 영어/숫자로, 쇼핑몰 화면에는 "카테고리 이름"이 표시됩니다.<br>
-      Category ID (English) is used internally, Category name is shown on the site.
+      카테고리 ID는 영어/숫자로 구성되며 내부적으로 사용됩니다.<br>
+      고객 화면에는 “카테고리 이름”이 표시됩니다.<br>
+      이 카테고리는 **Supabase categories 테이블**과 연동됩니다.
     </div>
 
     <table>
       <thead>
         <tr>
-          <th style="width:120px;">카테고리 ID</th>
+          <th style="width:140px;">카테고리 ID</th>
           <th>카테고리 이름</th>
           <th style="width:70px;">삭제</th>
         </tr>
@@ -309,14 +239,14 @@
     </div>
   </section>
 
-  <!-- 배너 관리 -->
+  <!-- ============================= -->
+  <!-- 배너 관리 / Banner Management -->
+  <!-- ============================= -->
   <section class="card">
     <div class="card-title">배너 관리 / Banner Management</div>
     <div class="card-sub">
-      메인 상단 프로모션 배너를 설정합니다. 여러 개를 만들면 자동 슬라이드됩니다.<br>
-      ✨ <b>이미지는 Base64 로 저장하지 않고, 파일명만 저장</b>합니다.<br>
-      &nbsp;&nbsp;- 이미지 파일은 프로젝트의 <code>images</code> 폴더에 넣어 주세요.<br>
-      &nbsp;&nbsp;- 파일 선택 시 <code>이미지 URL</code>에 자동으로 <code>images/파일명</code> 이 입력됩니다.
+      메인 화면 상단의 배너를 설정합니다.<br>
+      여러 개를 만들면 자동 슬라이드됩니다.
     </div>
 
     <table>
@@ -326,7 +256,7 @@
           <th>제목</th>
           <th>부제목</th>
           <th>이미지 URL</th>
-          <th style="width:120px;">이미지 파일(선택)</th>
+          <th style="width:160px;">이미지 파일</th>
           <th style="width:70px;">삭제</th>
         </tr>
       </thead>
@@ -339,1316 +269,530 @@
     </div>
   </section>
 
-  <!-- 계좌 정보 -->
+  <!-- ============================= -->
+  <!-- 계좌 정보 / Bank Account Information -->
+  <!-- ============================= -->
   <section class="card">
     <div class="card-title">입금 계좌 정보 / Bank Account Information</div>
     <div class="card-sub">
-      주문 완료 페이지와 메인 화면 하단에 표시되는 계좌 정보를 설정합니다.
+      주문 완료 페이지와 고객 화면에 표시되는 계좌 정보를 설정합니다.
     </div>
 
-    <div class="field-inline">
-      <label>은행명 / Bank</label>
-      <input id="accBank" />
-    </div>
-    <div class="field-inline">
-      <label>계좌번호 / Account No.</label>
-      <input id="accNumber" />
-    </div>
-    <div class="field-inline">
-      <label>예금주 / Holder</label>
-      <input id="accHolder" />
-    </div>
-    <!-- ✅ 고객센터 전화번호 관리용 필드 추가 -->
-    <div class="field-inline">
-      <label>고객센터 전화번호 / Customer Center Phone</label>
-      <input id="accCustomerPhone" placeholder="예: 010-8640-8732" />
-    </div>
+    <div class="field-inline"><label>은행명</label><input id="accBank" /></div>
+    <div class="field-inline"><label>계좌번호</label><input id="accNumber" /></div>
+    <div class="field-inline"><label>예금주</label><input id="accHolder" /></div>
+    <div class="field-inline"><label>고객센터 번호</label><input id="accCustomerPhone" /></div>
+
     <div class="field-inline" style="align-items:flex-start;">
-      <label>추가 안내 / Extra</label>
-      <textarea id="accExtra" style="min-height:70px;"></textarea>
+      <label>추가 안내</label>
+      <textarea id="accExtra" style="min-height:80px;"></textarea>
     </div>
 
-    <div style="text-align:right;margin-top:10px;">
+    <div style="text-align:right; margin-top:10px;">
       <button type="button" class="btn-primary" onclick="saveAccountConfig()">계좌 정보 저장</button>
     </div>
   </section>
 
-  <!-- 주문 엑셀 출력 & 전체 내역 보기 -->
+  <!-- ============================= -->
+  <!-- 주문 관리 / Orders (Supabase) -->
+  <!-- ============================= -->
   <section class="card">
-    <div class="card-title">주문 내역 관리 / Orders Management</div>
+    <div class="card-title">주문 관리 / Orders (Supabase)</div>
     <div class="card-sub">
-      order.html 에서 저장된 주문 내역(<code>orders</code>)을 사용합니다.<br>
-      ● <b>주문 엑셀 다운로드</b> : 아직 엑셀로 내보내지 않은 신규 주문만 엑셀 파일로 저장합니다.<br>
-      ● <b>전체 내역 출력</b> : 지금까지 저장된 모든 주문을 새 창에서 표로 확인합니다.<br>
-      ● <b>전체 내역 엑셀</b> : 지금까지 저장된 모든 주문을 엑셀 파일로 저장합니다.
+      Supabase DB의 <code>orders</code> 테이블에서 주문을 자동으로 불러옵니다.
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button type="button" class="btn-primary" onclick="exportOrdersToExcel()">
-        주문 엑셀 다운로드 / Download Orders Excel
-      </button>
-      <button type="button" class="btn-secondary" onclick="openOrdersWindow()">
-        전체 내역 출력 / View All Orders
-      </button>
-      <button type="button" class="btn-secondary" onclick="exportAllOrdersToExcel()">
-        전체 내역 엑셀 / Download All Orders Excel
-      </button>
-    </div>
-  </section>
 
-  <!-- 관리자용 주문 목록 (개별 출력) -->
-  <section class="card">
-    <div class="card-title">주문 목록 (관리자) / Admin Order List</div>
-    <div class="card-sub">
-      최신 주문이 위에 표시됩니다.<br>
-      ● <b>출력</b> 버튼을 누르면 주문서가 새 창으로 열리고 인쇄 창이 뜹니다.<br>
-      ● 출력이 완료되면 버튼 오른쪽에 <span style="color:#e74c3c;">출력완료</span> 표시가 나옵니다.<br>
-      ● <b>주문 목록 새로 고침 / Refresh</b>를 누르면
-         <b>이미 출력완료 된 주문은 목록에서 사라집니다.</b>
-    </div>
     <table>
       <thead>
         <tr>
-          <th style="width:40px;">No.</th>
-          <th style="width:140px;">Order ID</th>
-          <th style="width:160px;">DateTime</th>
-          <th style="width:80px;">Name</th>
+          <th style="width:50px;">No</th>
+          <th style="width:160px;">Order ID</th>
+          <th style="width:160px;">Date/Time</th>
+          <th style="width:120px;">Name</th>
           <th>Items</th>
-          <th style="width:120px;" class="text-center">출력</th>
+          <th style="width:120px;" class="text-center">출력(Print)</th>
         </tr>
       </thead>
-      <tbody id="adminOrderListBody"></tbody>
+      <tbody id="supabaseOrderListBody"></tbody>
     </table>
-    <div style="text-align:right;margin-top:8px;">
-      <button type="button" class="btn-secondary" onclick="renderAdminOrderList()">
-        주문 목록 새로 고침 / Refresh
-      </button>
+
+    <div style="text-align:right; margin-top:10px;">
+      <button type="button" class="btn-secondary" onclick="loadSupabaseOrders()">주문 목록 새로고침</button>
     </div>
   </section>
-</main>
+<!-- ============================= -->
+<!-- ① Supabase 주문 관리 코드 -->
+<!-- ============================= -->
+<script type="module">
+import { supabase } from "./js/supabaseClient.js";
 
-<script>
-  /* ===========================
-     기본 데이터 정의
-  ============================ */
-  const defaultCategories = [
-    { id:"laptop",  name:"노트북" },
-    { id:"desktop", name:"데스크탑" },
-    { id:"monitor", name:"모니터" },
-    { id:"cat4",    name:"건강식품" }
-  ];
+function fmt(n){ return Number(n||0).toLocaleString("ko-KR") + "원"; }
+function formatDate(t){
+  if(!t) return "-";
+  const d = new Date(t);
+  if(isNaN(d.getTime())) return "-";
+  return d.toLocaleString("ko-KR");
+}
 
-  const defaultProducts = [
-    {
-      id:"p1",
-      name:"게이밍 노트북 A (i7 · 16GB · 512GB)",
-      categoryId:"laptop",
-      priceOriginal:1490000,
-      priceSale:1290000,
-      imageUrl:"",
-      desc:"15.6인치 · RTX 그래픽 · 무료배송 / 15.6\" · RTX GPU · Free Shipping",
-      detailDesc:"",
-      detailImageUrl:""
-    },
-    {
-      id:"p2",
-      name:"사무용 노트북 B (i5 · 8GB · 256GB)",
-      categoryId:"laptop",
-      priceOriginal:890000,
-      priceSale:790000,
-      imageUrl:"",
-      desc:"가벼운 무게 · 사무/온라인 수업용 / Light weight · Office & Online class",
-      detailDesc:"",
-      detailImageUrl:""
-    },
-    {
-      id:"p3",
-      name:"게이밍 데스크탑 C (R7 · 16GB · 1TB)",
-      categoryId:"desktop",
-      priceOriginal:1790000,
-      priceSale:1590000,
-      imageUrl:"",
-      desc:"RTX 그래픽 · RGB 케이스 / RTX GPU · RGB Case",
-      detailDesc:"",
-      detailImageUrl:""
-    },
-    {
-      id:"p4",
-      name:"27인치 모니터 D (144Hz)",
-      categoryId:"monitor",
-      priceOriginal:350000,
-      priceSale:290000,
-      imageUrl:"",
-      desc:"144Hz · IPS 패널 / 144Hz · IPS Panel",
-      detailDesc:"",
-      detailImageUrl:""
-    },
-    {
-      id:"p5",
-      name:"흑염소육골진액",
-      categoryId:"cat4",
-      priceOriginal:198000,
-      priceSale:55000,
-      imageUrl:"",
-      desc:"건강식품 예시",
-      detailDesc:"",
-      detailImageUrl:""
-    },
-    {
-      id:"p6",
-      name:"엘부민진액스틱",
-      categoryId:"cat4",
-      priceOriginal:70000,
-      priceSale:35000,
-      imageUrl:"",
-      desc:"건강식품 예시",
-      detailDesc:"",
-      detailImageUrl:""
-    }
-  ];
+/* 주문 리스트 불러오기 */
+async function loadSupabaseOrders(){
+  const tbody = document.getElementById("supabaseOrderListBody");
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:10px;">불러오는 중...</td></tr>`;
 
-  const defaultBanners = [
-    {
-      id:"b1",
-      active:true,
-      title:"11월 특가 노트북 세일 / Special Laptop Sale",
-      subtitle:"인기 노트북 특판가 · 무료배송 / Popular laptops · Special price · Free shipping",
-      imageUrl:""
-    }
-  ];
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending:false });
 
-  const defaultAccountConfig = {
-    bankName:"국민은행 KB Bank",
-    accountNumber:"000000-00-000000",
-    holder:"K-Shopping",
-    extra:"입금자명은 주문자명과 동일하게 부탁드립니다.\nPlease use the same name as the order when making the bank transfer.",
-    // ✅ 기본 고객센터 번호 추가
-    customerPhone:"010-8640-8732"
-  };
-
-  const defaultImageMap = {
-    p1:"https://picsum.photos/seed/p1/140/100",
-    p2:"https://picsum.photos/seed/p2/140/100",
-    p3:"https://picsum.photos/seed/p3/140/100",
-    p4:"https://picsum.photos/seed/p4/140/100",
-    p5:"https://picsum.photos/seed/p5/140/100",
-    p6:"https://picsum.photos/seed/p6/140/100"
-  };
-
-  let products = [];
-  let categories = [];
-  let banners = [];
-  let accountConfig = defaultAccountConfig;
-  let currentDetailEditId = null;
-
-  /* ===========================
-     공통 유틸
-  ============================ */
-  function isQuotaError(e){
-    return e && (
-      e.name === "QuotaExceededError" ||
-      e.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
-      e.code === 22 ||
-      e.code === 1014
-    );
+  if(error){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">불러오기 오류</td></tr>`;
+    return;
   }
 
-  // products 전용 저장 함수
-  function saveProductsToStorage(arr){
-    try{
-      const cleaned = arr.map(p => {
-        const { imageData, ...rest } = p || {};
-        return rest;
-      });
-      localStorage.setItem("products", JSON.stringify(cleaned));
-    }catch(e){
-      if(isQuotaError(e)){
-        alert(
-          "브라우저 저장공간(localStorage)이 거의 가득 찼습니다.\n\n" +
-          "이미지 파일(base64)은 저장하지 않고, 이미지 URL만 사용하도록 구성되어 있습니다.\n" +
-          "상품 수를 줄이거나, 브라우저의 사이트 데이터(localStorage)를 정리한 뒤 다시 시도해 주세요."
-        );
-        console.warn("localStorage quota error while saving products:", e);
-      }else{
-        console.error(e);
-        alert("상품 정보를 저장하는 중 오류가 발생했습니다.\n(콘솔을 확인해 주세요)");
-      }
-    }
+  if(!data || data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#777;">주문 없음</td></tr>`;
+    return;
   }
 
-  function normalizeProduct(raw) {
-    if (!raw) raw = {};
-    return {
-      id: raw.id || ("p" + Date.now() + Math.random().toString(16).slice(2)),
-      name: raw.name || "",
-      categoryId: raw.categoryId || (defaultCategories[0] && defaultCategories[0].id) || "",
-      priceOriginal: Number(raw.priceOriginal) || 0,
-      priceSale: Number(raw.priceSale) || 0,
-      imageUrl: raw.imageUrl || "",
-      desc: raw.desc || "",
-      detailDesc: raw.detailDesc || "",
-      detailImageUrl: raw.detailImageUrl || ""
-    };
-  }
-
-  function getThumbUrl(p) {
-    if (p.imageUrl && p.imageUrl.trim() !== "") return p.imageUrl.trim();
-    return defaultImageMap[p.id] || "https://picsum.photos/seed/kshopping/140/100";
-  }
-
-  /* ===========================
-     데이터 로드
-  ============================ */
-  function loadProducts() {
-    try {
-      const saved = localStorage.getItem("products");
-      if (saved) {
-        const arr = JSON.parse(saved);
-        if (Array.isArray(arr) && arr.length) {
-          products = arr.map(normalizeProduct);
-          return;
-        }
-      }
-    } catch (e) {
-      console.warn("loadProducts 오류:", e);
-    }
-    products = defaultProducts.map(normalizeProduct);
-  }
-
-  function loadCategories() {
-    try {
-      const saved = localStorage.getItem("categories");
-      if (saved) {
-        const arr = JSON.parse(saved);
-        if (Array.isArray(arr) && arr.length) {
-          categories = arr;
-          return;
-        }
-      }
-    } catch(e){}
-    categories = defaultCategories;
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }
-
-  function loadBanners() {
-    try {
-      const savedRaw = localStorage.getItem("banners");
-      if (savedRaw) {
-        if (savedRaw.length < 1000000) {
-          const arr = JSON.parse(savedRaw);
-          if (Array.isArray(arr) && arr.length) {
-            banners = arr.map(b => ({
-              id: b.id || ("b"+Date.now()),
-              active: b.active !== false,
-              title: b.title || "",
-              subtitle: b.subtitle || "",
-              imageUrl: b.imageUrl || ""
-            }));
-            return;
-          }
-        } else {
-          console.warn("banners in localStorage too big, reset.");
-          localStorage.removeItem("banners");
-        }
-      }
-    } catch(e){}
-    banners = defaultBanners;
-    try { localStorage.setItem("banners", JSON.stringify(banners)); } catch(e){}
-  }
-
-  function loadAccountConfig() {
-    try {
-      const saved = localStorage.getItem("accountConfig");
-      if (saved) {
-        const obj = JSON.parse(saved);
-        accountConfig = Object.assign({}, defaultAccountConfig, obj || {});
-        return;
-      }
-    } catch(e){}
-    accountConfig = defaultAccountConfig;
-    localStorage.setItem("accountConfig", JSON.stringify(accountConfig));
-  }
-
-  /* ===========================
-     상품 테이블 렌더링
-  ============================ */
-  function renderProductsTable() {
-    const tbody = document.getElementById("productTableBody");
-    tbody.innerHTML = "";
-
-    products.forEach((p, idx) => {
-      const tr = document.createElement("tr");
-      tr.dataset.pid = p.id;
-
-      tr.innerHTML = `
+  let rows = "";
+  data.forEach((o, idx)=>{
+    const itemText = o.items.map(it=>`${it.name} x${it.qty}`).join("; ");
+    rows += `
+      <tr>
+        <td class="text-center">${idx+1}</td>
+        <td>${o.id}</td>
+        <td>${formatDate(o.created_at)}</td>
+        <td>${o.name}</td>
+        <td>${itemText}</td>
         <td class="text-center">
-          ${idx + 1}
-          <input type="hidden" class="prod-id" value="${p.id}" />
+          <button class="btn-small" onclick="printOrder('${o.id}')">출력</button>
         </td>
-        <td class="text-center">
-          <img class="img-thumb" src="${getThumbUrl(p)}" alt="${p.name}" />
-        </td>
-        <td><input type="text" class="prod-name" value="${p.name}" /></td>
-        <td><select class="prod-category"></select></td>
-        <td><input type="number" class="prod-original" value="${p.priceOriginal || 0}" /></td>
-        <td><input type="number" class="prod-sale" value="${p.priceSale || 0}" /></td>
-        <td><input type="text" class="prod-image-url" value="${p.imageUrl || ""}" /></td>
-        <td class="text-center">
-          <button type="button" class="btn-small btn-detail-edit">편집</button>
-        </td>
-        <td>
-          <input type="file" class="prod-image-file" accept="image/*" />
-          <div class="small-hint">
-            여기서 선택한 파일은 <b>현재 화면 미리보기용</b>입니다.<br>
-            실제 저장/노출에는 위의 "목록용 이미지 URL" 값만 사용됩니다.
-          </div>
-        </td>
-        <td>
-          <div class="table-actions">
-            <button type="button" class="btn-small btn-row-save">수정</button>
-            <button type="button" class="btn-danger btn-row-delete">삭제</button>
-          </div>
-        </td>
-      `;
-      tbody.appendChild(tr);
+      </tr>
+    `;
+  });
 
-      const catSelect = tr.querySelector(".prod-category");
-      categories.forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat.id;
-        opt.textContent = cat.name;
-        if (cat.id === p.categoryId) opt.selected = true;
-        catSelect.appendChild(opt);
-      });
+  tbody.innerHTML = rows;
+}
 
-      const fileInput = tr.querySelector(".prod-image-file");
-      const urlInput  = tr.querySelector(".prod-image-url");
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const img = tr.querySelector(".img-thumb");
-        const objectUrl = URL.createObjectURL(file);
-        img.src = objectUrl;
-        if (urlInput) urlInput.value = "images/" + file.name;
-      });
+window.loadSupabaseOrders = loadSupabaseOrders;
 
-      tr.querySelector(".btn-row-save").addEventListener("click", () => {
-        saveSingleProductRow(tr);
-        alert("해당 상품 정보가 저장되었습니다.");
-      });
+/* 주문 출력 */
+window.printOrder = async function(orderId){
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
 
-      tr.querySelector(".btn-row-delete").addEventListener("click", () => {
-        if (!confirm("해당 상품을 삭제하시겠습니까?")) return;
-        products = products.filter(prod => prod.id !== p.id);
-        saveProductsToStorage(products);
-        renderProductsTable();
-      });
-
-      tr.querySelector(".btn-detail-edit").addEventListener("click", () => {
-        openDetailEditor(p.id);
-      });
-
-      tr.addEventListener("click", (ev) => {
-        const tag = ev.target.tagName.toLowerCase();
-        if (tag === "button" || tag === "input" || tag === "select") return;
-        openDetailEditor(p.id);
-      });
-    });
+  if(error || !data){
+    alert("주문을 불러올 수 없습니다.");
+    return;
   }
 
-  function saveSingleProductRow(tr) {
-    const pid = tr.dataset.pid;
-    const idx = products.findIndex(p => p.id === pid);
-    if (idx === -1) return;
+  const o = data;
+  const w = window.open("", "printOrder");
+  w.document.write(`
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Order Print</title>
+<style>
+  body{font-family:system-ui;padding:20px;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{border-bottom:1px solid #ddd;padding:6px;}
+  th{background:#eee;}
+  .text-right{text-align:right;}
+</style>
+</head><body>
 
-    const p = products[idx];
-    p.name          = tr.querySelector(".prod-name").value.trim();
-    p.categoryId    = tr.querySelector(".prod-category").value;
-    p.priceOriginal = Number(tr.querySelector(".prod-original").value) || 0;
-    p.priceSale     = Number(tr.querySelector(".prod-sale").value) || 0;
-    p.imageUrl      = tr.querySelector(".prod-image-url").value.trim();
+<h2>주문서 / Order Details</h2>
+<p><b>주문번호:</b> ${o.id}</p>
+<p><b>일시:</b> ${formatDate(o.created_at)}</p>
+<p><b>이름:</b> ${o.name}</p>
+<p><b>연락처:</b> ${o.phone}</p>
+<p><b>주소:</b> ${o.address}</p>
+${o.memo ? `<p><b>요청사항:</b> ${o.memo}</p>` : ""}
 
-    products[idx] = normalizeProduct(p);
-    saveProductsToStorage(products);
-  }
+<h3>주문 상품</h3>
+<table>
+<thead><tr>
+  <th>상품명</th><th class="text-right">수량</th>
+  <th class="text-right">단가</th><th class="text-right">금액</th>
+</tr></thead>
+<tbody>
+${o.items.map(it=>{
+  const price = it.priceSale || it.price;
+  const line = price * it.qty;
+  return `
+<tr>
+  <td>${it.name}</td>
+  <td class="text-right">${it.qty}</td>
+  <td class="text-right">${fmt(price)}</td>
+  <td class="text-right">${fmt(line)}</td>
+</tr>`;
+}).join("")}
+</tbody></table>
 
-  function saveAllProducts() {
-    const tbody = document.getElementById("productTableBody");
-    if (!tbody) return;
-    const rows = tbody.querySelectorAll("tr");
-    const newProducts = [];
+<p style="margin-top:12px;">
+<b>총 수량:</b> ${o.total_qty}<br>
+<b>상품 합계:</b> ${fmt(o.subtotal)}<br>
+<b>총 결제 금액:</b> ${fmt(o.total)}
+</p>
 
-    const getVal = (tr, selector, def="") => {
-      const el = tr.querySelector(selector);
-      if (!el) return def;
-      return (el.value ?? "").toString();
-    };
+<script>window.print();</script>
+</body></html>
+  `);
+  w.document.close();
+};
 
-    rows.forEach(tr => {
-      const hiddenIdInput = tr.querySelector(".prod-id");
-      let pid =
-        (hiddenIdInput && hiddenIdInput.value.trim()) ||
-        (tr.dataset.pid || "");
+document.addEventListener("DOMContentLoaded", loadSupabaseOrders);
+</script>
 
-      if (!pid) {
-        pid = "p" + Date.now() + Math.random().toString(16).slice(2);
-      }
+<!-- ============================= -->
+<!-- ② Supabase 카테고리 관리 -->
+<!-- ============================= -->
+<script type="module">
+import { supabase } from "./js/supabaseClient.js";
 
-      const old = (Array.isArray(products) ? products : []).find(p => p.id === pid) || {};
+window.categories = [];
 
-      const merged = normalizeProduct({
-        id: pid,
-        name: getVal(tr, ".prod-name", old.name || "").trim(),
-        categoryId: getVal(tr, ".prod-category", old.categoryId || "laptop"),
-        priceOriginal: Number(getVal(tr, ".prod-original", old.priceOriginal || 0)) || 0,
-        priceSale: Number(getVal(tr, ".prod-sale", old.priceSale || 0)) || 0,
-        imageUrl: getVal(tr, ".prod-image-url", old.imageUrl || "").trim(),
-        desc: old.desc || "",
-        detailDesc: old.detailDesc || "",
-        detailImageUrl: old.detailImageUrl || ""
-      });
+/* DB 카테고리 불러오기 */
+async function loadCategoriesFromDB() {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("id", { ascending:true });
 
-      newProducts.push(merged);
-    });
-
-    products = newProducts;
-    saveProductsToStorage(products);
-    alert("모든 상품 정보가 저장되었습니다.");
-    renderProductsTable();
-  }
-
-  function addProductRow() {
-    const newId = "p" + Date.now();
-    products.push(normalizeProduct({
-      id:newId,
-      name:"새 상품",
-      categoryId: categories[0]?.id || "laptop",
-      priceOriginal:0,
-      priceSale:0,
-      imageUrl:"",
-      desc:"",
-      detailDesc:"",
-      detailImageUrl:""
-    }));
-    saveProductsToStorage(products);
-    renderProductsTable();
-  }
-
-  /* ===========================
-     상세 설명 + 상세이미지 편집
-  ============================ */
-  function openDetailEditor(productId) {
-    const p = products.find(prod => prod.id === productId);
-    if (!p) return;
-    currentDetailEditId = productId;
-
-    document.getElementById("detailSelectedName").textContent =
-      `${p.id} / ${p.name}`;
-    document.getElementById("detailEditor").value = p.detailDesc || "";
-    document.getElementById("detailImgUrlInput").value = p.detailImageUrl || "";
-    const fileInput = document.getElementById("detailImgFileInput");
-    if (fileInput) fileInput.value = "";
-
-    document.getElementById("detailEditorCard").scrollIntoView({behavior:"smooth"});
-  }
-
-  function clearDetailEditor() {
-    document.getElementById("detailEditor").value = "";
-    document.getElementById("detailImgUrlInput").value = "";
-  }
-
-  function saveDetailDescription() {
-    if (!currentDetailEditId) {
-      alert("먼저 상품 목록에서 편집할 상품을 선택해 주세요.");
-      return;
-    }
-    const text = document.getElementById("detailEditor").value;
-    const imgUrl = document.getElementById("detailImgUrlInput").value.trim();
-    const idx = products.findIndex(p => p.id === currentDetailEditId);
-    if (idx === -1) {
-      alert("선택된 상품을 찾을 수 없습니다.");
-      return;
-    }
-    products[idx].detailDesc = text;
-    products[idx].detailImageUrl = imgUrl;
-    products[idx] = normalizeProduct(products[idx]);
-    saveProductsToStorage(products);
-    alert("상세설명과 상세이미지 정보가 저장되었습니다.");
-  }
-
-  /* ===========================
-     카테고리
-  ============================ */
-  function renderCategoryTable() {
-    const tbody = document.getElementById("categoryTableBody");
-    tbody.innerHTML = "";
-    categories.forEach(cat => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input type="text" class="cat-id" value="${cat.id}" /></td>
-        <td><input type="text" class="cat-name" value="${cat.name}" /></td>
-        <td class="text-center">
-          <button type="button" class="btn-danger btn-cat-del">삭제</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-
-      tr.querySelector(".btn-cat-del").addEventListener("click", () => {
-        if (!confirm("해당 카테고리를 삭제하시겠습니까?\n(상품의 categoryId 는 직접 수정해야 합니다.)")) return;
-        categories = categories.filter(c => c !== cat);
-        renderCategoryTable();
-      });
-    });
-  }
-
-  function addCategoryRow() {
-    categories.push({ id:"", name:"새 카테고리" });
-    renderCategoryTable();
-  }
-
-  function saveCategories() {
-    const tbody = document.getElementById("categoryTableBody");
-    const rows = tbody.querySelectorAll("tr");
-    const arr = [];
-    rows.forEach(tr => {
-      const id = tr.querySelector(".cat-id").value.trim();
-      const name = tr.querySelector(".cat-name").value.trim();
-      if (!id || !name) return;
-      arr.push({ id, name });
-    });
-    categories = arr;
-    localStorage.setItem("categories", JSON.stringify(categories));
-    alert("카테고리가 저장되었습니다. (상품 카테고리 선택에도 바로 반영됩니다.)");
-    renderProductsTable();
-  }
-
-  /* ===========================
-     배너
-  ============================ */
-  function renderBannerTable() {
-    const tbody = document.getElementById("bannerTableBody");
-    tbody.innerHTML = "";
-    banners.forEach(b => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="text-center">
-          <input type="checkbox" class="banner-active" ${b.active !== false ? "checked" : ""} />
-        </td>
-        <td><input type="text" class="banner-title" value="${b.title || ""}" /></td>
-        <td><input type="text" class="banner-subtitle" value="${b.subtitle || ""}" /></td>
-        <td>
-          <input type="text" class="banner-img-url"
-                 placeholder="예: images/banner1.png"
-                 value="${b.imageUrl || ""}" />
-          <div class="small-hint">직접 입력하거나 아래에서 파일 선택하세요.</div>
-        </td>
-        <td>
-          <input type="file" class="banner-img-file" accept="image/*" />
-          <div class="small-hint">파일 선택 시 위 URL에 자동으로 <code>images/파일명</code>이 입력됩니다.</div>
-        </td>
-        <td class="text-center">
-          <button type="button" class="btn-danger btn-banner-del">삭제</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-
-      const fileInput = tr.querySelector(".banner-img-file");
-      const urlInput  = tr.querySelector(".banner-img-url");
-
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        urlInput.value = "images/" + file.name;
-      });
-
-      tr.querySelector(".btn-banner-del").addEventListener("click", () => {
-        banners = banners.filter(x => x !== b);
-        renderBannerTable();
-      });
-    });
-  }
-
-  function addBannerRow() {
-    banners.push({
-      id:"b"+Date.now(),
-      active:true,
-      title:"",
-      subtitle:"",
-      imageUrl:""
-    });
-    renderBannerTable();
-  }
-
-  function saveBanners() {
-    const tbody = document.getElementById("bannerTableBody");
-    const rows = tbody.querySelectorAll("tr");
-    const arr = [];
-
-    rows.forEach((tr, idx) => {
-      arr.push({
-        id:"b"+idx+"_"+Date.now(),
-        active: tr.querySelector(".banner-active").checked,
-        title: (tr.querySelector(".banner-title").value || "").trim(),
-        subtitle: (tr.querySelector(".banner-subtitle").value || "").trim(),
-        imageUrl: (tr.querySelector(".banner-img-url").value || "").trim()
-      });
-    });
-
-    banners = arr;
-    try {
-      localStorage.setItem("banners", JSON.stringify(banners));
-      alert("배너 설정이 저장되었습니다.");
-    } catch (e) {
-      alert(
-        "배너를 저장하는 중 오류가 발생했습니다.\n(localStorage 용량 초과 등)\n\n" +
-        "브라우저의 사이트 데이터(localStorage)를 정리한 뒤 다시 시도해 주세요."
-      );
-      console.error(e);
-    }
-  }
-
-  /* ===========================
-     계좌 정보
-  ============================ */
-  function renderAccountForm() {
-    document.getElementById("accBank").value   = accountConfig.bankName || "";
-    document.getElementById("accNumber").value = accountConfig.accountNumber || "";
-    document.getElementById("accHolder").value = accountConfig.holder || "";
-    document.getElementById("accCustomerPhone").value = accountConfig.customerPhone || "";
-    document.getElementById("accExtra").value  = accountConfig.extra || "";
-  }
-
-  function saveAccountConfig() {
-    accountConfig = {
-      bankName: document.getElementById("accBank").value.trim(),
-      accountNumber: document.getElementById("accNumber").value.trim(),
-      holder: document.getElementById("accHolder").value.trim(),
-      customerPhone: document.getElementById("accCustomerPhone").value.trim(),
-      extra: document.getElementById("accExtra").value
-    };
-    localStorage.setItem("accountConfig", JSON.stringify(accountConfig));
-    alert("계좌 정보가 저장되었습니다.");
-  }
-
-  /* ===========================
-     주문 데이터 + 품목 추출
-  ============================ */
-  function loadOrdersFromStorage() {
-    let orders = [];
-    try {
-      const saved = localStorage.getItem("orders");
-      if (saved) orders = JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-      orders = [];
-    }
-    if (!Array.isArray(orders)) orders = [];
-    return orders;
-  }
-
-  function formatDateTimeLocal(value) {
-    if (!value) return "";
-    const d = new Date(value);
-    if (isNaN(d.getTime())) return "";
-    const pad = n => String(n).padStart(2,"0");
-    return (
-      d.getFullYear() + "-" +
-      pad(d.getMonth()+1) + "-" +
-      pad(d.getDate()) + " " +
-      pad(d.getHours()) + ":" +
-      pad(d.getMinutes()) + ":" +
-      pad(d.getSeconds())
-    );
-  }
-
-  function getOrderItemsArray(o) {
-    if (!o || typeof o !== "object") return [];
-    const keys = [
-      "items",
-      "cartItems",
-      "orderItems",
-      "products",
-      "cart",
-      "lines"
-    ];
-    for (const k of keys) {
-      const v = o[k];
-      if (Array.isArray(v) && v.length) return v;
-    }
-    if (o.itemName || o.productName || o.title) {
-      return [{
-        name: o.itemName || o.productName || o.title,
-        qty:  o.qty || o.quantity || o.count || o.totalQty || 1,
-        priceSale: o.unitPrice || o.price || o.priceSale || 0
-      }];
-    }
+  if (error) {
+    alert("카테고리 로딩 오류");
+    console.error(error);
     return [];
   }
 
-  function getOrderItemsText(o) {
-    const arr = getOrderItemsArray(o);
-    if (arr.length) {
-      return arr.map(it => {
-        const name = it.name || it.productName || it.title || "-";
-        const qty  = it.qty ?? it.quantity ?? it.count ?? 1;
-        return `${name} x${qty}`;
-      }).join("; ");
-    }
-    if (o.itemsText || o.itemsSummary || o.itemSummary) {
-      return o.itemsText || o.itemsSummary || o.itemSummary;
-    }
-    return "";
-  }
+  return data || [];
+}
 
-  /* ===========================
-     주문 엑셀 출력 (신규 주문만)
-  ============================ */
-  function exportOrdersToExcel() {
-    const allOrders = loadOrdersFromStorage();
-    if (!allOrders.length) {
-      alert("저장된 주문 내역이 없습니다.");
-      return;
-    }
+/* 카테고리 테이블 렌더링 */
+async function renderCategoryTableDB(){
+  window.categories = await loadCategoriesFromDB();
 
-    const targets = allOrders.filter(o => !o.exported);
-    if (!targets.length) {
-      alert("엑셀로 내보낼 신규 주문이 없습니다.");
-      return;
-    }
+  const tbody = document.getElementById("categoryTableBody");
+  tbody.innerHTML = "";
 
-    const rows = targets.map(order => {
-      const o = order || {};
-
-      const methodLabel =
-        o.method === "call"
-          ? "전화 요청 / Phone"
-          : "폼 입력 / Form";
-
-      let name = "";
-      let phone = "";
-      let address = "";
-      let request = "";
-
-      if (o.customer) {
-        name    = o.customer.name    || "";
-        phone   = o.customer.phone   || "";
-        address = o.customer.address || "";
-        request = o.customer.memo    || "";
-      } else if (o.callRequest || o.callSupport) {
-        const c = o.callRequest || o.callSupport;
-        phone = c.phone || "";
-        const parts = [];
-        if (c.time) parts.push("시간:" + c.time);
-        if (c.memo) parts.push("메모:" + c.memo);
-        request = parts.join(" / ");
-      } else {
-        name    = o.name    || "";
-        phone   = o.phone   || "";
-        address = o.address || "";
-        request = o.memo || o.request || "";
-      }
-
-      const itemsArr = getOrderItemsArray(o);
-      const itemsStr = getOrderItemsText(o);
-
-      let totalQty = (typeof o.totalQty === "number") ? o.totalQty : 0;
-      let subtotal = (typeof o.subtotal === "number") ? o.subtotal : 0;
-      const shipping = (typeof o.shipping === "number") ? o.shipping : 0;
-
-      if ((totalQty === 0 || subtotal === 0) && itemsArr.length) {
-        totalQty = 0;
-        subtotal = 0;
-        itemsArr.forEach(it => {
-          const q = Number(it.qty ?? it.quantity ?? it.count ?? 1);
-          const p = Number(it.priceSale ?? it.price ?? it.unitPrice ?? 0);
-          totalQty += q;
-          subtotal += q * p;
-        });
-      }
-
-      const totalAmount = (typeof o.totalAmount === "number")
-        ? o.totalAmount
-        : subtotal + shipping;
-
-      const dateStr = formatDateTimeLocal(o.date || o.createdAt || o.orderTime);
-
-      return {
-        OrderID:     o.id || "",
-        DateTime:    dateStr,
-        Method:      methodLabel,
-        Name:        name,
-        Phone:       phone,
-        Address:     address,
-        Request:     request,
-        Items:       itemsStr,
-        TotalQty:    totalQty,
-        Subtotal:    subtotal,
-        Shipping:    shipping,
-        TotalAmount: totalAmount
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Orders");
-
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, "0");
-    const d = String(now.getDate()).padStart(2, "0");
-    const filename = `kshopping_orders_${y}-${m}-${d}.xlsx`;
-    XLSX.writeFile(wb, filename);
-
-    const updated = allOrders.map(o => {
-      if (!o.exported) return { ...o, exported: true };
-      return o;
-    });
-    localStorage.setItem("orders", JSON.stringify(updated));
-
-    alert(`새 주문 ${targets.length}건을 엑셀로 저장했습니다.\n(다음 출력부터는 이번에 출력한 주문은 제외됩니다.)`);
-  }
-
-  /* ===========================
-     전체 주문 엑셀 출력 (모든 주문)
-  ============================ */
-  function exportAllOrdersToExcel() {
-    const allOrders = loadOrdersFromStorage();
-    if (!allOrders.length) {
-      alert("저장된 주문 내역이 없습니다.");
-      return;
-    }
-
-    const rows = allOrders.map(order => {
-      const o = order || {};
-
-      const methodLabel =
-        o.method === "call"
-          ? "전화 요청 / Phone"
-          : "폼 입력 / Form";
-
-      let name = "";
-      let phone = "";
-      let address = "";
-      let request = "";
-
-      if (o.customer) {
-        name    = o.customer.name    || "";
-        phone   = o.customer.phone   || "";
-        address = o.customer.address || "";
-        request = o.customer.memo    || "";
-      } else if (o.callRequest || o.callSupport) {
-        const c = o.callRequest || o.callSupport;
-        phone = c.phone || "";
-        const parts = [];
-        if (c.time) parts.push("시간:" + c.time);
-        if (c.memo) parts.push("메모:" + c.memo);
-        request = parts.join(" / ");
-      } else {
-        name    = o.name    || "";
-        phone   = o.phone   || "";
-        address = o.address || "";
-        request = o.memo || o.request || "";
-      }
-
-      const itemsArr = getOrderItemsArray(o);
-      const itemsStr = getOrderItemsText(o);
-
-      let totalQty = (typeof o.totalQty === "number") ? o.totalQty : 0;
-      let subtotal = (typeof o.subtotal === "number") ? o.subtotal : 0;
-      const shipping = (typeof o.shipping === "number") ? o.shipping : 0;
-
-      if ((totalQty === 0 || subtotal === 0) && itemsArr.length) {
-        totalQty = 0;
-        subtotal = 0;
-        itemsArr.forEach(it => {
-          const q = Number(it.qty ?? it.quantity ?? it.count ?? 1);
-          const p = Number(it.priceSale ?? it.price ?? it.unitPrice ?? 0);
-          totalQty += q;
-          subtotal += q * p;
-        });
-      }
-
-      const totalAmount = (typeof o.totalAmount === "number")
-        ? o.totalAmount
-        : subtotal + shipping;
-
-      const dateStr = formatDateTimeLocal(o.date || o.createdAt || o.orderTime);
-
-      return {
-        OrderID:     o.id || "",
-        DateTime:    dateStr,
-        Method:      methodLabel,
-        Name:        name,
-        Phone:       phone,
-        Address:     address,
-        Request:     request,
-        Items:       itemsStr,
-        TotalQty:    totalQty,
-        Subtotal:    subtotal,
-        Shipping:    shipping,
-        TotalAmount: totalAmount
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "AllOrders");
-
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, "0");
-    const d = String(now.getDate()).padStart(2, "0");
-    const filename = `kshopping_orders_all_${y}-${m}-${d}.xlsx`;
-    XLSX.writeFile(wb, filename);
-
-    alert(`전체 주문 ${allOrders.length}건을 엑셀로 저장했습니다.`);
-  }
-
-  /* ===========================
-     전체 주문 내역 새 창에서 보기
-  ============================ */
-  function openOrdersWindow() {
-    const orders = loadOrdersFromStorage();
-    if (!orders.length) {
-      alert("저장된 주문 내역이 없습니다.");
-      return;
-    }
-
-    const win = window.open("", "kshopping_all_orders");
-    if (!win) {
-      alert("팝업이 차단되었습니다. 브라우저 팝업 허용 후 다시 시도해 주세요.");
-      return;
-    }
-
-    let html = `
-      <!DOCTYPE html>
-      <html lang="ko">
-      <head>
-        <meta charset="UTF-8">
-        <title>K-Shopping 주문 전체 내역</title>
-        <style>
-          body { font-family: system-ui, sans-serif; font-size: 12px; margin:16px; }
-          h1 { font-size:18px; margin-bottom:10px; }
-          table { width:100%; border-collapse:collapse; }
-          th, td {
-            border:1px solid #ddd;
-            padding:4px 6px;
-            text-align:left;
-            vertical-align:top;
-          }
-          th { background:#f5f5f5; }
-          .text-right { text-align:right; }
-        </style>
-      </head>
-      <body>
-        <h1>K-Shopping 주문 전체 내역 / All Orders</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Order ID</th>
-              <th>DateTime</th>
-              <th>Method</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Address</th>
-              <th>Request</th>
-              <th>Items</th>
-              <th class="text-right">Total Amount</th>
-              <th>Exported</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    orders.forEach((o, idx) => {
-      const methodLabel =
-        o.method === "call"
-          ? "전화요청 / Phone"
-          : "폼입력 / Form";
-
-      let name = "";
-      let phone = "";
-      let address = "";
-      let request = "";
-
-      if (o.customer) {
-        name    = o.customer.name    || "";
-        phone   = o.customer.phone   || "";
-        address = o.customer.address || "";
-        request = o.customer.memo    || "";
-      } else if (o.callRequest || o.callSupport) {
-        const c = o.callRequest || o.callSupport;
-        phone = c.phone || "";
-        const parts = [];
-        if (c.time) parts.push("시간:" + c.time);
-        if (c.memo) parts.push("메모:" + c.memo);
-        request = parts.join(" / ");
-      } else {
-        name    = o.name    || "";
-        phone   = o.phone   || "";
-        address = o.address || "";
-        request = o.memo || o.request || "";
-      }
-
-      const itemsStr = getOrderItemsText(o);
-      const totalAmount = (typeof o.totalAmount === "number") ? o.totalAmount : 0;
-      const dateStr = formatDateTimeLocal(o.date || o.createdAt || o.orderTime);
-
-      html += `
-        <tr>
-          <td>${idx + 1}</td>
-          <td>${o.id || ""}</td>
-          <td>${dateStr}</td>
-          <td>${methodLabel}</td>
-          <td>${name}</td>
-          <td>${phone}</td>
-          <td>${address}</td>
-          <td>${request}</td>
-          <td>${itemsStr}</td>
-          <td class="text-right">${totalAmount.toLocaleString("ko-KR")}원</td>
-          <td>${o.exported ? "Y" : ""}</td>
-        </tr>
-      `;
-    });
-
-    html += `
-          </tbody>
-        </table>
-      </body>
-      </html>
-    `;
-
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-  }
-
-  /* ===========================
-     관리자용 주문 목록 + 개별 출력
-     - 출력 버튼 클릭 시: 새 창 + window.print()
-     - 출력 후: orders 데이터에 printed:true 저장
-     - 같은 행에 "출력완료" 표시
-     - 새로고침 시 printed 된 주문은 목록에서 제외
-  ============================ */
-  function renderAdminOrderList() {
-    const tbody = document.getElementById("adminOrderListBody");
-    if (!tbody) return;
-
-    const allOrders = loadOrdersFromStorage();
-    const orders = allOrders.filter(o => !o.printed);  // 출력완료 제외
-
-    tbody.innerHTML = "";
-
-    if (!orders.length) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="6" style="text-align:center;color:#777;">출력할 주문이 없습니다.</td>`;
-      tbody.appendChild(tr);
-      return;
-    }
-
-    const list = [...orders].reverse(); // 최신 주문이 위로
-    list.forEach((o, idx) => {
-      const tr = document.createElement("tr");
-      const dateStr = formatDateTimeLocal(o.date || o.createdAt || o.orderTime);
-      const name = (o.customer && o.customer.name) || o.name || "";
-      const items = getOrderItemsText(o);
-
-      tr.innerHTML = `
-        <td class="text-center">${idx + 1}</td>
-        <td>${o.id || ""}</td>
-        <td>${dateStr}</td>
-        <td>${name}</td>
-        <td>${items}</td>
-        <td class="text-center">
-          <button type="button" class="btn-small" onclick="openOrderPrint('${o.id || ""}', this)">출력</button>
-          <span class="print-status" style="color:#e74c3c;font-size:11px;margin-left:4px;"></span>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function openOrderPrint(orderId, btnEl) {
-    let orders = loadOrdersFromStorage();
-    const idx = orders.findIndex(o => o.id === orderId);
-    if (idx === -1) {
-      alert("해당 주문을 찾을 수 없습니다.");
-      return;
-    }
-    const order = orders[idx];
-
-    const win = window.open("", "kshopping_order_print_" + (order.id || ""));
-    if (!win) {
-      alert("팝업이 차단되었습니다. 팝업 허용 후 다시 시도해 주세요.");
-      return;
-    }
-
-    const fmtPrice = (n) => Number(n || 0).toLocaleString("ko-KR") + "원";
-    const dateStr = formatDateTimeLocal(order.date || order.createdAt || order.orderTime);
-    const methodLabel = order.method === "call"
-      ? "전화 주문 / Phone Order"
-      : "온라인 주문서 / Online Order Form";
-
-    let name = "", phone = "", address = "", memo = "";
-    if (order.customer) {
-      name = order.customer.name || "";
-      phone = order.customer.phone || "";
-      address = order.customer.address || "";
-      memo = order.customer.memo || "";
-    } else {
-      name = order.name || "";
-      phone = order.phone || "";
-      address = order.address || "";
-      memo = order.memo || order.request || "";
-    }
-
-    const itemsArr = getOrderItemsArray(order);
-    let rows = "";
-    let totalQty = 0;
-    let subtotal = 0;
-    itemsArr.forEach(it => {
-      const q = Number(it.qty ?? it.quantity ?? it.count ?? 1);
-      const p = Number(it.priceSale ?? it.price ?? it.unitPrice ?? 0);
-      const line = q * p;
-      totalQty += q;
-      subtotal += line;
-      const itemName = it.name || it.productName || it.title || "-";
-      rows += `
-        <tr>
-          <td>${itemName}</td>
-          <td class="text-right">${q}</td>
-          <td class="text-right">${fmtPrice(p)}</td>
-          <td class="text-right">${fmtPrice(line)}</td>
-        </tr>
-      `;
-    });
-
-    if (typeof order.totalQty === "number") totalQty = order.totalQty;
-    if (typeof order.subtotal === "number") subtotal = order.subtotal;
-    const shipping = typeof order.shipping === "number" ? order.shipping : 0;
-    let totalAmount = subtotal + shipping;
-    if (typeof order.totalAmount === "number") totalAmount = order.totalAmount;
-
-    const addrConfirm = address
-      ? `<div class="address-box">
-          아래 주소로 배송이 진행됩니다. 주소가 정확한지 다시 한 번 확인해 주세요.<br>
-          Your order will be shipped to the address below. Please make sure it is correct.
-          <b>${address}</b>
-        </div>`
-      : "";
-
-    win.document.open();
-    win.document.write(`
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>K-Shopping 주문 상세 / Order Details</title>
-  <style>
-    body { background:#f7f7f7; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#222; }
-    .card { background:#fff; max-width:900px; margin:20px auto; padding:16px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-    h1 { font-size:20px; margin-bottom:10px; }
-    h2 { font-size:16px; margin:16px 0 8px; }
-    p  { font-size:13px; line-height:1.6; margin:2px 0; }
-    table { width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; }
-    th,td { border-bottom:1px solid #eee; padding:4px 2px; text-align:left; }
-    th { background:#fafafa; }
-    .text-right { text-align:right; }
-    .address-box {
-      margin-top:10px; padding:10px 12px;
-      border-radius:8px; border:1px solid #ffd591; background:#fff7e6;
-      font-size:13px; line-height:1.5;
-    }
-    .address-box b { display:block; margin-top:4px; }
-    .btn-print {
-      display:inline-block; margin-top:12px; padding:8px 14px;
-      border-radius:999px; border:1px solid #333; background:#fff; cursor:pointer;
-      font-size:13px;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>주문 정보 / Order Details</h1>
-    <p>주문번호 / Order ID : <b>${order.id || ""}</b></p>
-    <p>주문 방식 / Method : <b>${methodLabel}</b></p>
-    <p>주문일시 / Date : ${dateStr}</p>
-    <br />
-    <p>이름 / Name : ${name || "-"}</p>
-    <p>연락처 / Phone : ${phone || "-"}</p>
-    <p>주소 / Address : ${address || "-"}</p>
-    <p>요청사항 / Request : ${memo || "-"}</p>
-    ${addrConfirm}
-    <h2>주문 상품 / Ordered Items</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>상품명 / Product</th>
-          <th class="text-right">수량 / Qty</th>
-          <th class="text-right">단가 / Price</th>
-          <th class="text-right">금액 / Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
-    <p style="margin-top:8px;">
-      총 수량 / Total Qty : <b>${totalQty}</b><br>
-      상품 합계 / Subtotal : <b>${fmtPrice(subtotal)}</b><br>
-      배송비 / Shipping : <b>${shipping === 0 ? "0원 (또는 무료)" : fmtPrice(shipping)}</b><br>
-      최종 결제 예정 금액 / Total Amount : <b>${fmtPrice(totalAmount)}</b>
-    </p>
-    <button class="btn-print" onclick="window.print()">인쇄 / Print</button>
-  </div>
-</body>
-</html>
-    `);
-    win.document.close();
-    win.focus();
-    win.print();
-
-    // 1) 주문에 printed 플래그 저장
-    orders[idx] = { ...order, printed:true };
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    // 2) 현재 행에 "출력완료" 표시
-    if (btnEl) {
-      const row = btnEl.closest("tr");
-      if (row) {
-        const span = row.querySelector(".print-status");
-        if (span) span.textContent = "출력완료";
-      }
-    }
-  }
-
-  /* ===========================
-     DOM 로드 시 초기화
-  ============================ */
-  document.addEventListener("DOMContentLoaded", () => {
-    loadCategories();
-    loadProducts();
-    loadBanners();
-    loadAccountConfig();
-
-    renderProductsTable();
-    renderCategoryTable();
-    renderBannerTable();
-    renderAccountForm();
-    renderAdminOrderList();   // ✅ 주문 목록 자동 로드
-
-    const detailFileInput = document.getElementById("detailImgFileInput");
-    if (detailFileInput) {
-      detailFileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const urlInput = document.getElementById("detailImgUrlInput");
-        if (urlInput) {
-          urlInput.value = "images/" + file.name;
-        }
-      });
-    }
+  window.categories.forEach((c)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="cat-id" value="${c.id}"></td>
+      <td><input class="cat-name" value="${c.name}"></td>
+      <td class="text-center">
+        <button class="btn-danger" onclick="deleteCategoryDB('${c.id}')">삭제</button>
+      </td>`;
+    tbody.appendChild(tr);
   });
+
+  renderProductsTable(); // 상품 카테고리도 갱신
+}
+
+window.addCategoryRow = function(){
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><input class="cat-id" value=""></td>
+    <td><input class="cat-name" value="새 카테고리"></td>
+    <td class="text-center"><button class="btn-danger" onclick="this.closest('tr').remove()">삭제</button></td>`;
+  document.getElementById("categoryTableBody").appendChild(tr);
+};
+
+/* 저장 */
+window.saveCategories = async function(){
+  const rows = document.querySelectorAll("#categoryTableBody tr");
+  const newArr = [];
+  rows.forEach(tr=>{
+    const id = tr.querySelector(".cat-id").value.trim();
+    const name = tr.querySelector(".cat-name").value.trim();
+    if(id && name) newArr.push({id,name});
+  });
+
+  await supabase.from("categories").delete().neq("id","");
+  const { error } = await supabase.from("categories").insert(newArr);
+
+  if(error){
+    alert("저장 실패 (중복 ID 확인)");
+    return;
+  }
+
+  alert("저장 완료!");
+  renderCategoryTableDB();
+};
+
+/* 삭제 */
+window.deleteCategoryDB = async function(id){
+  if(!confirm("삭제할까요?")) return;
+
+  await supabase.from("categories").delete().eq("id", id);
+  renderCategoryTableDB();
+};
+
+/* 초기 실행 */
+document.addEventListener("DOMContentLoaded", renderCategoryTableDB);
 </script>
-</body>
-</html>
+
+<!-- ============================= -->
+<!-- ③ 상품 / 배너 / 계좌 (localStorage) -->
+<!-- ============================= -->
+<script>
+let products = [];
+let banners = [];
+let accountConfig = {
+  bankName:"국민은행 KB Bank",
+  accountNumber:"000000-00-000000",
+  holder:"K-Shopping",
+  customerPhone:"010-8640-8732",
+  extra:"입금자명은 주문자명과 동일하게 부탁드립니다."
+};
+
+/* 상품 ======================== */
+function normalizeProduct(p){
+  return {
+    id: p.id || ("p"+Date.now()+Math.random()),
+    name: p.name || "",
+    categoryId: p.categoryId || "",
+    priceOriginal: Number(p.priceOriginal)||0,
+    priceSale: Number(p.priceSale)||0,
+    imageUrl: p.imageUrl || "",
+    detailDesc: p.detailDesc || "",
+    detailImageUrl: p.detailImageUrl || ""
+  };
+}
+
+function loadProducts(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("products"));
+    products = Array.isArray(saved) ? saved.map(normalizeProduct) : [];
+  }catch{ products = []; }
+}
+
+function saveProductsToStorage(arr){
+  localStorage.setItem("products", JSON.stringify(arr));
+}
+
+/* 상품 테이블 렌더링 */
+function renderProductsTable(){
+  const tbody = document.getElementById("productTableBody");
+  tbody.innerHTML = "";
+
+  products.forEach((p, idx)=>{
+    const tr = document.createElement("tr");
+    tr.dataset.id = p.id;
+
+    tr.innerHTML = `
+      <td class="text-center">${idx+1}</td>
+      <td><img class="img-thumb" src="${p.imageUrl || "https://picsum.photos/70/50"}"></td>
+      <td><input type="text" class="prod-name" value="${p.name}"></td>
+
+      <td><select class="prod-category"></select></td>
+
+      <td><input type="number" class="prod-original" value="${p.priceOriginal}"></td>
+      <td><input type="number" class="prod-sale" value="${p.priceSale}"></td>
+      <td><input type="text" class="prod-image-url" value="${p.imageUrl}"></td>
+
+      <td class="text-center">
+        <button class="btn-small" onclick="openDetailEditor('${p.id}')">편집</button>
+      </td>
+
+      <td><input type="file" class="prod-image-file"></td>
+
+      <td class="text-center">
+        <button class="btn-small" onclick="saveSingleProduct('${p.id}', this)">수정</button>
+        <button class="btn-danger" onclick="deleteProduct('${p.id}')">삭제</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+    /* 카테고리 채우기 */
+    const sel = tr.querySelector(".prod-category");
+    window.categories?.forEach(c=>{
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      if(c.id === p.categoryId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+
+    tr.querySelector(".prod-image-file").addEventListener("change", e=>{
+      const f = e.target.files[0];
+      if(f) tr.querySelector(".prod-image-url").value = "images/"+f.name;
+    });
+  });
+}
+
+/* 상품 저장/삭제 */
+function saveSingleProduct(pid, btn){
+  const tr = btn.closest("tr");
+  const idx = products.findIndex(p=>p.id===pid);
+  if(idx===-1) return;
+
+  const p = products[idx];
+  p.name = tr.querySelector(".prod-name").value.trim();
+  p.categoryId = tr.querySelector(".prod-category").value;
+  p.priceOriginal = Number(tr.querySelector(".prod-original").value)||0;
+  p.priceSale = Number(tr.querySelector(".prod-sale").value)||0;
+  p.imageUrl = tr.querySelector(".prod-image-url").value.trim();
+
+  products[idx] = normalizeProduct(p);
+  saveProductsToStorage(products);
+  alert("상품 저장됨");
+}
+
+function deleteProduct(pid){
+  if(!confirm("삭제?")) return;
+  products = products.filter(p=>p.id!==pid);
+  saveProductsToStorage(products);
+  renderProductsTable();
+}
+
+function addProductRow(){
+  const p = normalizeProduct({});
+  products.push(p);
+  saveProductsToStorage(products);
+  renderProductsTable();
+}
+
+function saveAllProducts(){
+  const arr=[];
+  document.querySelectorAll("#productTableBody tr").forEach(tr=>{
+    const pid = tr.dataset.id;
+    const p = products.find(x=>x.id===pid);
+    p.name = tr.querySelector(".prod-name").value.trim();
+    p.categoryId = tr.querySelector(".prod-category").value;
+    p.priceOriginal = Number(tr.querySelector(".prod-original").value)||0;
+    p.priceSale = Number(tr.querySelector(".prod-sale").value)||0;
+    p.imageUrl = tr.querySelector(".prod-image-url").value.trim();
+    arr.push(normalizeProduct(p));
+  });
+  products = arr;
+  saveProductsToStorage(products);
+  alert("전체 저장 완료");
+}
+
+/* 상세 설명 */
+let currentDetailId = null;
+function openDetailEditor(pid){
+  const p = products.find(x=>x.id===pid);
+  if(!p) return;
+  currentDetailId = pid;
+  document.getElementById("detailSelectedName").textContent = p.name;
+  document.getElementById("detailEditor").value = p.detailDesc || "";
+  document.getElementById("detailImgUrlInput").value = p.detailImageUrl || "";
+}
+
+function clearDetailEditor(){
+  document.getElementById("detailEditor").value = "";
+  document.getElementById("detailImgUrlInput").value = "";
+}
+
+function saveDetailDescription(){
+  if(!currentDetailId){
+    alert("상품을 먼저 선택하세요");
+    return;
+  }
+  const p = products.find(x=>x.id===currentDetailId);
+  p.detailDesc = document.getElementById("detailEditor").value;
+  p.detailImageUrl = document.getElementById("detailImgUrlInput").value.trim();
+  saveProductsToStorage(products);
+  alert("상세설명 저장됨");
+}
+
+/* 배너 ======================== */
+function loadBanners(){
+  try{
+    banners = JSON.parse(localStorage.getItem("banners")) || [];
+  }catch{ banners=[]; }
+}
+
+function renderBannerTable(){
+  const tbody = document.getElementById("bannerTableBody");
+  tbody.innerHTML = "";
+
+  banners.forEach((b,idx)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="text-center"><input type="checkbox" class="banner-active" ${b.active?"checked":""}></td>
+      <td><input class="banner-title" value="${b.title||""}"></td>
+      <td><input class="banner-subtitle" value="${b.subtitle||""}"></td>
+      <td><input class="banner-img-url" value="${b.imageUrl||""}"></td>
+      <td><input type="file" class="banner-img-file"></td>
+      <td class="text-center"><button class="btn-danger" onclick="deleteBanner(${idx})">삭제</button></td>
+    `;
+    tbody.appendChild(tr);
+
+    tr.querySelector(".banner-img-file").addEventListener("change", e=>{
+      const f = e.target.files[0];
+      if(f) tr.querySelector(".banner-img-url").value = "images/"+f.name;
+    });
+  });
+}
+
+function addBannerRow(){
+  banners.push({active:true,title:"",subtitle:"",imageUrl:""});
+  renderBannerTable();
+}
+
+function deleteBanner(idx){
+  banners.splice(idx,1);
+  renderBannerTable();
+}
+
+function saveBanners(){
+  const arr=[];
+  document.querySelectorAll("#bannerTableBody tr").forEach(tr=>{
+    arr.push({
+      active: tr.querySelector(".banner-active").checked,
+      title: tr.querySelector(".banner-title").value.trim(),
+      subtitle: tr.querySelector(".banner-subtitle").value.trim(),
+      imageUrl: tr.querySelector(".banner-img-url").value.trim()
+    });
+  });
+  banners = arr;
+  localStorage.setItem("banners", JSON.stringify(arr));
+  alert("배너 저장됨");
+}
+
+/* 계좌 ======================== */
+function loadAccountConfig(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("accountConfig"));
+    if(saved) accountConfig = saved;
+  }catch{}
+}
+
+function renderAccountForm(){
+  document.getElementById("accBank").value = accountConfig.bankName;
+  document.getElementById("accNumber").value = accountConfig.accountNumber;
+  document.getElementById("accHolder").value = accountConfig.holder;
+  document.getElementById("accCustomerPhone").value = accountConfig.customerPhone;
+  document.getElementById("accExtra").value = accountConfig.extra;
+}
+
+function saveAccountConfig(){
+  accountConfig = {
+    bankName: document.getElementById("accBank").value.trim(),
+    accountNumber: document.getElementById("accNumber").value.trim(),
+    holder: document.getElementById("accHolder").value.trim(),
+    customerPhone: document.getElementById("accCustomerPhone").value.trim(),
+    extra: document.getElementById("accExtra").value
+  };
+  localStorage.setItem("accountConfig", JSON.stringify(accountConfig));
+  alert("계좌 저장됨");
+}
+
+/* 초기 로딩 */
+document.addEventListener("DOMContentLoaded", ()=>{
+  loadProducts();
+  loadBanners();
+  loadAccountConfig();
+
+  renderProductsTable();
+  renderBannerTable();
+  renderAccountForm();
+});
+</script>

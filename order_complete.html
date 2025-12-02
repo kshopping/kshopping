@@ -38,14 +38,6 @@
     }
     .btn-row { text-align:center; }
 
-    #bankExtra {
-      white-space: pre-line;
-    }
-
-    .order-items-title {
-      margin-top:14px;
-    }
-
     .address-confirm-box {
       margin-top:8px;
       padding:10px 12px;
@@ -55,12 +47,9 @@
       font-size:13px;
       line-height:1.5;
     }
-    .address-confirm-box b {
-      display:block;
-      margin-top:4px;
-    }
-  
-/* === Header from index.html (Genie copy) === */
+    .address-confirm-box b { display:block; margin-top:4px; }
+
+    /* === Header === */
 .ks-header {
   position: sticky;
   top: 0;
@@ -107,14 +96,6 @@
   font-weight: 700;
 }
 
-.ks-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  overflow-x: auto;
-}
-
 .ks-actions {
   display: flex;
   align-items: center;
@@ -125,49 +106,25 @@
   background: transparent;
   font-size: 13px;
   cursor: pointer;
-  position: relative;
 }
-.ks-icon-btn .cart-label {
-  font-weight: 700;
-  color: #ff4d4f;
-}
+.ks-icon-btn .cart-label { color:#ff4d4f; font-weight:700; }
 
 .cart-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  background: #ff4d4f;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  width: 38px; height: 38px;
+  background: #ff4d4f; border-radius: 50%;
+  display: flex; justify-content:center; align-items:center;
+  cursor:pointer;
   position: relative;
-  transition: 0.15s;
 }
-.cart-icon-wrapper:hover {
-  background: #e0242a;
-  transform: translateY(-1px);
-}
-.cart-icon-wrapper img {
-  width: 19px;
-  filter: invert(100%);
-}
+.cart-icon-wrapper img { width: 19px; filter: invert(100%); }
 .ks-cart-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background-color: #222;
-  color: #fff;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  visibility: hidden;
+  position:absolute; top:-4px; right:-4px;
+  background:#222; color:#fff;
+  border-radius:999px; font-size:11px;
+  min-width:18px; height:18px;
+  display:flex; justify-content:center; align-items:center;
+  visibility:hidden;
 }
-
   </style>
 </head>
 
@@ -182,282 +139,151 @@
       </span>
     </div>
 
-    <nav class="ks-nav"></nav>
+    <div class="ks-actions">
+      <button class="ks-icon-btn">
+        <span onclick="goToAdmin()">관리자 / Admin</span>
+        <span class="cart-label" onclick="goToCartPage()"> / 장바구니</span>
+      </button>
 
-   <div class="ks-actions">
-  <button class="ks-icon-btn" type="button">
-    <!-- 이 글씨는 관리자 이동 -->
-    <span onclick="goToAdmin()">관리자 / Admin</span>
-    <!-- 이 글씨는 장바구니 이동 -->
-    <span class="cart-label" onclick="goToCartPage()"> / 장바구니</span>
-  </button>
-
-  <!-- 동그란 아이콘도 장바구니로 이동 -->
-  <div class="cart-icon-wrapper" onclick="goToCartPage()">
-    <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart" />
-    <span class="ks-cart-badge" id="headerCartCount">0</span>
-  </div>
-</div>
- 
+      <div class="cart-icon-wrapper" onclick="goToCartPage()">
+        <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png">
+        <span class="ks-cart-badge" id="headerCartCount">0</span>
+      </div>
+    </div>
   </div>
 </header>
 <div class="ks-header-spacer"></div>
 
 <div class="card">
-  <h1>주문 접수가 완료되었습니다 / Order Received</h1>
+  <h1>주문 접수 완료 / Order Received</h1>
   <p>
     주문이 정상적으로 접수되었습니다.<br>
     아래 주문 정보와 입금 계좌를 확인해 주세요.<br><br>
     ⚠ <b>결제는 아직 완료되지 않았습니다.</b><br>
-    입금 확인 후 상품이 발송됩니다.<br>
-    Payment has not been completed yet. Your items will be shipped after we confirm your bank transfer.
+    입금 확인 후 상품이 발송됩니다.
   </p>
 </div>
 
-<div class="card" id="orderInfo">
-</div>
+<div class="card" id="orderInfo"></div>
 
 <div class="card">
-  <h2>입금 계좌 안내 / Bank Transfer Information</h2>
+  <h2>입금 계좌 / Bank Information</h2>
   <p>
-    은행명 / Bank :
-    <b id="bankName">국민은행 KB Bank</b><br>
-    계좌번호 / Account No. :
-    <b id="bankNumber">000000-00-000000</b><br>
-    예금주 / Account Holder :
-    <b id="bankHolder">K-Shopping</b><br><br>
-    <span id="bankExtra">
-      입금자명은 주문자명과 동일하게 부탁드립니다.
-      Please use the same name as the order when making the bank transfer.
-    </span>
+    은행 / Bank : <b id="bankName">국민은행 KB Bank</b><br>
+    계좌번호 / Account : <b id="bankNumber">000000-00-000000</b><br>
+    예금주 / Holder : <b id="bankHolder">K-Shopping</b><br><br>
+    <span id="bankExtra">입금자명은 주문자명과 동일하게 부탁드립니다.</span>
   </p>
 </div>
 
 <div class="card btn-row">
-  <button type="button" class="btn-primary" onclick="location.href='index.html'">
-    계속 쇼핑하기 / Continue Shopping
-  </button>
+  <button class="btn-primary" onclick="location.href='index.html'">계속 쇼핑하기</button>
 </div>
 
-<script>
-  function calculateCartSummaryForHeader() {
-    try {
-      const saved = localStorage.getItem("cart");
-      const cart = saved ? JSON.parse(saved) : [];
-      const qty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
-      return { qty };
-    } catch (e) {
-      return { qty: 0 };
-    }
+<!-- 🔵 Supabase load -->
+<script type="module">
+import { supabase } from "./js/supabaseClient.js";
+
+function goToCartPage(){ location.href="cart.html"; }
+function goToAdmin(){
+  const pw=prompt("관리자 비밀번호:");
+  if(pw==="100101") location.href="admin.html";
+}
+
+function updateHeaderCartCount(){
+  const saved = localStorage.getItem("cart");
+  const cart = saved ? JSON.parse(saved) : [];
+  const qty = cart.reduce((a,b)=>a+(b.qty||1),0);
+  const el = document.getElementById("headerCartCount");
+  el.textContent = qty;
+  el.style.visibility = qty>0 ? "visible":"hidden";
+}
+
+function formatPrice(n){ return n.toLocaleString()+"원"; }
+
+async function loadOrder(){
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("id");
+  const box = document.getElementById("orderInfo");
+
+  if(!orderId){
+    box.innerHTML = "<p>주문 정보를 찾을 수 없습니다.</p>";
+    return;
   }
 
-  function updateHeaderCartCount() {
-    const badge = document.getElementById("headerCartCount");
-    if (!badge) return;
-    const { qty } = calculateCartSummaryForHeader();
-    badge.textContent = qty;
-    badge.style.visibility = qty > 0 ? "visible" : "hidden";
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
+
+  if(error || !data){
+    box.innerHTML = "<p>주문 정보를 불러올 수 없습니다.</p>";
+    return;
   }
 
-  function goToCartPage() {
-    location.href = "cart.html";
+  let html = `
+    <h2>주문 정보</h2>
+    <p>주문번호: <b>${data.id}</b></p>
+    <p>주문일시: ${new Date(data.created_at).toLocaleString("ko-KR")}</p>
+    <hr style="margin:10px 0;">
+    <p>이름: ${data.name}</p>
+    <p>연락처: ${data.phone}</p>
+    <p>주소: ${data.address}</p>
+  `;
+
+  if(data.memo){
+    html += `<p>요청사항: ${data.memo}</p>`;
   }
 
-  function goToAdmin() {
-    const pw = prompt("관리자 비밀번호를 입력하세요:");
-    if (pw === "100101") location.href = "admin.html";
-    else if (pw !== null) alert("비밀번호가 올바르지 않습니다.");
-  }
+  html += `
+    <div class="address-confirm-box">
+      아래 주소로 배송됩니다.<br>
+      <b>${data.address}</b>
+    </div>
+  `;
 
-  function formatPrice(num) {
-    return num.toLocaleString("ko-KR") + "원";
-  }
+  let rows = "";
+  data.items.forEach(item=>{
+    const qty=item.qty||1;
+    const price=item.priceSale || item.price;
+    const line=qty*price;
 
-  (function loadAccountConfig(){
-    const defaultAccount = {
-      bankName: "국민은행 KB Bank",
-      accountNumber: "000000-00-000000",
-      holder: "K-Shopping",
-      extra: "입금자명은 주문자명과 동일하게 부탁드립니다.\nPlease use the same name as the order when making the bank transfer."
-    };
-
-    let cfg = defaultAccount;
-    try {
-      const saved = localStorage.getItem("accountConfig");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === "object") {
-          cfg = {
-            bankName: parsed.bankName || defaultAccount.bankName,
-            accountNumber: parsed.accountNumber || defaultAccount.accountNumber,
-            holder: parsed.holder || defaultAccount.holder,
-            extra: parsed.extra || defaultAccount.extra
-          };
-        }
-      }
-    } catch(e) {}
-
-    document.getElementById("bankName").textContent   = cfg.bankName;
-    document.getElementById("bankNumber").textContent = cfg.accountNumber;
-    document.getElementById("bankHolder").textContent = cfg.holder;
-    document.getElementById("bankExtra").textContent  = cfg.extra;
-  })();
-
-  (function renderOrderInfo(){
-    const orderInfoEl = document.getElementById("orderInfo");
-    const savedLast = localStorage.getItem("lastOrder");
-    if (!savedLast) {
-      orderInfoEl.innerHTML = `
-        <p style="font-size:13px; color:#777;">
-          최근 주문 정보를 찾을 수 없습니다.<br>
-          브라우저 기록이 지워졌거나, 주문 페이지를 새로 고침했을 수 있습니다.<br>
-          We could not find your latest order information.
-        </p>
-      `;
-      return;
-    }
-
-    let order;
-    try {
-      order = JSON.parse(savedLast);
-    } catch(e) {
-      orderInfoEl.innerHTML = `
-        <p style="font-size:13px; color:#777;">
-          주문 정보를 불러오는 중 오류가 발생했습니다.<br>
-          There was an error loading your order information.
-        </p>
-      `;
-      return;
-    }
-
-    let html = "";
-
-    let methodText = "기타 / Other";
-    if (order.method === "form") {
-      methodText = "온라인 주문서 / Online Order Form";
-    } else if (order.method === "phone") {
-      methodText = "전화 주문 / Phone Order";
-    }
-
-    html += `
-      <h2>주문 정보 / Order Details</h2>
-      <p>주문번호 / Order ID : <b>${order.id || "-"}</b></p>
-      <p>주문 방식 / Method : <b>${methodText}</b></p>
+    rows += `
+      <tr>
+        <td>${item.name}</td>
+        <td class="text-right">${qty}</td>
+        <td class="text-right">${formatPrice(price)}</td>
+        <td class="text-right">${formatPrice(line)}</td>
+      </tr>
     `;
-
-    if (order.date) {
-      const d = new Date(order.date);
-      if (!isNaN(d.getTime())) {
-        html += `<p>주문일시 / Date : ${d.toLocaleString("ko-KR")}</p>`;
-      }
-    }
-
-    html += `<hr style="margin:10px 0;">`;
-
-    /* ✅ 여기부터: 주문자 이름/연락처/주소/요청사항 항상 출력하도록 수정 */
-    const customer = order.customer || {};
-    const name = customer.name || order.name || "-";
-    const phone = customer.phone || order.phone || "-";
-    const addr = customer.address || order.address || "-";
-    const memo =
-      customer.memo ||
-      order.memo ||
-      order.request ||
-      "";
-
-    html += `
-      <p>이름 / Name : ${name}</p>
-      <p>연락처 / Phone : ${phone}</p>
-      <p>주소 / Address : ${addr}</p>
-    `;
-    if (memo) {
-      html += `<p>요청사항 / Request : ${memo}</p>`;
-    }
-
-    if (addr && addr !== "-") {
-      html += `
-        <div class="address-confirm-box">
-          아래 주소로 배송이 진행됩니다. 주소가 정확한지 다시 한 번 확인해 주세요.<br>
-          Your order will be shipped to the address above. Please make sure it is correct.
-          <b>${addr}</b>
-        </div>
-      `;
-    }
-    /* ✅ 여기까지가 추가·수정 부분 */
-
-    let cart = Array.isArray(order.cart) ? order.cart : [];
-    let rows = "";
-    let totalQty = 0;
-    let subtotal = 0;
-
-    if (cart.length > 0) {
-      cart.forEach(item => {
-        const qty   = item.qty || 1;
-        const price = item.priceSale || item.price || 0;
-        const line  = qty * price;
-        totalQty   += qty;
-        subtotal   += line;
-
-        rows += `
-          <tr>
-            <td>${item.name || "-"}</td>
-            <td class="text-right">${qty}</td>
-            <td class="text-right">${formatPrice(price)}</td>
-            <td class="text-right">${formatPrice(line)}</td>
-          </tr>
-        `;
-      });
-
-      if (typeof order.totalQty === "number") totalQty = order.totalQty;
-      if (typeof order.subtotal === "number") subtotal = order.subtotal;
-
-      let shipping = 0;
-      if (typeof order.shipping === "number") {
-        shipping = order.shipping;
-      }
-
-      let totalAmount = subtotal + shipping;
-      if (typeof order.totalAmount === "number") {
-        totalAmount = order.totalAmount;
-      }
-
-      html += `
-        <h3 class="order-items-title">주문 상품 / Ordered Items</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>상품명 / Product</th>
-              <th class="text-right">수량 / Qty</th>
-              <th class="text-right">단가 / Price</th>
-              <th class="text-right">금액 / Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-        <p style="margin-top:8px;">
-          총 수량 / Total Qty : <b>${totalQty}</b><br>
-          상품 합계 / Subtotal : <b>${formatPrice(subtotal)}</b><br>
-          배송비 / Shipping : <b>${shipping === 0 ? "0원 (또는 무료)" : formatPrice(shipping)}</b><br>
-          최종 결제 예정 금액 / Total Amount : <b>${formatPrice(totalAmount)}</b>
-        </p>
-      `;
-    } else {
-      html += `
-        <p style="font-size:13px; color:#777;">
-          주문 상품 목록을 찾을 수 없습니다.<br>
-          We could not find the list of ordered items.
-        </p>
-      `;
-    }
-
-    orderInfoEl.innerHTML = html;
-  })();
-
-  document.addEventListener("DOMContentLoaded", () => {
-    updateHeaderCartCount();
   });
+
+  html += `
+    <h3>주문 상품</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>상품명</th><th class="text-right">수량</th>
+          <th class="text-right">가격</th><th class="text-right">금액</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="margin-top:8px;">
+      총 수량: <b>${data.total_qty}</b><br>
+      상품 합계: <b>${formatPrice(data.subtotal)}</b><br>
+      총 결제 예정 금액: <b>${formatPrice(data.total)}</b>
+    </p>
+  `;
+
+  box.innerHTML = html;
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  updateHeaderCartCount();
+  loadOrder();
+});
 </script>
 
 </body>
