@@ -1,13 +1,8 @@
-// supabaseClient.js
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.js";
+// js/supabaseClient.js (수정 완료 버전)
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// 🔹 프로젝트 URL & ANON KEY
-const SUPABASE_URL = "https://byxwhsnbekwazucaaysj.supabase.co";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....(생략)";
+const supabaseUrl = "https://byxwhsnbekwazucaaysj.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5eHdoc25iZWt3YXp1Y2FheXNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNTExNTMsImV4cCI6MjA3OTkyNzE1M30.1Q2jlYWjF9yTeqpc_g3Dr-Kp8za9VP93MFsLmnGs9FM";
 
-// 🔹 Supabase 클라이언트 생성
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// 🔹 전역에서도 접근 가능
-window.supabase = supabase;
+export const supabase = createClient(supabaseUrl, supabaseKey);

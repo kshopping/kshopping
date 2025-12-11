@@ -1,798 +1,97 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>K-Shopping 관리자 / Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-SHOP 관리자</title>
 
-  <!-- XLSX (엑셀 라이브러리) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body {
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:#f7f7f7;
-      color:#222;
-    }
-    a { text-decoration:none; color:inherit; }
-
-    header {
-      background:#222;
-      color:#fff;
-    }
-    .header-inner{
-      max-width:1100px;
-      margin:0 auto;
-      padding:10px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-    }
-    .header-title h1 { font-size:18px; }
-    .header-title small { font-size:12px; color:#bbb; display:block; margin-top:2px; }
-
-    main {
-      max-width:1100px;
-      margin:0 auto;
-      padding:16px;
-    }
-
-    .card {
-      background:#fff;
-      border-radius:10px;
-      padding:16px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.05);
-      margin-bottom:18px;
-    }
-    .card-title {
-      font-size:16px;
-      font-weight:600;
-      margin-bottom:8px;
-    }
-    .card-sub {
-      font-size:12px;
-      color:#777;
-      margin-bottom:10px;
-    }
-
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:12px;
-    }
-    th, td {
-      border-bottom:1px solid #eee;
-      padding:6px 4px;
-      text-align:left;
-      vertical-align:middle;
-    }
-    th { background:#fafafa; font-weight:600; }
-    .text-center { text-align:center; }
-    .text-right { text-align:right; }
-
-    input[type="text"],
-    textarea {
-      width:100%;
-      padding:4px 6px;
-      border:1px solid #ccc;
-      border-radius:4px;
-      font-size:12px;
-    }
-    input[type="number"] {
-      width:110px;
-      padding:4px 6px;
-      border:1px solid #ccc;
-      border-radius:4px;
-      font-size:12px;
-    }
-
-    .btn-primary {
-      border:none;
-      background:#222;
-      color:#fff;
-      padding:8px 14px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:600;
-      cursor:pointer;
-    }
-    .btn-secondary {
-      border:1px solid #ccc;
-      background:#fff;
-      color:#333;
-      padding:6px 12px;
-      border-radius:999px;
-      font-size:12px;
-      cursor:pointer;
-    }
-    .btn-danger {
-      border:none;
-      background:#e74c3c;
-      color:#fff;
-      padding:5px 10px;
-      border-radius:4px;
-      font-size:11px;
-      cursor:pointer;
-    }
-
-    .img-thumb {
-      width:70px;
-      height:50px;
-      object-fit:cover;
-      border-radius:4px;
-      background:#eee;
-    }
-  </style>
+  <link rel="stylesheet" href="css/admin.css">
+  <script type="module" src="js/admin.js" defer></script>
 </head>
 
 <body>
-<header>
-  <div class="header-inner">
-    <div class="header-title">
-      <h1>K-Shopping 관리자 페이지</h1>
-      <small>상품 / 카테고리 / 배너 / 계좌 / 주문관리(Supabase)</small>
+ <script>
+        const adminPass = "100101";  // 원하는 비밀번호
+
+        const input = prompt("관리자 비밀번호를 입력하세요:");
+
+        if (input !== adminPass) {
+            alert("비밀번호가 올바르지 않습니다.");
+            location.href = "index.html";   // 메인으로 강제 이동
+        }
+    </script>
+    <!-- 🔥 여기까지 관리자 잠금 -->
+
+    
+    <!-- 아래부터 기존 관리자 내용 -->
+    <div id="sidebar">
+        …
     </div>
-    <button type="button" class="btn-secondary" onclick="location.href='index.html'">
-      메인으로 이동
-    </button>
+
+</body>
+</html>
+  <!-- 사이드바 -->
+  <div id="sidebar">
+      <button class="home-btn" onclick="location.href='index.html'">🏠 메인으로</button>
+
+      <h2>관리자 메뉴</h2>
+      <button class="menu-btn" onclick="showPage('products')">상품 관리</button>
+      <button class="menu-btn" onclick="showPage('categories')">카테고리 관리</button>
+      <button class="menu-btn" onclick="showPage('banners')">배너 관리</button>
+      <button class="menu-btn" onclick="showPage('orders')">주문 관리</button>
+      <button class="menu-btn" onclick="showPage('printed')">출력된 주문</button>
+      <button class="menu-btn" onclick="showPage('account')">계좌 정보</button>
+      <button class="menu-btn" onclick="showPage('detailImages')">상세이미지 관리</button>
   </div>
-</header>
 
-<main>
-  <!-- ============================= -->
-  <!-- 상품 관리 / Product Management -->
-  <!-- ============================= -->
-  <section class="card">
-    <div class="card-title">상품 관리 / Product Management</div>
-    <div class="card-sub">
-      상품 데이터는 현재 localStorage 기반입니다.<br>
-      (차후 Supabase 연동 단계에서 서버 저장으로 업그레이드 예정)
+  <!-- 메인 영역 -->
+  <div id="main-area">
+
+    <div id="default-page">
+      <h2>K-SHOP 관리자 페이지</h2>
+      <p>왼쪽 메뉴에서 관리 항목을 선택하세요.</p>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40px;">No.</th>
-          <th style="width:80px;">이미지</th>
-          <th style="min-width:180px;">상품명</th>
-          <th style="width:180px;">카테고리</th>
-          <th style="width:80px;">출고가</th>
-          <th style="width:80px;">특판가</th>
-          <th style="width:200px;">목록용 이미지 URL</th>
-          <th style="width:70px;">설명</th>
-          <th style="width:120px;">이미지 파일</th>
-          <th style="width:90px;">수정/삭제</th>
-        </tr>
-      </thead>
-      <tbody id="productTableBody"></tbody>
-    </table>
+    <div id="products" class="page hidden"></div>
+    <div id="categories" class="page hidden"></div>
+    <div id="banners" class="page hidden"></div>
+    <div id="orders" class="page hidden"></div>
+    <div id="printed" class="page hidden"></div>
 
-    <div class="flex-row">
-      <button type="button" class="btn-secondary" onclick="addProductRow()">상품 추가</button>
-      <button type="button" class="btn-primary" onclick="saveAllProducts()">상품 저장</button>
-    </div>
-  </section>
+    <!-- 계좌 여러개 관리 -->
+    <div id="account" class="page hidden">
+      <h2>계좌 정보 관리</h2>
 
-  <!-- ============================= -->
-  <!-- 상품 상세 설명 에디터 -->
-  <!-- ============================= -->
-  <section class="card" id="detailEditorCard">
-    <div class="card-title">상세페이지 설명 / Product Detail Description</div>
-    <div class="card-sub">위 상품 행을 클릭하거나 연필 버튼을 누르면 편집합니다.</div>
+      <!-- 계좌 추가 폼 -->
+      <div class="account-form">
+        <label>은행명</label>
+        <input id="bankName" placeholder="예: 뉴아이은행">
 
-    <div class="field-inline">
-      <label>선택된 상품</label>
-      <div id="detailSelectedName" style="font-size:13px;color:#333;">(선택 없음)</div>
-    </div>
+        <label>계좌번호</label>
+        <input id="bankNumber" placeholder="예: 111-222-333">
 
-    <textarea id="detailEditor"
-      placeholder="상세페이지 설명을 입력하세요."></textarea>
+        <label>예금주</label>
+        <input id="bankOwner" placeholder="예: 민정곤">
 
-    <div class="field-inline" style="margin-top:8px;">
-      <label>상세 이미지 URL</label>
-      <input id="detailImgUrlInput" type="text" placeholder="예: images/detail.png">
-    </div>
-
-    <div class="field-inline">
-      <label>상세 이미지 파일</label>
-      <div style="flex:1;">
-        <input id="detailImgFileInput" type="file" accept="image/*">
-        <div class="small-hint">
-          파일 선택 시 자동으로 위 URL 칸에 <code>images/파일명</code> 입력됩니다.
-        </div>
+        <button id="addAccountBtn" class="add-btn">+ 계좌 추가</button>
       </div>
+
+      <h3 style="margin-top:25px;">📌 등록된 계좌 목록</h3>
+
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>은행명</th>
+            <th>계좌번호</th>
+            <th>예금주</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="accountList"></tbody>
+      </table>
     </div>
 
-    <div class="flex-row" style="margin-top:8px;">
-      <button type="button" class="btn-secondary" onclick="clearDetailEditor()">초기화</button>
-      <button type="button" class="btn-primary" onclick="saveDetailDescription()">상세설명 저장</button>
-    </div>
-  </section>
-
-  <!-- ============================= -->
-  <!-- 카테고리 관리 / Category Management -->
-  <!-- ============================= -->
-  <section class="card">
-    <div class="card-title">카테고리 관리 / Category Management</div>
-    <div class="card-sub">
-      카테고리 ID는 영어/숫자로 구성되며 내부적으로 사용됩니다.<br>
-      고객 화면에는 “카테고리 이름”이 표시됩니다.<br>
-      이 카테고리는 **Supabase categories 테이블**과 연동됩니다.
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width:140px;">카테고리 ID</th>
-          <th>카테고리 이름</th>
-          <th style="width:70px;">삭제</th>
-        </tr>
-      </thead>
-      <tbody id="categoryTableBody"></tbody>
-    </table>
-
-    <div class="flex-row">
-      <button type="button" class="btn-secondary" onclick="addCategoryRow()">카테고리 추가</button>
-      <button type="button" class="btn-primary" onclick="saveCategories()">카테고리 저장</button>
-    </div>
-  </section>
-
-  <!-- ============================= -->
-  <!-- 배너 관리 / Banner Management -->
-  <!-- ============================= -->
-  <section class="card">
-    <div class="card-title">배너 관리 / Banner Management</div>
-    <div class="card-sub">
-      메인 화면 상단의 배너를 설정합니다.<br>
-      여러 개를 만들면 자동 슬라이드됩니다.
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width:40px;">사용</th>
-          <th>제목</th>
-          <th>부제목</th>
-          <th>이미지 URL</th>
-          <th style="width:160px;">이미지 파일</th>
-          <th style="width:70px;">삭제</th>
-        </tr>
-      </thead>
-      <tbody id="bannerTableBody"></tbody>
-    </table>
-
-    <div class="flex-row">
-      <button type="button" class="btn-secondary" onclick="addBannerRow()">배너 추가</button>
-      <button type="button" class="btn-primary" onclick="saveBanners()">배너 저장</button>
-    </div>
-  </section>
-
-  <!-- ============================= -->
-  <!-- 계좌 정보 / Bank Account Information -->
-  <!-- ============================= -->
-  <section class="card">
-    <div class="card-title">입금 계좌 정보 / Bank Account Information</div>
-    <div class="card-sub">
-      주문 완료 페이지와 고객 화면에 표시되는 계좌 정보를 설정합니다.
-    </div>
-
-    <div class="field-inline"><label>은행명</label><input id="accBank" /></div>
-    <div class="field-inline"><label>계좌번호</label><input id="accNumber" /></div>
-    <div class="field-inline"><label>예금주</label><input id="accHolder" /></div>
-    <div class="field-inline"><label>고객센터 번호</label><input id="accCustomerPhone" /></div>
-
-    <div class="field-inline" style="align-items:flex-start;">
-      <label>추가 안내</label>
-      <textarea id="accExtra" style="min-height:80px;"></textarea>
-    </div>
-
-    <div style="text-align:right; margin-top:10px;">
-      <button type="button" class="btn-primary" onclick="saveAccountConfig()">계좌 정보 저장</button>
-    </div>
-  </section>
-
-  <!-- ============================= -->
-  <!-- 주문 관리 / Orders (Supabase) -->
-  <!-- ============================= -->
-  <section class="card">
-    <div class="card-title">주문 관리 / Orders (Supabase)</div>
-    <div class="card-sub">
-      Supabase DB의 <code>orders</code> 테이블에서 주문을 자동으로 불러옵니다.
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width:50px;">No</th>
-          <th style="width:160px;">Order ID</th>
-          <th style="width:160px;">Date/Time</th>
-          <th style="width:120px;">Name</th>
-          <th>Items</th>
-          <th style="width:120px;" class="text-center">출력(Print)</th>
-        </tr>
-      </thead>
-      <tbody id="supabaseOrderListBody"></tbody>
-    </table>
-
-    <div style="text-align:right; margin-top:10px;">
-      <button type="button" class="btn-secondary" onclick="loadSupabaseOrders()">주문 목록 새로고침</button>
-    </div>
-  </section>
-<!-- ============================= -->
-<!-- ① Supabase 주문 관리 코드 -->
-<!-- ============================= -->
-<script type="module">
-import { supabase } from "./js/supabaseClient.js";
-
-function fmt(n){ return Number(n||0).toLocaleString("ko-KR") + "원"; }
-function formatDate(t){
-  if(!t) return "-";
-  const d = new Date(t);
-  if(isNaN(d.getTime())) return "-";
-  return d.toLocaleString("ko-KR");
-}
-
-/* 주문 리스트 불러오기 */
-async function loadSupabaseOrders(){
-  const tbody = document.getElementById("supabaseOrderListBody");
-  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:10px;">불러오는 중...</td></tr>`;
-
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending:false });
-
-  if(error){
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">불러오기 오류</td></tr>`;
-    return;
-  }
-
-  if(!data || data.length === 0){
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#777;">주문 없음</td></tr>`;
-    return;
-  }
-
-  let rows = "";
-  data.forEach((o, idx)=>{
-    const itemText = o.items.map(it=>`${it.name} x${it.qty}`).join("; ");
-    rows += `
-      <tr>
-        <td class="text-center">${idx+1}</td>
-        <td>${o.id}</td>
-        <td>${formatDate(o.created_at)}</td>
-        <td>${o.name}</td>
-        <td>${itemText}</td>
-        <td class="text-center">
-          <button class="btn-small" onclick="printOrder('${o.id}')">출력</button>
-        </td>
-      </tr>
-    `;
-  });
-
-  tbody.innerHTML = rows;
-}
-
-window.loadSupabaseOrders = loadSupabaseOrders;
-
-/* 주문 출력 */
-window.printOrder = async function(orderId){
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("id", orderId)
-    .single();
-
-  if(error || !data){
-    alert("주문을 불러올 수 없습니다.");
-    return;
-  }
-
-  const o = data;
-  const w = window.open("", "printOrder");
-  w.document.write(`
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-<title>Order Print</title>
-<style>
-  body{font-family:system-ui;padding:20px;}
-  table{width:100%;border-collapse:collapse;}
-  th,td{border-bottom:1px solid #ddd;padding:6px;}
-  th{background:#eee;}
-  .text-right{text-align:right;}
-</style>
-</head><body>
-
-<h2>주문서 / Order Details</h2>
-<p><b>주문번호:</b> ${o.id}</p>
-<p><b>일시:</b> ${formatDate(o.created_at)}</p>
-<p><b>이름:</b> ${o.name}</p>
-<p><b>연락처:</b> ${o.phone}</p>
-<p><b>주소:</b> ${o.address}</p>
-${o.memo ? `<p><b>요청사항:</b> ${o.memo}</p>` : ""}
-
-<h3>주문 상품</h3>
-<table>
-<thead><tr>
-  <th>상품명</th><th class="text-right">수량</th>
-  <th class="text-right">단가</th><th class="text-right">금액</th>
-</tr></thead>
-<tbody>
-${o.items.map(it=>{
-  const price = it.priceSale || it.price;
-  const line = price * it.qty;
-  return `
-<tr>
-  <td>${it.name}</td>
-  <td class="text-right">${it.qty}</td>
-  <td class="text-right">${fmt(price)}</td>
-  <td class="text-right">${fmt(line)}</td>
-</tr>`;
-}).join("")}
-</tbody></table>
-
-<p style="margin-top:12px;">
-<b>총 수량:</b> ${o.total_qty}<br>
-<b>상품 합계:</b> ${fmt(o.subtotal)}<br>
-<b>총 결제 금액:</b> ${fmt(o.total)}
-</p>
-
-<script>window.print();</script>
-</body></html>
-  `);
-  w.document.close();
-};
-
-document.addEventListener("DOMContentLoaded", loadSupabaseOrders);
-</script>
-
-<!-- ============================= -->
-<!-- ② Supabase 카테고리 관리 -->
-<!-- ============================= -->
-<script type="module">
-import { supabase } from "./js/supabaseClient.js";
-
-window.categories = [];
-
-/* DB 카테고리 불러오기 */
-async function loadCategoriesFromDB() {
-  const { data, error } = await supabase
-    .from("categories")
-    .select("*")
-    .order("id", { ascending:true });
-
-  if (error) {
-    alert("카테고리 로딩 오류");
-    console.error(error);
-    return [];
-  }
-
-  return data || [];
-}
-
-/* 카테고리 테이블 렌더링 */
-async function renderCategoryTableDB(){
-  window.categories = await loadCategoriesFromDB();
-
-  const tbody = document.getElementById("categoryTableBody");
-  tbody.innerHTML = "";
-
-  window.categories.forEach((c)=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><input class="cat-id" value="${c.id}"></td>
-      <td><input class="cat-name" value="${c.name}"></td>
-      <td class="text-center">
-        <button class="btn-danger" onclick="deleteCategoryDB('${c.id}')">삭제</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-
-  renderProductsTable(); // 상품 카테고리도 갱신
-}
-
-window.addCategoryRow = function(){
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td><input class="cat-id" value=""></td>
-    <td><input class="cat-name" value="새 카테고리"></td>
-    <td class="text-center"><button class="btn-danger" onclick="this.closest('tr').remove()">삭제</button></td>`;
-  document.getElementById("categoryTableBody").appendChild(tr);
-};
-
-/* 저장 */
-window.saveCategories = async function(){
-  const rows = document.querySelectorAll("#categoryTableBody tr");
-  const newArr = [];
-  rows.forEach(tr=>{
-    const id = tr.querySelector(".cat-id").value.trim();
-    const name = tr.querySelector(".cat-name").value.trim();
-    if(id && name) newArr.push({id,name});
-  });
-
-  await supabase.from("categories").delete().neq("id","");
-  const { error } = await supabase.from("categories").insert(newArr);
-
-  if(error){
-    alert("저장 실패 (중복 ID 확인)");
-    return;
-  }
-
-  alert("저장 완료!");
-  renderCategoryTableDB();
-};
-
-/* 삭제 */
-window.deleteCategoryDB = async function(id){
-  if(!confirm("삭제할까요?")) return;
-
-  await supabase.from("categories").delete().eq("id", id);
-  renderCategoryTableDB();
-};
-
-/* 초기 실행 */
-document.addEventListener("DOMContentLoaded", renderCategoryTableDB);
-</script>
-
-<!-- ============================= -->
-<!-- ③ 상품 / 배너 / 계좌 (localStorage) -->
-<!-- ============================= -->
-<script>
-let products = [];
-let banners = [];
-let accountConfig = {
-  bankName:"국민은행 KB Bank",
-  accountNumber:"000000-00-000000",
-  holder:"K-Shopping",
-  customerPhone:"010-8640-8732",
-  extra:"입금자명은 주문자명과 동일하게 부탁드립니다."
-};
-
-/* 상품 ======================== */
-function normalizeProduct(p){
-  return {
-    id: p.id || ("p"+Date.now()+Math.random()),
-    name: p.name || "",
-    categoryId: p.categoryId || "",
-    priceOriginal: Number(p.priceOriginal)||0,
-    priceSale: Number(p.priceSale)||0,
-    imageUrl: p.imageUrl || "",
-    detailDesc: p.detailDesc || "",
-    detailImageUrl: p.detailImageUrl || ""
-  };
-}
-
-function loadProducts(){
-  try{
-    const saved = JSON.parse(localStorage.getItem("products"));
-    products = Array.isArray(saved) ? saved.map(normalizeProduct) : [];
-  }catch{ products = []; }
-}
-
-function saveProductsToStorage(arr){
-  localStorage.setItem("products", JSON.stringify(arr));
-}
-
-/* 상품 테이블 렌더링 */
-function renderProductsTable(){
-  const tbody = document.getElementById("productTableBody");
-  tbody.innerHTML = "";
-
-  products.forEach((p, idx)=>{
-    const tr = document.createElement("tr");
-    tr.dataset.id = p.id;
-
-    tr.innerHTML = `
-      <td class="text-center">${idx+1}</td>
-      <td><img class="img-thumb" src="${p.imageUrl || "https://picsum.photos/70/50"}"></td>
-      <td><input type="text" class="prod-name" value="${p.name}"></td>
-
-      <td><select class="prod-category"></select></td>
-
-      <td><input type="number" class="prod-original" value="${p.priceOriginal}"></td>
-      <td><input type="number" class="prod-sale" value="${p.priceSale}"></td>
-      <td><input type="text" class="prod-image-url" value="${p.imageUrl}"></td>
-
-      <td class="text-center">
-        <button class="btn-small" onclick="openDetailEditor('${p.id}')">편집</button>
-      </td>
-
-      <td><input type="file" class="prod-image-file"></td>
-
-      <td class="text-center">
-        <button class="btn-small" onclick="saveSingleProduct('${p.id}', this)">수정</button>
-        <button class="btn-danger" onclick="deleteProduct('${p.id}')">삭제</button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-
-    /* 카테고리 채우기 */
-    const sel = tr.querySelector(".prod-category");
-    window.categories?.forEach(c=>{
-      const opt = document.createElement("option");
-      opt.value = c.id;
-      opt.textContent = c.name;
-      if(c.id === p.categoryId) opt.selected = true;
-      sel.appendChild(opt);
-    });
-
-    tr.querySelector(".prod-image-file").addEventListener("change", e=>{
-      const f = e.target.files[0];
-      if(f) tr.querySelector(".prod-image-url").value = "images/"+f.name;
-    });
-  });
-}
-
-/* 상품 저장/삭제 */
-function saveSingleProduct(pid, btn){
-  const tr = btn.closest("tr");
-  const idx = products.findIndex(p=>p.id===pid);
-  if(idx===-1) return;
-
-  const p = products[idx];
-  p.name = tr.querySelector(".prod-name").value.trim();
-  p.categoryId = tr.querySelector(".prod-category").value;
-  p.priceOriginal = Number(tr.querySelector(".prod-original").value)||0;
-  p.priceSale = Number(tr.querySelector(".prod-sale").value)||0;
-  p.imageUrl = tr.querySelector(".prod-image-url").value.trim();
-
-  products[idx] = normalizeProduct(p);
-  saveProductsToStorage(products);
-  alert("상품 저장됨");
-}
-
-function deleteProduct(pid){
-  if(!confirm("삭제?")) return;
-  products = products.filter(p=>p.id!==pid);
-  saveProductsToStorage(products);
-  renderProductsTable();
-}
-
-function addProductRow(){
-  const p = normalizeProduct({});
-  products.push(p);
-  saveProductsToStorage(products);
-  renderProductsTable();
-}
-
-function saveAllProducts(){
-  const arr=[];
-  document.querySelectorAll("#productTableBody tr").forEach(tr=>{
-    const pid = tr.dataset.id;
-    const p = products.find(x=>x.id===pid);
-    p.name = tr.querySelector(".prod-name").value.trim();
-    p.categoryId = tr.querySelector(".prod-category").value;
-    p.priceOriginal = Number(tr.querySelector(".prod-original").value)||0;
-    p.priceSale = Number(tr.querySelector(".prod-sale").value)||0;
-    p.imageUrl = tr.querySelector(".prod-image-url").value.trim();
-    arr.push(normalizeProduct(p));
-  });
-  products = arr;
-  saveProductsToStorage(products);
-  alert("전체 저장 완료");
-}
-
-/* 상세 설명 */
-let currentDetailId = null;
-function openDetailEditor(pid){
-  const p = products.find(x=>x.id===pid);
-  if(!p) return;
-  currentDetailId = pid;
-  document.getElementById("detailSelectedName").textContent = p.name;
-  document.getElementById("detailEditor").value = p.detailDesc || "";
-  document.getElementById("detailImgUrlInput").value = p.detailImageUrl || "";
-}
-
-function clearDetailEditor(){
-  document.getElementById("detailEditor").value = "";
-  document.getElementById("detailImgUrlInput").value = "";
-}
-
-function saveDetailDescription(){
-  if(!currentDetailId){
-    alert("상품을 먼저 선택하세요");
-    return;
-  }
-  const p = products.find(x=>x.id===currentDetailId);
-  p.detailDesc = document.getElementById("detailEditor").value;
-  p.detailImageUrl = document.getElementById("detailImgUrlInput").value.trim();
-  saveProductsToStorage(products);
-  alert("상세설명 저장됨");
-}
-
-/* 배너 ======================== */
-function loadBanners(){
-  try{
-    banners = JSON.parse(localStorage.getItem("banners")) || [];
-  }catch{ banners=[]; }
-}
-
-function renderBannerTable(){
-  const tbody = document.getElementById("bannerTableBody");
-  tbody.innerHTML = "";
-
-  banners.forEach((b,idx)=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="text-center"><input type="checkbox" class="banner-active" ${b.active?"checked":""}></td>
-      <td><input class="banner-title" value="${b.title||""}"></td>
-      <td><input class="banner-subtitle" value="${b.subtitle||""}"></td>
-      <td><input class="banner-img-url" value="${b.imageUrl||""}"></td>
-      <td><input type="file" class="banner-img-file"></td>
-      <td class="text-center"><button class="btn-danger" onclick="deleteBanner(${idx})">삭제</button></td>
-    `;
-    tbody.appendChild(tr);
-
-    tr.querySelector(".banner-img-file").addEventListener("change", e=>{
-      const f = e.target.files[0];
-      if(f) tr.querySelector(".banner-img-url").value = "images/"+f.name;
-    });
-  });
-}
-
-function addBannerRow(){
-  banners.push({active:true,title:"",subtitle:"",imageUrl:""});
-  renderBannerTable();
-}
-
-function deleteBanner(idx){
-  banners.splice(idx,1);
-  renderBannerTable();
-}
-
-function saveBanners(){
-  const arr=[];
-  document.querySelectorAll("#bannerTableBody tr").forEach(tr=>{
-    arr.push({
-      active: tr.querySelector(".banner-active").checked,
-      title: tr.querySelector(".banner-title").value.trim(),
-      subtitle: tr.querySelector(".banner-subtitle").value.trim(),
-      imageUrl: tr.querySelector(".banner-img-url").value.trim()
-    });
-  });
-  banners = arr;
-  localStorage.setItem("banners", JSON.stringify(arr));
-  alert("배너 저장됨");
-}
-
-/* 계좌 ======================== */
-function loadAccountConfig(){
-  try{
-    const saved = JSON.parse(localStorage.getItem("accountConfig"));
-    if(saved) accountConfig = saved;
-  }catch{}
-}
-
-function renderAccountForm(){
-  document.getElementById("accBank").value = accountConfig.bankName;
-  document.getElementById("accNumber").value = accountConfig.accountNumber;
-  document.getElementById("accHolder").value = accountConfig.holder;
-  document.getElementById("accCustomerPhone").value = accountConfig.customerPhone;
-  document.getElementById("accExtra").value = accountConfig.extra;
-}
-
-function saveAccountConfig(){
-  accountConfig = {
-    bankName: document.getElementById("accBank").value.trim(),
-    accountNumber: document.getElementById("accNumber").value.trim(),
-    holder: document.getElementById("accHolder").value.trim(),
-    customerPhone: document.getElementById("accCustomerPhone").value.trim(),
-    extra: document.getElementById("accExtra").value
-  };
-  localStorage.setItem("accountConfig", JSON.stringify(accountConfig));
-  alert("계좌 저장됨");
-}
-
-/* 초기 로딩 */
-document.addEventListener("DOMContentLoaded", ()=>{
-  loadProducts();
-  loadBanners();
-  loadAccountConfig();
-
-  renderProductsTable();
-  renderBannerTable();
-  renderAccountForm();
-});
-</script>
+  </div>
+</body>
+</html>

@@ -2,289 +2,223 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>주문 접수 완료 / Order Received - K-Shopping</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주문 완료</title>
+
+  <link rel="stylesheet" href="css/index.css">
+
   <style>
     body {
-      background:#f7f7f7;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:#222;
+      padding: 30px 20px;
+      font-family: Pretendard, sans-serif;
+      background: #f6f7fb;
+      text-align: center;
     }
-    .card {
-      background:#fff;
-      border-radius:10px;
-      max-width:900px;
-      margin:20px auto;
-      padding:16px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+
+    #complete-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.07);
     }
-    h1 { font-size:22px; margin-bottom:6px; }
-    h2 { font-size:18px; margin-bottom:8px; }
-    h3 { font-size:16px; margin:14px 0 8px; }
-    p  { font-size:13px; line-height:1.6; }
 
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    th, td {
-      border-bottom:1px solid #eee;
-      padding:4px 2px;
-      text-align:left;
+    .title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
-    th { background:#fafafa; }
-    .text-right { text-align:right; }
 
-    .btn-primary {
-      border:none; background:#222; color:#fff;
-      padding:10px 16px; border-radius:999px; font-size:14px; cursor:pointer;
+    #orderId {
+      font-size: 20px;
+      color: #ff6f00;
+      font-weight: 700;
     }
-    .btn-row { text-align:center; }
 
-    .address-confirm-box {
-      margin-top:8px;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid #ffd591;
-      background:#fff7e6;
-      font-size:13px;
-      line-height:1.5;
+    .sub-text {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 20px;
     }
-    .address-confirm-box b { display:block; margin-top:4px; }
 
-    /* === Header === */
-.ks-header {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background-color: #ffffff;
-  border-bottom: 1px solid #eee;
-}
-.ks-header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.ks-header-spacer { height: 64px; }
+    /* 주문 요약 박스 */
+    #order-summary-box {
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      text-align: left;
+      margin-top: 20px;
+    }
 
-.ks-logo {
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  margin-right: 12px;
-  white-space: nowrap;
-}
-.ks-logo-main {
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: 0.3px;
-}
-.ks-logo-sub {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: #666;
-}
-.ks-logo-sub .kor {
-  margin-right: 4px;
-}
-.ks-logo-sub .eng {
-  font-size: 11px;
-  background: linear-gradient(90deg, #ff4d4f, #ff9800);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
+    .summary-title {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
 
-.ks-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.ks-icon-btn {
-  border: none;
-  background: transparent;
-  font-size: 13px;
-  cursor: pointer;
-}
-.ks-icon-btn .cart-label { color:#ff4d4f; font-weight:700; }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
 
-.cart-icon-wrapper {
-  width: 38px; height: 38px;
-  background: #ff4d4f; border-radius: 50%;
-  display: flex; justify-content:center; align-items:center;
-  cursor:pointer;
-  position: relative;
-}
-.cart-icon-wrapper img { width: 19px; filter: invert(100%); }
-.ks-cart-badge {
-  position:absolute; top:-4px; right:-4px;
-  background:#222; color:#fff;
-  border-radius:999px; font-size:11px;
-  min-width:18px; height:18px;
-  display:flex; justify-content:center; align-items:center;
-  visibility:hidden;
-}
+    .summary-total {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 14px;
+      color: #e74c3c;
+    }
+
+    /* 여러 계좌 박스 */
+    .account-box {
+      margin-top: 30px;
+      padding: 12px;
+      background: #fff4d6;
+      border-left: 5px solid #ffb300;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #0066ff;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .account-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 16px;
+    }
+
+    .account-line {
+      margin-bottom: 4px;
+    }
+
+    .btn {
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .btn-main {
+      background: #0d6efd;
+      color: #fff;
+    }
+
+    .btn-main:hover {
+      background: #004bcc;
+    }
   </style>
 </head>
 
 <body>
-<header class="ks-header">
-  <div class="ks-header-inner">
-    <div class="ks-logo" onclick="location.href='index.html'">
-      <span class="ks-logo-main">K-Shopping</span>
-      <span class="ks-logo-sub">
-        <span class="kor">외국인을 위한 전문 쇼핑몰</span> /
-        <span class="eng">Global Shopping for Foreigners</span>
-      </span>
-    </div>
 
-    <div class="ks-actions">
-      <button class="ks-icon-btn">
-        <span onclick="goToAdmin()">관리자 / Admin</span>
-        <span class="cart-label" onclick="goToCartPage()"> / 장바구니</span>
-      </button>
+  <div id="complete-wrap">
+    <div class="title">🎉 주문이 완료되었습니다!</div>
 
-      <div class="cart-icon-wrapper" onclick="goToCartPage()">
-        <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png">
-        <span class="ks-cart-badge" id="headerCartCount">0</span>
-      </div>
-    </div>
-  </div>
-</header>
-<div class="ks-header-spacer"></div>
-
-<div class="card">
-  <h1>주문 접수 완료 / Order Received</h1>
-  <p>
-    주문이 정상적으로 접수되었습니다.<br>
-    아래 주문 정보와 입금 계좌를 확인해 주세요.<br><br>
-    ⚠ <b>결제는 아직 완료되지 않았습니다.</b><br>
-    입금 확인 후 상품이 발송됩니다.
-  </p>
-</div>
-
-<div class="card" id="orderInfo"></div>
-
-<div class="card">
-  <h2>입금 계좌 / Bank Information</h2>
-  <p>
-    은행 / Bank : <b id="bankName">국민은행 KB Bank</b><br>
-    계좌번호 / Account : <b id="bankNumber">000000-00-000000</b><br>
-    예금주 / Holder : <b id="bankHolder">K-Shopping</b><br><br>
-    <span id="bankExtra">입금자명은 주문자명과 동일하게 부탁드립니다.</span>
-  </p>
-</div>
-
-<div class="card btn-row">
-  <button class="btn-primary" onclick="location.href='index.html'">계속 쇼핑하기</button>
-</div>
-
-<!-- 🔵 Supabase load -->
-<script type="module">
-import { supabase } from "./js/supabaseClient.js";
-
-function goToCartPage(){ location.href="cart.html"; }
-function goToAdmin(){
-  const pw=prompt("관리자 비밀번호:");
-  if(pw==="100101") location.href="admin.html";
-}
-
-function updateHeaderCartCount(){
-  const saved = localStorage.getItem("cart");
-  const cart = saved ? JSON.parse(saved) : [];
-  const qty = cart.reduce((a,b)=>a+(b.qty||1),0);
-  const el = document.getElementById("headerCartCount");
-  el.textContent = qty;
-  el.style.visibility = qty>0 ? "visible":"hidden";
-}
-
-function formatPrice(n){ return n.toLocaleString()+"원"; }
-
-async function loadOrder(){
-  const params = new URLSearchParams(location.search);
-  const orderId = params.get("id");
-  const box = document.getElementById("orderInfo");
-
-  if(!orderId){
-    box.innerHTML = "<p>주문 정보를 찾을 수 없습니다.</p>";
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("id", orderId)
-    .single();
-
-  if(error || !data){
-    box.innerHTML = "<p>주문 정보를 불러올 수 없습니다.</p>";
-    return;
-  }
-
-  let html = `
-    <h2>주문 정보</h2>
-    <p>주문번호: <b>${data.id}</b></p>
-    <p>주문일시: ${new Date(data.created_at).toLocaleString("ko-KR")}</p>
-    <hr style="margin:10px 0;">
-    <p>이름: ${data.name}</p>
-    <p>연락처: ${data.phone}</p>
-    <p>주소: ${data.address}</p>
-  `;
-
-  if(data.memo){
-    html += `<p>요청사항: ${data.memo}</p>`;
-  }
-
-  html += `
-    <div class="address-confirm-box">
-      아래 주소로 배송됩니다.<br>
-      <b>${data.address}</b>
-    </div>
-  `;
-
-  let rows = "";
-  data.items.forEach(item=>{
-    const qty=item.qty||1;
-    const price=item.priceSale || item.price;
-    const line=qty*price;
-
-    rows += `
-      <tr>
-        <td>${item.name}</td>
-        <td class="text-right">${qty}</td>
-        <td class="text-right">${formatPrice(price)}</td>
-        <td class="text-right">${formatPrice(line)}</td>
-      </tr>
-    `;
-  });
-
-  html += `
-    <h3>주문 상품</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>상품명</th><th class="text-right">수량</th>
-          <th class="text-right">가격</th><th class="text-right">금액</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p style="margin-top:8px;">
-      총 수량: <b>${data.total_qty}</b><br>
-      상품 합계: <b>${formatPrice(data.subtotal)}</b><br>
-      총 결제 예정 금액: <b>${formatPrice(data.total)}</b>
+    <p class="sub-text">
+      주문번호: <span id="orderId"></span><br>
+      주문해주셔서 감사합니다. 관리자 확인 후 빠르게 처리됩니다.
     </p>
-  `;
 
-  box.innerHTML = html;
-}
+    <!-- 주문 요약 -->
+    <div id="order-summary-box">
+      <div class="summary-title">🛍 주문 상품 내역</div>
+      <div id="summary-items"></div>
+      <div class="summary-total" id="summary-total"></div>
+    </div>
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  updateHeaderCartCount();
-  loadOrder();
-});
-</script>
+    <!-- 여러 계좌 -->
+    <div class="account-box">
+      <div class="account-title">💳 입금 계좌</div>
+      <div id="bankInfo">불러오는 중...</div>
+    </div>
+
+    <button class="btn btn-main" onclick="location.href='index.html'">🏠 메인으로 돌아가기</button>
+  </div>
+
+  <script type="module">
+    import { supabase } from "./js/supabaseClient.js";
+
+    /* 주문번호 */
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get("id");
+    document.getElementById("orderId").textContent = orderId;
+
+    /* 주문 상세 */
+    async function loadOrder() {
+      const { data: order } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", orderId)
+        .single();
+
+      if (!order) {
+        document.getElementById("summary-items").innerHTML = "<p>주문 정보를 불러올 수 없습니다.</p>";
+        return;
+      }
+
+      let html = "";
+      let total = 0;
+      let qty = 0;
+
+      order.items.forEach((item) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        qty += item.qty;
+
+        html += `
+          <div class="summary-item">
+            <span>${item.name} x ${item.qty}</span>
+            <span>${itemTotal.toLocaleString()}원</span>
+          </div>`;
+      });
+
+      document.getElementById("summary-items").innerHTML = html;
+      document.getElementById("summary-total").textContent =
+        `총 ${qty}개 | 총 금액: ${total.toLocaleString()}원`;
+    }
+
+    /* 여러 계좌 불러오기 */
+    async function loadAccount() {
+      const bankInfo = document.getElementById("bankInfo");
+
+      const { data, error } = await supabase
+        .from("account_info")
+        .select("*")
+        .order("id");
+
+      if (error || !data || data.length === 0) {
+        bankInfo.textContent = "계좌 정보를 불러올 수 없습니다.";
+        return;
+      }
+
+      let html = "";
+      data.forEach(acc => {
+        html += `
+          <div class="account-line">
+            ${acc.bank_name} ${acc.bank_number} / 예금주: ${acc.bank_owner}
+          </div>`;
+      });
+
+      bankInfo.innerHTML = html;
+    }
+
+    loadOrder();
+    loadAccount();
+  </script>
 
 </body>
 </html>
+
