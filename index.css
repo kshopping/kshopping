@@ -156,9 +156,11 @@ body {
 ============================= */
 #category-area {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; 
     gap: 12px;
-    flex-wrap:warp;
+    flex-wrap: nowrap;             /* ⭐ 두 줄 금지 */
+    overflow-x: auto;              /* ⭐ 가로 스크롤 */
+    white-space: nowrap;  
     margin-top: 14px;
     padding: 10px 0;
     background: #ffffffc9;
@@ -174,6 +176,7 @@ body {
     cursor: pointer;
     transition: 0.25s;
     font-size: 14px;
+    flex: 0 0 auto;
 }
 
 .category-btn:hover {
