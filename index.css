@@ -480,46 +480,68 @@ body {
         width: 100%;
     }
 }
-/* ============================
-   📱 mobile fix
-============================ */
+/* ================================
+   📱 완전 고정 모바일 최적화
+================================ */
 @media (max-width: 480px) {
 
-    /* 상품 이미지 크기 조절 */
-    .product-card img {
-        height: 160px !important;
-        object-fit: cover;
+    /* 상단 헤더 압축 */
+    #fixed-header {
+        padding: 10px 12px !important;
     }
 
-    /* 카테고리 영역 정렬 */
-    #category-area {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        justify-content: center;
+    #wrap {
+        padding-top: 130px !important;
     }
 
-    #category-area button {
-        font-size: 13px;
-        padding: 6px 12px;
-        flex: 1 1 calc(33% - 10px);
-        max-width: 120px;
-    }
-
-    /* 상단 메뉴(장바구니 포함) 중앙 정렬 */
+    /* 장바구니 포함 상단 메뉴 중앙 배치 */
     #top-menu {
         justify-content: center !important;
-        gap: 10px;
+        gap: 6px !important;
     }
 
     .cart-main-btn {
-        transform: scale(0.9);
+        transform: scale(0.85) !important;
     }
 
-    /* 상품 타이틀/설명 중앙 정렬 */
-    .product-title,
-    .item-name {
+    /* 카테고리 버튼 3열 배치 */
+    #category-area {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        justify-content: center !important;
+        padding: 6px 0 !important;
+    }
+
+    #category-area .category-btn {
+        flex: 1 1 calc(33% - 10px) !important;
+        font-size: 12px !important;
+        padding: 6px 8px !important;
+        max-width: 110px !important;
+    }
+
+    /* 🔥 상품 이미지 강제 축소 (핵심) */
+    .product-card img {
+        width: 100% !important;
+        height: 130px !important;
+        object-fit: cover !important;
+        border-radius: 12px !important;
+    }
+
+    /* 상품 카드 여백 줄이기 */
+    .product-card {
+        padding: 10px !important;
+    }
+
+    /* 상품명/설명 가운데 정렬 */
+    .product-name,
+    .item-name,
+    .product-desc {
         text-align: center !important;
-        width: 100%;
+    }
+
+    /* “담기 / 상세보기” 버튼 더 크게 */
+    .product-buttons button {
+        padding: 10px !important;
+        font-size: 14px !important;
     }
 }
