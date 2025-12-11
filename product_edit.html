@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상품 수정</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+  <script type="module" src="js/product_edit.js" defer></script>
+
+  <style>
+    .edit-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .edit-title {
+      font-size: 26px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .form-row label {
+      width: 90px;
+      font-weight: bold;
+    }
+
+    .form-row input, 
+    .form-row select {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .img-row {
+      margin-bottom: 15px;
+    }
+
+    .img-row label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      resize: vertical;
+    }
+
+    .btn-area {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="edit-container">
+
+  <div class="edit-title">상품 수정</div>
+
+  <div class="form-row">
+    <label>상품명</label>
+    <input id="name">
+  </div>
+
+  <div class="form-row">
+    <label>정상가</label>
+    <input id="price_original">
+  </div>
+
+  <div class="form-row">
+    <label>판매가</label>
+    <input id="price_sale">
+  </div>
+
+  <div class="form-row">
+    <label>카테고리</label>
+    <select id="category"></select>
+  </div>
+
+  <div class="img-row">
+    <label>대표 이미지</label>
+    <input type="file" id="image_file">
+  </div>
+
+  <div class="img-row">
+    <label>상세 이미지</label>
+    <input type="file" id="detail_file">
+  </div>
+
+  <div style="margin-top: 10px; margin-bottom: 5px; font-weight: bold;">
+    설명
+  </div>
+  <textarea id="desc"></textarea>
+
+  <div class="btn-area">
+    <button id="saveBtn" class="btn green">상품 수정</button>
+    <button onclick="history.back()" class="btn grey">취소</button>
+  </div>
+
+</div>
+
+</body>
+</html>

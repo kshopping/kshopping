@@ -4,8 +4,6 @@ import { supabase } from "./supabaseClient.js";
    유틸
 =========================================================== */
 const $ = (id) => document.getElementById(id);
-const safe = (v) => (v ?? "");
-const num = (v) => Number(v || 0);
 
 /* ===========================================================
    페이지 전환
@@ -67,6 +65,10 @@ async function loadProductPage() {
   `;
 }
 
+window.addProduct = function () {
+  location.href = "product_add.html";
+};
+
 /* ===========================================================
    카테고리 관리
 =========================================================== */
@@ -102,14 +104,64 @@ async function loadCategoryPage() {
   `;
 }
 
+window.addCategory = async function () {
+  const name = $("new_cat").value.trim();
+  if (!name) return alert("카테고리명을 입력하세요.");
+
+  const newId = "cat_" + Date.now();
+
+  const { error } = await supabase.from("categories").insert({
+    id: newId,
+    name
+  });
+
+  if (error) {
+    console.error(error);
+    return alert("카테고리 추가 실패!");
+  }
+
+  alert("추가 완료!");
+  loadCategoryPage();
+};
+
+window.editCategory = async function(id, oldName) {
+  const newName = prompt("새 카테고리 이름을 입력하세요:", oldName);
+
+  if (!newName || newName.trim() === "") {
+    alert("수정이 취소되었습니다.");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("categories")
+    .update({ name: newName.trim() })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    alert("카테고리 수정 실패!");
+    return;
+  }
+
+  alert("수정 완료!");
+  loadCategoryPage();
+};
+
+window.deleteCategory = async function (id) {
+  await supabase.from("categories").delete().eq("id", id);
+  loadCategoryPage();
+};
+
 /* ===========================================================
    배너 관리
 =========================================================== */
 async function loadBannerPage() {
   const main = $("main-area");
 
-  let { data: banners } = await supabase.from("banners").select("*").order("sort_order");
-  banners = banners.filter((b) => b.video_url);
+  const { data: banners } = await supabase
+    .from("banners")
+    .select("*")
+    .order("id", { ascending: false });
 
   const rows = banners
     .map(
@@ -126,7 +178,7 @@ async function loadBannerPage() {
   main.innerHTML = `
     <h3>배너 관리</h3>
 
-    <input id="banner_file" type="file" accept="video/*" multiple>
+    <input id="banner_file" type="file" accept="video/*">
     <button class="btn green" onclick="addBanner()">업로드</button>
 
     <table>
@@ -136,8 +188,45 @@ async function loadBannerPage() {
   `;
 }
 
+window.addBanner = async function () {
+  const file = document.getElementById("banner_file").files[0];
+  if (!file) return alert("파일을 선택하세요.");
+
+  const path = `banners/${Date.now()}_${file.name}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("kshop")
+    .upload(path, file, { upsert: true });
+
+  if (uploadError) {
+    console.error(uploadError);
+    return alert("업로드 실패!");
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("kshop").getPublicUrl(path);
+
+  const { error } = await supabase.from("banners").insert({
+    video_url: publicUrl,
+    sort_order: 1
+  });
+
+  if (error) {
+    console.error(error);
+    return alert("DB 저장 실패!");
+  }
+
+  alert("업로드 완료!");
+  loadBannerPage();
+};
+
+window.deleteBanner = async function (id) {
+  await supabase.from("banners").delete().eq("id", id);
+  loadBannerPage();
+};
 /* ===========================================================
-   주문 관리 (출력 전)
+   주문 관리 (출력 전 주문 목록)
 =========================================================== */
 async function loadOrderPage() {
   const main = $("main-area");
@@ -288,71 +377,58 @@ async function loadPrintedPage() {
 }
 
 /* ===========================================================
-   주문 삭제
+   출력된 주문 삭제
 =========================================================== */
 window.deleteOrder = async function (orderId) {
-  if (!confirm("정말 삭제하시겠습니까?")) return;
-
   await supabase.from("orders").delete().eq("id", orderId);
-
   loadOrderPage();
   loadPrintedPage();
 };
 
 /* ===========================================================
-   엑셀 다운로드 (CSV)
+   출력 데이터 저장 (일별/월별/연도별)
 =========================================================== */
 window.exportByPeriod = async function (type) {
-  const { data } = await supabase.from("orders").select("*").eq("printed", true);
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("printed", true);
 
-  if (!data?.length) {
-    alert("출력된 주문이 없습니다.");
-    return;
-  }
+  if (!data || data.length === 0) return alert("저장할 주문이 없습니다.");
 
-  const groups = {};
+  const grouped = {};
 
   data.forEach((o) => {
-    const date = new Date(o.printed_at);
+    const date = o.printed_at?.split("T")[0] || "";
+    const [y, m, d] = date.split("-");
+
     let key = "";
+    if (type === "day") key = `${y}-${m}-${d}`;
+    if (type === "month") key = `${y}-${m}`;
+    if (type === "year") key = `${y}`;
 
-    if (type === "day") key = date.toISOString().split("T")[0];
-    if (type === "month") key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    if (type === "year") key = `${date.getFullYear()}`;
-
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(o);
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(o);
   });
 
-  Object.entries(groups).forEach(([key, orders]) => {
-    exportCSV(orders, `orders_${type}_${key}.csv`);
+  const blob = new Blob([JSON.stringify(grouped, null, 2)], {
+    type: "application/json",
   });
 
-  alert("다운로드 완료!");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download =
+    type === "day"
+      ? "일별_주문.json"
+      : type === "month"
+      ? "월별_주문.json"
+      : "연도별_주문.json";
+
+  link.click();
 };
 
-function exportCSV(data, filename) {
-  const rows = data.map((o) => [
-    o.id,
-    o.name,
-    o.total,
-    o.items.reduce((t, i) => t + i.qty, 0),
-    o.printed_at
-  ]);
-
-  const csv =
-    "주문번호,고객명,총금액,총수량,출력일\n" +
-    rows.map((r) => r.join(",")).join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-}
-
 /* ===========================================================
-   계좌 여러 개 관리 기능
+   계좌 정보 관리
 =========================================================== */
 async function loadAccountPage() {
   const main = $("main-area");
@@ -377,18 +453,16 @@ async function loadAccountPage() {
 
     <div class="account-form">
       <label>은행명</label>
-      <input id="bankName" placeholder="예: 뉴아이은행">
+      <input id="bankName">
 
       <label>계좌번호</label>
-      <input id="bankNumber" placeholder="예: 111-222-333">
+      <input id="bankNumber">
 
       <label>예금주</label>
-      <input id="bankOwner" placeholder="예: 민정곤">
+      <input id="bankOwner">
 
       <button id="addAccountBtn" class="btn green">+ 계좌 추가</button>
     </div>
-
-    <h3 style="margin-top:25px;">등록된 계좌 목록</h3>
 
     <table>
       <tr>
@@ -419,29 +493,16 @@ window.addAccount = async function () {
 };
 
 window.deleteAccount = async function (id) {
-  if (!confirm("삭제할까요?")) return;
-
   await supabase.from("account_info").delete().eq("id", id);
-
   loadAccountPage();
 };
 
 /* ===========================================================
-   초기 실행
+   상세 이미지 관리
 =========================================================== */
-showPage("products");
-window.addProduct = function () {
-  // 앞으로 상품 추가용 페이지 만들면 여기로 이동
-  location.href = "product_add.html";
-};
-/* ===========================================================
-   🔥 상세 이미지 관리 — 상품관리의 모든 상품 표시
-=========================================================== */
-
 async function loadDetailImagesPage() {
-  const main = document.getElementById("main-area");
+  const main = $("main-area");
 
-  // 🔥 1) products 테이블의 모든 상품을 가져온다 (필터 없음)
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
@@ -452,40 +513,28 @@ async function loadDetailImagesPage() {
     return alert("상품 목록을 불러오지 못했습니다.");
   }
 
-  // 🔥 2) 테이블에 한 줄씩 상품 표시
   const rows = products
     .map(
       (p) => `
     <tr>
       <td>${p.id}</td>
       <td>${p.name}</td>
-
       <td>
         <img src="${p.detail_image_url || p.image_url || ""}" 
-             class="img-thumb" 
-             style="max-height:80px;">
+             class="img-thumb" style="max-height:80px;">
       </td>
-
       <td>
         <input type="file" id="file_${p.id}" />
-
-        <button class="btn blue" onclick="uploadDetailImage(${p.id})">
-          업로드
-        </button>
-
-        <button class="btn red" onclick="deleteDetailImage(${p.id})">
-          삭제
-        </button>
+        <button class="btn blue" onclick="uploadDetailImage(${p.id})">업로드</button>
+        <button class="btn red" onclick="deleteDetailImage(${p.id})">삭제</button>
       </td>
     </tr>
   `
     )
     .join("");
 
-  // 🔥 3) 상세 이미지 관리 화면 그리기
   main.innerHTML = `
     <h2>상세 이미지 관리</h2>
-
     <table>
       <tr>
         <th>ID</th>
@@ -497,10 +546,6 @@ async function loadDetailImagesPage() {
     </table>
   `;
 }
-
-/* ===========================================================
-   🔥 상세 이미지 업로드
-=========================================================== */
 
 window.uploadDetailImage = async function (productId) {
   const file = document.getElementById(`file_${productId}`).files[0];
@@ -530,37 +575,30 @@ window.uploadDetailImage = async function (productId) {
   loadDetailImagesPage();
 };
 
-/* ===========================================================
-   🔥 상세 이미지 삭제
-=========================================================== */
-
 window.deleteDetailImage = async function (productId) {
-  if (!confirm("정말 삭제하시겠습니까?")) return;
-
   const { data: product } = await supabase
     .from("products")
     .select("detail_image_url")
     .eq("id", productId)
     .single();
 
-  if (!product?.detail_image_url) {
-    await supabase
-      .from("products")
-      .update({ detail_image_url: null })
-      .eq("id", productId);
-    return alert("삭제 완료!");
+  if (product?.detail_image_url) {
+    const path = product.detail_image_url.split("/").slice(4).join("/");
+    await supabase.storage.from("kshop").remove([path]);
   }
-
-  const fullUrl = product.detail_image_url;
-  const path = fullUrl.split("/").slice(4).join("/");
-
-  await supabase.storage.from("kshop").remove([path]);
 
   await supabase
     .from("products")
     .update({ detail_image_url: null })
     .eq("id", productId);
 
-  alert("이미지 삭제 완료!");
+  alert("삭제 완료!");
   loadDetailImagesPage();
+};
+
+/* ===========================================================
+   상품 수정 페이지 이동
+=========================================================== */
+window.editProduct = function (id) {
+  location.href = `product_edit.html?id=${id}`;
 };
