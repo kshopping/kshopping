@@ -121,9 +121,3 @@ body {
     border-radius: 8px;
     cursor: pointer;
 }
-@media (max-width: 768px) {
-    .product-title {
-        text-align: center !important;
-        width: 100%;
-    }
-}
