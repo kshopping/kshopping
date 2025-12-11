@@ -158,9 +158,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 12px;
-    flex-wrap:nowarp;
-    overflow-x: auto;       /* ⭐ 가로 스크롤 */
-    white-space: nowrap; 
+    flex-wrap:warp;
     margin-top: 14px;
     padding: 10px 0;
     background: #ffffffc9;
