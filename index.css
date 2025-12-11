@@ -481,62 +481,45 @@ body {
     }
 }
 /* ============================
-   📱 MOBILE OPTIMIZATION
+   📱 mobile fix
 ============================ */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
 
     /* 상품 이미지 크기 조절 */
     .product-card img {
-        width: 100%;
-        max-height: 220px;
+        height: 160px !important;
         object-fit: cover;
     }
 
-    /* 상세페이지 이미지 줄이기 */
-    .main-img {
-        max-height: 250px !important;
-        object-fit: cover;
-    }
-
-    /* 카테고리 막대 가로 스크롤 */
+    /* 카테고리 영역 정렬 */
     #category-area {
         display: flex;
-        overflow-x: auto;
-        white-space: nowrap;
-        gap: 10px;
-        padding-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
     }
 
     #category-area button {
-        flex: 0 0 auto;
-        font-size: 14px;
+        font-size: 13px;
         padding: 6px 12px;
+        flex: 1 1 calc(33% - 10px);
+        max-width: 120px;
     }
 
-    /* 상단 메뉴 정렬 수정 */
+    /* 상단 메뉴(장바구니 포함) 중앙 정렬 */
     #top-menu {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
+        justify-content: center !important;
         gap: 10px;
     }
 
-    /* 장바구니 버튼이 화면 밖으로 밀리는 문제 해결 */
     .cart-main-btn {
-        padding: 6px 10px;
-        font-size: 15px;
-        margin-right: 0;
+        transform: scale(0.9);
     }
 
-    #cartCount {
-        right: -4px;
-        top: -4px;
-    }
-
-    /* 상품명과 설명 가운데 정렬 */
-    .product-name,
-    .product-desc {
+    /* 상품 타이틀/설명 중앙 정렬 */
+    .product-title,
+    .item-name {
         text-align: center !important;
+        width: 100%;
     }
 }
