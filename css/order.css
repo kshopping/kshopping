@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f2f4f7;
+  font-family: Pretendard, sans-serif;
+  text-align: center;
+}
+
+.title {
+  margin-top: 40px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+}
+
+.order-box {
+  width: 420px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.07);
+  text-align: left;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.form-row label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+  font-weight: 600;
+}
+
+.form-row input,
+.form-row textarea {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-row input:focus,
+.form-row textarea:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+}
+
+textarea {
+  height: 80px;
+  resize: none;
+}
+
+.btn-order {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-order:hover {
+  background: #16a34a;
+}
+
+.btn-back {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #4b5563;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background: #374151;
+}
+
+/* 모바일 대응 */
+@media (max-width: 500px) {
+  .order-box {
+    width: 90%;
+    padding: 20px;
+  }
+}
