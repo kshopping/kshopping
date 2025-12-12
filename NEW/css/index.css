@@ -34,20 +34,20 @@ body {
 /* ---------- 카테고리 (핵심) ---------- */
 
 #category-area {
-  display: flex;          /* 가로로 나열 */
-  flex-wrap: nowrap;      /* 줄바꿈 금지 */
-  overflow-x: auto;       /* 가로 스크롤 */
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 8px;
   padding: 8px;
   background: #fff;
 }
 
 #category-area::-webkit-scrollbar {
-  display: none;          /* 스크롤바 숨김 */
+  display: none;
 }
 
 #category-area > * {
-  flex-shrink: 0;         /* 줄어들지 않게 */
+  flex-shrink: 0;
   padding: 8px 14px;
   background: #e5e7eb;
   border-radius: 20px;
@@ -58,18 +58,18 @@ body {
 /* ---------- 본문 ---------- */
 
 #wrap {
-  padding-top: 120px;     /* 고정 헤더 높이만큼 띄움 */
+  padding-top: 120px;
 }
 
 /* ---------- 상품 영역 (핵심) ---------- */
 
 #product-area {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 모바일 2열 */
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   padding: 12px;
   max-width: 1000px;
-  margin: 0 auto;         /* 가운데 정렬 */
+  margin: 0 auto;
 }
 
 /* 화면 넓어질 때 */
@@ -85,9 +85,18 @@ body {
   }
 }
 
-/* 상품 카드 */
+/* ---------- 상품 카드 ---------- */
+/* 🔴 padding 제거 (이미지 좌측 쏠림 원인) */
 .product-card {
   background: white;
   border-radius: 12px;
-  padding: 10px;
+  padding: 0;
+}
+
+/* 🔴 이미지 풀폭 고정 */
+.product-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
