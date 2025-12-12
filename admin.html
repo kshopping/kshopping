@@ -6,15 +6,20 @@
   <title>K-SHOP 관리자</title>
 
   <link rel="stylesheet" href="css/admin.css">
+
+  <!-- 관리자 스크립트(기능) -->
   <script type="module" src="js/admin.js" defer></script>
+
+  <!-- XLSX 엑셀 라이브러리 (exportByPeriod 기능에 반드시 필요) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
 
+  <!-- 관리자 비밀번호 체크 (한 번 인증 시 세션 유지) -->
   <script>
     const adminPass = "100101";
 
-    // 이미 인증이 된 상태라면 비밀번호 물어보지 않음
     if (!sessionStorage.getItem("admin_ok")) {
       const input = prompt("관리자 비밀번호를 입력하세요:");
 
@@ -27,11 +32,12 @@
     }
   </script>
 
-  <!-- 기존 기능 유지: 사이드바 + 메인영역 -->
+  <!-- 좌측 사이드바 -->
   <div id="sidebar">
       <button class="home-btn" onclick="location.href='index.html'">🏠 메인으로</button>
 
       <h2>관리자 메뉴</h2>
+
       <button class="menu-btn" onclick="showPage('products')">상품 관리</button>
       <button class="menu-btn" onclick="showPage('categories')">카테고리 관리</button>
       <button class="menu-btn" onclick="showPage('banners')">배너 관리</button>
@@ -41,23 +47,26 @@
       <button class="menu-btn" onclick="showPage('detailImages')">상세이미지 관리</button>
   </div>
 
+  <!-- 메인 영역 -->
   <div id="main-area">
 
-    <!-- 기본 초기 화면 -->
+    <!-- 초기 안내 페이지 -->
     <div id="default-page">
       <h2>K-SHOP 관리자 페이지</h2>
       <p>왼쪽 메뉴에서 관리 항목을 선택하세요.</p>
     </div>
 
-    <!-- 페이지 영역들 (기존 기능 그대로 유지) -->
+    <!-- 각 관리 페이지 영역 -->
     <div id="products" class="page hidden"></div>
     <div id="categories" class="page hidden"></div>
     <div id="banners" class="page hidden"></div>
     <div id="orders" class="page hidden"></div>
     <div id="printed" class="page hidden"></div>
     <div id="account" class="page hidden"></div>
+    <div id="detailImages" class="page hidden"></div>
 
   </div>
 
 </body>
 </html>
+
