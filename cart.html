@@ -1,131 +1,139 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>장바구니</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>장바구니</title>
 
-  <!-- 메인 CSS 재사용 -->
-  <link rel="stylesheet" href="css/index.css">
+<!-- 메인 CSS 재사용 -->
+<link rel="stylesheet" href="css/index.css">
 
-  <style>
-    /* 장바구니 박스 */
-    #cart-wrap {
-      max-width: 800px;
-      margin: 40px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+<style>
+/* 장바구니 박스 */
+#cart-wrap {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-    .cart-item-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid #eee;
-    }
+.cart-item-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
 
-    .cart-item-box img {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      object-fit: cover;
-    }
+.cart-item-box img {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+}
 
-    .cart-name {
-      font-size: 17px;
-      font-weight: 600;
-    }
+.cart-name {
+  font-size: 17px;
+  font-weight: 600;
+}
 
-    .cart-price {
-      font-size: 15px;
-      color: #444;
-    }
+.cart-price {
+  font-size: 15px;
+  color: #444;
+}
 
-    .qty-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-    }
+.qty-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
 
-    .qty-btn {
-      padding: 5px 10px;
-      border: none;
-      background: #eee;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+.qty-btn {
+  padding: 5px 10px;
+  border: none;
+  background: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .qty-btn:hover {
-      background: #ffd95a;
-    }
+.qty-btn:hover {
+  background: #ffd95a;
+}
 
-    .remove-btn {
-      background: #ff7676;
-      color: #fff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+.remove-btn {
+  background: #ff7676;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .remove-btn:hover {
-      background: #ff4f4f;
-    }
+.remove-btn:hover {
+  background: #ff4f4f;
+}
 
-    #cart-total-area {
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 2px solid #ddd;
-    }
+#cart-total-area {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 2px solid #ddd;
+}
 
-    #cart-total-area div {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+#cart-total-area div {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
 
-    #goOrder {
-      width: 100%;
-      padding: 16px;
-      background: #27ae60;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 20px;
-      cursor: pointer;
-      margin-top: 25px;
-    }
+#goOrder {
+  width: 100%;
+  padding: 16px;
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 25px;
+}
 
-    #goOrder:hover {
-      background: #1f8a4b;
-    }
-  </style>
+#goOrder:hover {
+  background: #1f8a4b;
+}
+</style>
 </head>
 
 <body>
 
-  <div id="cart-wrap">
+<div id="cart-wrap">
 
-    <h2 style="text-align:center; margin-bottom:20px;">🛒 장바구니</h2>
+  <h2 style="text-align:center; margin-bottom:20px;">🛒 장바구니</h2>
 
-    <!-- 장바구니 목록 -->
-    <div id="cartList"></div>
+  <!-- 장바구니 목록 -->
+  <div id="cartList"></div>
 
-    <!-- 합계 -->
-    <div id="cart-total-area">
-      <div id="cartTotal"></div>
-    </div>
-
-    <!-- 주문하기 -->
-    <button id="goOrder">주문하기</button>
-
+  <!-- 합계 -->
+  <div id="cart-total-area">
+    <div id="cartTotal"></div>
   </div>
 
-  <script type="module" src="./js/cart.js"></script>
+  <!-- 주문하기 -->
+  <button id="goOrder">주문하기</button>
+
+</div>
+
+<!-- ✅ 빈 장바구니 진입 차단 (웹 전용, UI 영향 없음) -->
+<script>
+const cartData = JSON.parse(localStorage.getItem('cart')) || [];
+if (!Array.isArray(cartData) || cartData.length === 0) {
+  location.href = 'index.html';
+}
+</script>
+
+<script type="module" src="./js/cart.js"></script>
 
 </body>
 </html>

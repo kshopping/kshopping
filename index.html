@@ -23,8 +23,8 @@
             <!-- 장바구니 이동 -->
             <button id="cartGoBtn" class="cart-main-btn">
                 🛒 <span id="cartCount"></span>
-             
-        
+            </button>
+
             <!-- 장바구니 미리보기 -->
             <div id="cart-preview"></div>
 
@@ -67,8 +67,6 @@
             <div class="bank-label">입금 안내</div>
             <div id="bankDynamic" class="bank-value">불러오는 중...</div>
         </div>
-
-       
     </section>
 
     <!-- =======================
@@ -93,6 +91,26 @@
       스크립트
 ========================================= -->
 <script type="module" src="./js/index.js"></script>
+
+<!-- =========================================
+      장바구니 진입 차단 로직 (추가)
+========================================= -->
+<script>
+  const cartGoBtn = document.getElementById("cartGoBtn");
+
+  if (cartGoBtn) {
+    cartGoBtn.addEventListener("click", function () {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      if (cart.length === 0) {
+        alert("장바구니에 담긴 상품이 없습니다.");
+        return;
+      }
+
+      location.href = "cart.html";
+    });
+  }
+</script>
 
 </body>
 </html>

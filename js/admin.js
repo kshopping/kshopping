@@ -1,3 +1,4 @@
+console.log("🔥 admin.js 실제 로드됨");
 import { supabase } from "./supabaseClient.js";
 
 /* ===========================================================
