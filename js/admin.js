@@ -471,7 +471,7 @@ window.deleteOrder = async function (orderId) {
 
   alert("삭제 완료");
   loadOrderPage();
-  loadPrintedPage();
+ 
 };
 
 // ===========================
