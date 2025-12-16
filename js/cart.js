@@ -1,131 +1,105 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>장바구니</title>
+/* ===========================================================
+   🛒 장바구니 로드
+=========================================================== */
+function loadCart() {
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const listArea = document.getElementById("cartList");
+  const totalArea = document.getElementById("cartTotal");
 
-  <!-- 메인 CSS 재사용 -->
-  <link rel="stylesheet" href="css/index.css">
+  // 장바구니 비었을 때
+  if (cart.length === 0) {
+    listArea.innerHTML = `
+      <div style="text-align:center; padding:40px 0; color:#666; font-size:18px;">
+        🛒 장바구니가 비어 있습니다.
+      </div>
+    `;
+    totalArea.innerHTML = "";
+    return;
+  }
 
-  <style>
-    /* 장바구니 박스 */
-    #cart-wrap {
-      max-width: 800px;
-      margin: 40px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+  let html = "";
+  let totalPrice = 0;
 
-    .cart-item-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid #eee;
-    }
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.qty;
+    totalPrice += itemTotal;
 
-    .cart-item-box img {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      object-fit: cover;
-    }
+    html += `
+      <div class="cart-item-box">
+        <img src="${item.image}" alt="${item.name}">
 
-    .cart-name {
-      font-size: 17px;
-      font-weight: 600;
-    }
+        <div style="flex:1;">
+          <div class="cart-name">${item.name}</div>
+          <div class="cart-price">${item.price.toLocaleString()}원</div>
 
-    .cart-price {
-      font-size: 15px;
-      color: #444;
-    }
+          <div class="qty-box">
+            <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+          </div>
+        </div>
 
-    .qty-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-    }
+        <button class="remove-btn" onclick="removeItem(${index})">삭제</button>
+      </div>
+    `;
+  });
 
-    .qty-btn {
-      padding: 5px 10px;
-      border: none;
-      background: #eee;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+  listArea.innerHTML = html;
 
-    .qty-btn:hover {
-      background: #ffd95a;
-    }
+  totalArea.innerHTML = `
+    총 수량: ${cart.reduce((t,i)=>t+i.qty,0)}개<br>
+    총 금액: ${totalPrice.toLocaleString()}원
+  `;
+}
 
-    .remove-btn {
-      background: #ff7676;
-      color: #fff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+/* ===========================================================
+   🔼 수량 증가/감소
+=========================================================== */
+window.changeQty = function (index, diff) {
+  let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
-    .remove-btn:hover {
-      background: #ff4f4f;
-    }
+  cart[index].qty += diff;
+  if (cart[index].qty < 1) cart[index].qty = 1;
 
-    #cart-total-area {
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 2px solid #ddd;
-    }
+  localStorage.setItem("cartItems", JSON.stringify(cart));
 
-    #cart-total-area div {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+  loadCart();
 
-    #goOrder {
-      width: 100%;
-      padding: 16px;
-      background: #27ae60;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 20px;
-      cursor: pointer;
-      margin-top: 25px;
-    }
+  // index.js와 연동될 경우 카운트 업데이트
+  if (window.updateCartCount) updateCartCount();
+  if (window.updateCartPreview) updateCartPreview();
+};
 
-    #goOrder:hover {
-      background: #1f8a4b;
-    }
-  </style>
-</head>
+/* ===========================================================
+   ❌ 삭제
+=========================================================== */
+window.removeItem = function (index) {
+  let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
-<body>
+  cart.splice(index, 1);
+  localStorage.setItem("cartItems", JSON.stringify(cart));
 
-  <div id="cart-wrap">
+  loadCart();
 
-    <h2 style="text-align:center; margin-bottom:20px;">🛒 장바구니</h2>
+  if (window.updateCartCount) updateCartCount();
+  if (window.updateCartPreview) updateCartPreview();
+};
 
-    <!-- 장바구니 목록 -->
-    <div id="cartList"></div>
+/* ===========================================================
+   🧾 주문 페이지 이동
+=========================================================== */
+document.getElementById("goOrder").addEventListener("click", () => {
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  if (cart.length === 0) {
+    alert("장바구니가 비어 있습니다.");
+    return;
+  }
 
-    <!-- 합계 -->
-    <div id="cart-total-area">
-      <div id="cartTotal"></div>
-    </div>
+  location.href = "order.html";
+});
 
-    <!-- 주문하기 -->
-    <button id="goOrder">주문하기</button>
+/* ===========================================================
+   🚀 초기 실행
+=========================================================== */
+loadCart();
 
-  </div>
-
-  <script type="module" src="./js/cart.js"></script>
-
-</body>
-</html>
