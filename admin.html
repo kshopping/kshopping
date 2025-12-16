@@ -7,6 +7,27 @@
 
   <link rel="stylesheet" href="css/admin.css" />
 
+  <!-- ✅ 비밀번호 체크를 "가장 먼저" 실행 (admin.js보다 먼저) -->
+  <script>
+    (function () {
+      const adminPass = "100101";
+      const okKey = "admin_ok";
+
+      // ✅ 세션에 남아있으면 바로 통과 (원하는 동작이면 유지)
+      // ✅ 매번 물어보게 하려면 아래 if를 무조건 prompt로 바꾸면 됨.
+      if (sessionStorage.getItem(okKey) !== "true") {
+        const input = prompt("관리자 비밀번호를 입력하세요:");
+
+        if (input !== adminPass) {
+          alert("비밀번호가 올바르지 않습니다.");
+          location.replace("index.html");
+          return;
+        }
+        sessionStorage.setItem(okKey, "true");
+      }
+    })();
+  </script>
+
   <!-- XLSX (엑셀 저장용) : admin.js에서 사용하므로 먼저 로드 -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -16,29 +37,12 @@
 
 <body>
 
-  <!-- 관리자 비밀번호 체크 -->
-  <script>
-    const adminPass = "100101";
-
-    if (!sessionStorage.getItem("admin_ok")) {
-      const input = prompt("관리자 비밀번호를 입력하세요:");
-
-      if (input !== adminPass) {
-        alert("비밀번호가 올바르지 않습니다.");
-        location.href = "index.html";
-      } else {
-        sessionStorage.setItem("admin_ok", "true");
-      }
-    }
-  </script>
-
   <!-- 사이드바 -->
   <div id="sidebar">
     <button class="home-btn" onclick="location.href='index.html'">🏠 메인으로</button>
 
     <h2>관리자 메뉴</h2>
 
-    <!-- showPage는 admin.js에서 window.showPage 로 등록됨 -->
     <button class="menu-btn" onclick="showPage('products')">상품 관리</button>
     <button class="menu-btn" onclick="showPage('categories')">카테고리 관리</button>
     <button class="menu-btn" onclick="showPage('banners')">배너 관리</button>
@@ -58,3 +62,4 @@
 
 </body>
 </html>
+
