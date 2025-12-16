@@ -1,12 +1,19 @@
 {
+  "cleanUrls": false,
+  "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/admin",
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/admin/",
-      "destination": "/admin.html"
-    }
+    { "source": "/", "destination": "/index.html" },
+
+    { "source": "/cart", "destination": "/cart.html" },
+    { "source": "/cart/", "destination": "/cart.html" },
+
+    { "source": "/detail", "destination": "/detail.html" },
+    { "source": "/detail/", "destination": "/detail.html" },
+
+    { "source": "/order", "destination": "/order.html" },
+    { "source": "/order/", "destination": "/order.html" },
+
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin/", "destination": "/admin.html" }
   ]
 }
