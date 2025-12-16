@@ -670,3 +670,4 @@ window.deleteProduct = async function (productId) {
   alert("상품이 삭제되었습니다.");
   loadProductPage(); // 상품 목록 새로고침
 };
+window.deleteProduct = deleteProduct;
