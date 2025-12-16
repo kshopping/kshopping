@@ -68,27 +68,7 @@ async function loadProductPage() {
 window.addProduct = function () {
   location.href = "product_add.html";
 };
-/* ===========================================================
-   🔥 상품 삭제 (← 이거 추가)
-=========================================================== */
-window.deleteProduct = async function (id) {
-  const ok = confirm("정말 이 상품을 삭제하시겠습니까?");
-  if (!ok) return;
 
-  const { error } = await supabase
-    .from("products")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error(error);
-    alert("상품 삭제 실패!");
-    return;
-  }
-
-  alert("상품이 삭제되었습니다.");
-  loadProductPage(); // 목록 새로고침
-};
 /* ===========================================================
    카테고리 관리
 =========================================================== */
@@ -669,4 +649,24 @@ window.deleteDetailImage = async function (productId) {
 =========================================================== */
 window.editProduct = function (id) {
   location.href = `product_edit.html?id=${id}`;
+};
+/* ===========================================================
+   🗑 상품 삭제 (정식 버전)
+=========================================================== */
+window.deleteProduct = async function (productId) {
+  if (!confirm("정말 이 상품을 삭제하시겠습니까?")) return;
+
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId);
+
+  if (error) {
+    console.error(error);
+    alert("상품 삭제 실패");
+    return;
+  }
+
+  alert("상품이 삭제되었습니다.");
+  loadProductPage(); // 상품 목록 새로고침
 };
