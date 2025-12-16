@@ -126,6 +126,14 @@
   </div>
 
   <script type="module" src="./js/cart.js"></script>
+<script>
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+  if (cart.length === 0) {
+    alert("장바구니가 비어 있습니다.");
+    location.href = "index.html";
+  }
+</script>
 
 </body>
 </html>
