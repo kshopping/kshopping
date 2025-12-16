@@ -44,7 +44,8 @@ async function loadProductPage() {
         <td>${catMap[p.category_id] ?? "없음"}</td>
         <td>
           <button class="btn blue" onclick="editProduct('${p.id}')">수정</button>
-          <button class="btn red" onclick="deleteProduct('${p.id}')">삭제</button>
+          <button class="btn red" onclick="window.deleteProduct('${p.id}')" >삭제</button>
+         
         </td>
       </tr>
     `
@@ -63,6 +64,7 @@ async function loadProductPage() {
       ${rows}
     </table>
   `;
+ 
 }
 
 window.addProduct = function () {
