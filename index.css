@@ -475,19 +475,4 @@ body {
     opacity: 1;
     z-index: 5;
 }
-/* =========================
-   EDGE PIP 완전 차단 (확정판)
-========================= */
-#banner-area {
-    pointer-events: none;
-}
 
-#banner-area .banner-slide,
-#banner-area img {
-    pointer-events: none;
-}
-
-/* 배너 위 텍스트만 다시 살림 */
-#banner-text-overlay {
-    pointer-events: auto;
-}
