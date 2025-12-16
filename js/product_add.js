@@ -1,8 +1,18 @@
 import { supabase } from "./supabaseClient.js";
 
-// 카테고리 불러오기
+/* ===========================================================
+   카테고리 불러오기
+=========================================================== */
 async function loadCategories() {
-  const { data, error } = await supabase.from("categories").select("*");
+  const select = document.getElementById("category");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">카테고리 선택</option>`;
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name");
 
   if (error) {
     console.error(error);
@@ -10,22 +20,21 @@ async function loadCategories() {
     return;
   }
 
-  const select = document.getElementById("category");
-
-  // 카테고리 옵션 추가
-  data.forEach(c => {
+  data.forEach((c) => {
     const opt = document.createElement("option");
-    opt.value = c.id;     // ★ 반드시 ID를 value로 사용
+    opt.value = c.id;
     opt.textContent = c.name;
     select.appendChild(opt);
   });
 }
 
-// 이미지 업로드 함수
-async function uploadImage(file, pathPrefix) {
+/* ===========================================================
+   이미지 업로드 공통 함수
+=========================================================== */
+async function uploadImage(file, folder) {
   if (!file) return null;
 
-  const filePath = `${pathPrefix}/${Date.now()}_${file.name}`;
+  const filePath = `${folder}/${Date.now()}_${file.name}`;
 
   const { error: uploadError } = await supabase.storage
     .from("kshop")
@@ -37,36 +46,53 @@ async function uploadImage(file, pathPrefix) {
     return null;
   }
 
-  // 업로드한 이미지 URL 가져오기
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("kshop").getPublicUrl(filePath);
+  const { data } = supabase.storage
+    .from("kshop")
+    .getPublicUrl(filePath);
 
-  return publicUrl;
+  return data.publicUrl;
 }
 
-// 저장 버튼 클릭
-document.getElementById("saveBtn").onclick = async function () {
-  const name = document.getElementById("name").value.trim();
-  const price_original = Number(document.getElementById("price_original").value);
-  const price_sale = Number(document.getElementById("price_sale").value);
-  const category_id = document.getElementById("category").value;
-  const description = document.getElementById("description").value.trim();
+/* ===========================================================
+   상품 저장
+=========================================================== */
+document.getElementById("saveBtn").addEventListener("click", async function (e) {
+  // 🔥 중복 클릭 방지
+  e.target.disabled = true;
 
-  const imageFile = document.getElementById("image_file").files[0];
-  const detailFile = document.getElementById("detail_file").files[0];
+  // DOM 안전 체크
+  const nameEl = document.getElementById("name");
+  const priceOriginalEl = document.getElementById("price_original");
+  const priceSaleEl = document.getElementById("price_sale");
+  const categoryEl = document.getElementById("category");
+  const descEl = document.getElementById("description");
 
-  if (!name || !price_original || !price_sale) {
-    return alert("필수 입력값을 모두 입력하세요!");
+  if (!nameEl || !priceOriginalEl || !priceSaleEl) {
+    alert("폼 요소가 존재하지 않습니다.");
+    e.target.disabled = false;
+    return;
   }
 
-  // 대표 이미지 업로드
-  const image_url = await uploadImage(imageFile, "products");
+  const name = nameEl.value.trim();
+  const price_original = Number(priceOriginalEl.value);
+  const price_sale = Number(priceSaleEl.value);
+  const category_id = categoryEl?.value || null;
+  const description = descEl?.value.trim() || "";
 
-  // 상세 이미지 업로드
+  if (!name || !price_original || !price_sale) {
+    alert("필수 항목을 모두 입력하세요.");
+    e.target.disabled = false;
+    return;
+  }
+
+  const imageFile = document.getElementById("image_file")?.files[0] || null;
+  const detailFile = document.getElementById("detail_file")?.files[0] || null;
+
+  // 이미지 업로드
+  const image_url = await uploadImage(imageFile, "products");
   const detail_image_url = await uploadImage(detailFile, "details");
 
-  // 🔥 Supabase 저장 (created_at 제거)
+  // DB 저장
   const { error } = await supabase.from("products").insert({
     name,
     price_original,
@@ -80,12 +106,17 @@ document.getElementById("saveBtn").onclick = async function () {
   if (error) {
     console.error(error);
     alert("상품 저장 중 오류가 발생했습니다.");
+    e.target.disabled = false;
     return;
   }
 
   alert("상품이 성공적으로 추가되었습니다!");
-  location.href = "admin.html";
-};
 
-// 초기 실행
+  // 🔥 replace 사용 (뒤로가기·중복 실행 완전 차단)
+  location.replace("admin.html");
+});
+
+/* ===========================================================
+   초기 실행
+=========================================================== */
 loadCategories();
