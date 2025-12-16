@@ -32,6 +32,7 @@ async function loadProductPage() {
   const catMap = {};
   categories?.forEach((c) => (catMap[c.id] = c.name));
 
+  // ✅ 여기부터 변경: inline onclick 제거하고 data-id로만 박음
   const rows = (products ?? [])
     .map(
       (p) => `
@@ -43,8 +44,8 @@ async function loadProductPage() {
         <td>${p.price_sale.toLocaleString()}원</td>
         <td>${catMap[p.category_id] ?? "없음"}</td>
         <td>
-          <button class="btn blue" onclick="editProduct('${p.id}')">수정</button>
-          <button class="btn red" onclick="deleteProduct('${p.id}')">삭제</button>
+          <button class="btn blue js-edit" data-id="${p.id}">수정</button>
+          <button class="btn red js-del" data-id="${p.id}">삭제</button>
         </td>
       </tr>
     `
@@ -63,6 +64,21 @@ async function loadProductPage() {
       ${rows}
     </table>
   `;
+
+  // ✅ 여기부터 변경: JS에서 클릭 이벤트 연결 (이 방식은 무조건 됨)
+  main.querySelectorAll(".js-edit").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      window.editProduct(id);
+    });
+  });
+
+  main.querySelectorAll(".js-del").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      window.deleteProduct(id);
+    });
+  });
 }
 
 window.addProduct = function () {
@@ -124,7 +140,7 @@ window.addCategory = async function () {
   loadCategoryPage();
 };
 
-window.editCategory = async function(id, oldName) {
+window.editCategory = async function (id, oldName) {
   const newName = prompt("새 카테고리 이름을 입력하세요:", oldName);
 
   if (!newName || newName.trim() === "") {
@@ -225,6 +241,7 @@ window.deleteBanner = async function (id) {
   await supabase.from("banners").delete().eq("id", id);
   loadBannerPage();
 };
+
 /* ===========================================================
    주문 관리 (출력 전 주문 목록)
 =========================================================== */
@@ -418,7 +435,6 @@ window.exportByPeriod = async function (type) {
 
     const rows = [];
 
-    // 헤더
     rows.push([
       "주문번호",
       "고객명",
@@ -431,7 +447,6 @@ window.exportByPeriod = async function (type) {
       "상품목록"
     ]);
 
-    // 데이터
     orders.forEach((o) => {
       const qty = o.items.reduce((t, i) => t + i.qty, 0);
 
@@ -452,14 +467,10 @@ window.exportByPeriod = async function (type) {
       ]);
     });
 
-    // 워크시트 생성
     const ws = XLSX.utils.aoa_to_sheet(rows);
-
-    // 워크북 생성
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Orders");
 
-    // 파일명
     const filename =
       type === "day"
         ? `orders_day_${key}.xlsx`
@@ -467,13 +478,11 @@ window.exportByPeriod = async function (type) {
         ? `orders_month_${key}.xlsx`
         : `orders_year_${key}.xlsx`;
 
-    // 다운로드 실행
     XLSX.writeFile(wb, filename);
   });
 
   alert("엑셀 저장 완료!");
 };
-
 
 /* ===========================================================
    계좌 정보 관리
@@ -649,4 +658,25 @@ window.deleteDetailImage = async function (productId) {
 =========================================================== */
 window.editProduct = function (id) {
   location.href = `product_edit.html?id=${id}`;
+};
+
+/* ===========================================================
+   🗑 상품 삭제 (정식 버전)
+=========================================================== */
+window.deleteProduct = async function (productId) {
+  if (!confirm("정말 이 상품을 삭제하시겠습니까?")) return;
+
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId);
+
+  if (error) {
+    console.error(error);
+    alert("상품 삭제 실패");
+    return;
+  }
+
+  alert("상품이 삭제되었습니다.");
+  loadProductPage();
 };

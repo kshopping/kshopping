@@ -1,11 +1,18 @@
 import { supabase } from "./supabaseClient.js";
 
 /* ===========================================================
-   🛒 장바구니 이동 버튼
+   🛒 장바구니 이동 버튼 (비어있으면 차단)
 =========================================================== */
 const cartGoBtn = document.getElementById("cartGoBtn");
 if (cartGoBtn) {
   cartGoBtn.addEventListener("click", () => {
+    const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+    if (cart.length === 0) {
+      alert("장바구니가 비어 있습니다.");
+      return;
+    }
+
     location.href = "cart.html";
   });
 }
