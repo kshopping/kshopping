@@ -476,9 +476,18 @@ body {
     z-index: 5;
 }
 /* =========================
-   EDGE 화면속화면(PIP) 버그 차단
+   EDGE PIP 완전 차단 (확정판)
 ========================= */
+#banner-area {
+    pointer-events: none;
+}
+
+#banner-area .banner-slide,
 #banner-area img {
     pointer-events: none;
 }
 
+/* 배너 위 텍스트만 다시 살림 */
+#banner-text-overlay {
+    pointer-events: auto;
+}
