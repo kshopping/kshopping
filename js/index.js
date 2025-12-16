@@ -97,14 +97,10 @@ async function loadCategories() {
   const { data: categories } = await supabase.from("categories").select("*");
 
   area.innerHTML = (categories || [])
-    .map(
-      (c) => `
-        <button class="category-btn" data-cat-id="${c.id}">
-          ${c.name}
-        </button>`
-    )
+   .map(c => `<button class="category-btn" data-cat-id="${c.id}">${c.name}</button>`) 
     .join("");
 }
+ 
 
 /* ===========================================================
    🔥 상품 로드 (정상가/세일가 + 가운데 정렬)

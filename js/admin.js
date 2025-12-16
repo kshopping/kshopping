@@ -385,21 +385,23 @@ window.deleteOrder = async function (orderId) {
   loadPrintedPage();
 };
 
-/* ===========================================================
-   출력 데이터 저장 (일별/월별/연도별)
-=========================================================== */
+// ===========================
+// XLSX 엑셀 저장 기능 (안전모드)
+// ===========================
 window.exportByPeriod = async function (type) {
   const { data } = await supabase
     .from("orders")
     .select("*")
     .eq("printed", true);
 
-  if (!data || data.length === 0) return alert("저장할 주문이 없습니다.");
+  if (!data || data.length === 0) {
+    return alert("출력된 주문이 없습니다.");
+  }
 
-  const grouped = {};
+  const groups = {};
 
   data.forEach((o) => {
-    const date = o.printed_at?.split("T")[0] || "";
+    const date = o.printed_at.split("T")[0];
     const [y, m, d] = date.split("-");
 
     let key = "";
@@ -407,25 +409,71 @@ window.exportByPeriod = async function (type) {
     if (type === "month") key = `${y}-${m}`;
     if (type === "year") key = `${y}`;
 
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(o);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(o);
   });
 
-  const blob = new Blob([JSON.stringify(grouped, null, 2)], {
-    type: "application/json",
+  Object.keys(groups).forEach((key) => {
+    const orders = groups[key];
+
+    const rows = [];
+
+    // 헤더
+    rows.push([
+      "주문번호",
+      "고객명",
+      "연락처",
+      "주소",
+      "요청사항",
+      "총금액",
+      "총수량",
+      "출력일",
+      "상품목록"
+    ]);
+
+    // 데이터
+    orders.forEach((o) => {
+      const qty = o.items.reduce((t, i) => t + i.qty, 0);
+
+      const itemText = o.items
+        .map((i) => `${i.name}(${i.qty}개 × ${i.price}원)`)
+        .join(" / ");
+
+      rows.push([
+        o.id,
+        o.name,
+        o.phone,
+        o.address,
+        o.memo,
+        o.total,
+        qty,
+        o.printed_at.split("T")[0],
+        itemText
+      ]);
+    });
+
+    // 워크시트 생성
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Orders");
+
+    // 파일명
+    const filename =
+      type === "day"
+        ? `orders_day_${key}.xlsx`
+        : type === "month"
+        ? `orders_month_${key}.xlsx`
+        : `orders_year_${key}.xlsx`;
+
+    // 다운로드 실행
+    XLSX.writeFile(wb, filename);
   });
 
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download =
-    type === "day"
-      ? "일별_주문.json"
-      : type === "month"
-      ? "월별_주문.json"
-      : "연도별_주문.json";
-
-  link.click();
+  alert("엑셀 저장 완료!");
 };
+
 
 /* ===========================================================
    계좌 정보 관리
