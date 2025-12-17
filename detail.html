@@ -18,8 +18,13 @@
 
   <div class="product-detail-box">
 
-      <!-- 메인 상품 이미지 -->
-      <img id="productImage" class="main-img" src="" alt="상품 이미지">
+      <!-- 메인 상품 이미지 (썸네일 / 그대로 둠) -->
+      <img 
+        id="productImage" 
+        class="main-img" 
+        src="" 
+        alt="상품 이미지"
+      >
 
       <!-- 상품 기본 정보 -->
       <div class="product-title" id="productName"></div>
@@ -37,7 +42,12 @@
 
       <!-- 🔥 상세 이미지 영역 -->
       <div id="detailImageWrap" class="detail-image-wrap">
-        <img id="detailImage" class="detail-img">
+        <!-- ✅ 여기만 수정됨: class="detail-image" 추가 -->
+        <img 
+          id="detailImage" 
+          class="detail-img detail-image"
+          alt="상세 이미지"
+        >
       </div>
 
   </div>
@@ -47,3 +57,4 @@
 <script type="module" src="./js/detail.js"></script>
 </body>
 </html>
+

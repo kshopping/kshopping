@@ -121,3 +121,13 @@ body {
     border-radius: 8px;
     cursor: pointer;
 }
+/* =============================
+   ✅ 상세 이미지 (잘리지 않게)
+============================= */
+.detail-image {
+    width: 100%;
+    height: auto;          /* 🔑 높이 고정 제거 */
+    max-height: none;      /* 🔑 혹시 모를 제한 제거 */
+    object-fit: contain;  /* 🔑 절대 자르지 않음 */
+    border-radius: 10px;
+}
