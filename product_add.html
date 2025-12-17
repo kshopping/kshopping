@@ -94,6 +94,7 @@
     }
   </style>
 
+  <!-- ✅ JS 그대로 사용 -->
   <script type="module" src="js/product_add.js" defer></script>
 </head>
 
@@ -123,19 +124,20 @@
         <select id="category"></select>
       </div>
 
+      <!-- ✅ JS와 ID 통일 -->
       <div class="form-group">
         <label>대표 이미지</label>
-        <input type="file" id="image">
+        <input type="file" id="image_file">
       </div>
 
       <div class="form-group">
         <label>상세 이미지</label>
-        <input type="file" id="detail_image">
+        <input type="file" id="detail_file">
       </div>
 
       <div class="form-group full-width">
         <label>설명</label>
-        <textarea id="desc" placeholder="상품 설명을 입력하세요"></textarea>
+        <textarea id="description" placeholder="상품 설명을 입력하세요"></textarea>
       </div>
 
     </div>
@@ -148,3 +150,4 @@
   </div>
 </body>
 </html>
+
