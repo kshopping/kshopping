@@ -29,19 +29,24 @@ async function loadCategories() {
 }
 
 /* ===========================================================
-   이미지 업로드 공통 함수
+   ✅ 안전한 이미지 업로드 (한글 파일명 제거)
 =========================================================== */
 async function uploadImage(file, folder) {
   if (!file) return null;
 
-  const filePath = `${folder}/${Date.now()}_${file.name}`;
+  const ext = file.name.split(".").pop().toLowerCase();
+  const safeName = `${Date.now()}.${ext}`;
+  const filePath = `${folder}/${safeName}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error } = await supabase.storage
     .from("kshop")
-    .upload(filePath, file, { upsert: true });
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false
+    });
 
-  if (uploadError) {
-    console.error(uploadError);
+  if (error) {
+    console.error("이미지 업로드 실패:", error);
     alert("이미지 업로드 실패!");
     return null;
   }
@@ -57,27 +62,13 @@ async function uploadImage(file, folder) {
    상품 저장
 =========================================================== */
 document.getElementById("saveBtn").addEventListener("click", async function (e) {
-  // 🔥 중복 클릭 방지
   e.target.disabled = true;
 
-  // DOM 안전 체크
-  const nameEl = document.getElementById("name");
-  const priceOriginalEl = document.getElementById("price_original");
-  const priceSaleEl = document.getElementById("price_sale");
-  const categoryEl = document.getElementById("category");
-  const descEl = document.getElementById("description");
-
-  if (!nameEl || !priceOriginalEl || !priceSaleEl) {
-    alert("폼 요소가 존재하지 않습니다.");
-    e.target.disabled = false;
-    return;
-  }
-
-  const name = nameEl.value.trim();
-  const price_original = Number(priceOriginalEl.value);
-  const price_sale = Number(priceSaleEl.value);
-  const category_id = categoryEl?.value || null;
-  const description = descEl?.value.trim() || "";
+  const name = document.getElementById("name")?.value.trim();
+  const price_original = Number(document.getElementById("price_original")?.value);
+  const price_sale = Number(document.getElementById("price_sale")?.value);
+  const category_id = document.getElementById("category")?.value || null;
+  const desc = document.getElementById("desc")?.value.trim() || "";
 
   if (!name || !price_original || !price_sale) {
     alert("필수 항목을 모두 입력하세요.");
@@ -85,14 +76,12 @@ document.getElementById("saveBtn").addEventListener("click", async function (e) 
     return;
   }
 
-  const imageFile = document.getElementById("image_file")?.files[0] || null;
-  const detailFile = document.getElementById("detail_file")?.files[0] || null;
+  const imageFile = document.getElementById("image")?.files[0] || null;
+  const detailFile = document.getElementById("detail_image")?.files[0] || null;
 
-  // 이미지 업로드
   const image_url = await uploadImage(imageFile, "products");
   const detail_image_url = await uploadImage(detailFile, "details");
 
-  // DB 저장
   const { error } = await supabase.from("products").insert({
     name,
     price_original,
@@ -100,7 +89,7 @@ document.getElementById("saveBtn").addEventListener("click", async function (e) 
     category_id,
     image_url,
     detail_image_url,
-    desc: description
+    desc
   });
 
   if (error) {
@@ -111,8 +100,6 @@ document.getElementById("saveBtn").addEventListener("click", async function (e) 
   }
 
   alert("상품이 성공적으로 추가되었습니다!");
-
-  // 🔥 replace 사용 (뒤로가기·중복 실행 완전 차단)
   location.replace("admin.html");
 });
 
