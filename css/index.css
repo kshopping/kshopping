@@ -230,19 +230,22 @@ body {
     transform: translateY(-8px);
     box-shadow: 0 14px 28px rgba(0,0,0,0.12);
 }
-
-/* 상품 이미지 */
+/* =============================
+   ✅ 메인 상품 이미지 (안 잘리고 정렬 유지)
+============================= */
 .product-card img {
     width: 100%;
-    aspect-ratio: 4/3;
+    height: 220px;        /* 🔑 카드 높이 통일 */
     border-radius: 14px;
-    object-fit: cover;
+    object-fit: contain; /* 🔑 절대 자르지 않음 */
+    background: #f5f5f5; /* 여백 보정 */
     transition: 0.35s ease;
 }
 
 .product-card:hover img {
     transform: scale(1.06);
 }
+
 
 /* 할인 뱃지 */
 .product-badge {
