@@ -13,6 +13,19 @@
       align-items: center;
     }
 
+    /* ===== 로고 (크게 + 번개색) ===== */
+    .header-title {
+      font-size: 26px;          /* 크게 */
+      font-weight: 900;
+      color: #ff4d4f;           /* 번개와 동일 */
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .header-title:hover {
+      color: #ff6b6d;           /* 살짝 밝아짐 */
+    }
+
     /* ===== 중앙 슬로건 ===== */
     .header-slogan {
       flex: 1;
@@ -24,38 +37,43 @@
       white-space: nowrap;
     }
 
-    /* 🔴 할인 배지와 동일한 레드 */
+    /* 🔴 공통 레드 */
     .highlight-red {
       color: #ff4d4f;
       font-weight: 700;
     }
 
-    /* ⚡ 매우 큰 SVG 번개 */
+    /* ⚡ 번개 (깜빡 + 흔들림) */
     .lightning-svg {
       display: inline-block;
       vertical-align: middle;
       margin: 0 8px;
-      animation: lightningPulse 0.9s infinite ease-in-out;
+      animation: lightningCombo 0.9s infinite ease-in-out;
+      transform-origin: center;
     }
 
     .lightning-svg svg {
-      width: 26px;   /* ⬅ 크게 */
-      height: 34px;  /* ⬅ 매우 크게 */
+      width: 26px;
+      height: 34px;
       fill: #ff4d4f;
     }
 
-    @keyframes lightningPulse {
+    @keyframes lightningCombo {
       0% {
-        opacity: 0.5;
-        transform: scale(1);
+        opacity: 0.4;
+        transform: rotate(0deg) scale(1);
       }
-      50% {
+      30% {
         opacity: 1;
-        transform: scale(1.2);
+        transform: rotate(-8deg) scale(1.15);
+      }
+      60% {
+        opacity: 1;
+        transform: rotate(8deg) scale(1.15);
       }
       100% {
-        opacity: 0.5;
-        transform: scale(1);
+        opacity: 0.4;
+        transform: rotate(0deg) scale(1);
       }
     }
 
@@ -144,4 +162,3 @@
 
 </body>
 </html>
-
