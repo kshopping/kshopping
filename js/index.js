@@ -92,13 +92,19 @@ async function loadCategories() {
   const area = document.getElementById("category-area");
   const { data: categories } = await supabase.from("categories").select("*");
 
-  area.innerHTML = (categories || [])
-    .map(
-      (c) =>
-        `<button class="category-btn" data-cat-id="${c.id}">${c.name}</button>`
-    )
-    .join("");
+  area.innerHTML = `
+    <button class="category-btn active-cat" data-cat-id="">
+      전체보기
+    </button>
+    ${(categories || [])
+      .map(
+        (c) =>
+          `<button class="category-btn" data-cat-id="${c.id}">${c.name}</button>`
+      )
+      .join("")}
+  `;
 }
+
 
 /* ===========================================================
    🔥 상품 로드 (✅ 일시 품절 대응)
