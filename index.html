@@ -5,94 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>K-Shopping</title>
   <link rel="stylesheet" href="css/index.css">
+
+  <style>
+    /* ===== 헤더 레이아웃 ===== */
+    #fixed-header-inner {
+      display: flex;
+      align-items: center;
+    }
+
+    /* ===== 중앙 슬로건 ===== */
+    .header-slogan {
+      flex: 1;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ff9900;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    /* 🔴 할인 배지와 동일한 레드 */
+    .highlight-red {
+      color: #ff4d4f;
+      font-weight: 700;
+    }
+
+    /* ⚡ 매우 큰 SVG 번개 */
+    .lightning-svg {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 8px;
+      animation: lightningPulse 0.9s infinite ease-in-out;
+    }
+
+    .lightning-svg svg {
+      width: 26px;   /* ⬅ 크게 */
+      height: 34px;  /* ⬅ 매우 크게 */
+      fill: #ff4d4f;
+    }
+
+    @keyframes lightningPulse {
+      0% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+    }
+
+    /* 🚚 배송 강조 */
+    .shipping-fast {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .header-slogan {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- =========================================
-      🔥 FIXED HEADER (고정 상단바)
-========================================= -->
 <header id="fixed-header">
   <div id="fixed-header-inner">
 
     <!-- 로고 -->
-   <div class="header-title" onclick="location.href='index.html'">
-  K-Shopping
-</div>
+    <div class="header-title" onclick="location.href='index.html'">
+      K-Shopping
+    </div>
+
+    <!-- 중앙 문구 -->
+    <div class="header-slogan">
+      외국인을 위한
+      <span class="lightning-svg">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+        </svg>
+      </span>
+      초특가 쇼핑몰
+    </div>
 
     <!-- 상단 메뉴 -->
     <div id="top-menu">
-
-      <!-- 🛒 장바구니 이동 버튼 -->
       <button id="cartGoBtn" class="cart-main-btn">
         🛒 <span id="cartCount"></span>
       </button>
-
-      <!-- 🛒 장바구니 미리보기 -->
       <div id="cart-preview"></div>
-
-      <!-- 관리자 -->
       <button onclick="location.href='admin.html'">🔑 관리자</button>
     </div>
+
   </div>
 
-  <!-- 카테고리 -->
   <nav id="category-area"></nav>
 </header>
 
-<!-- =========================================
-      🔥 메인 컨텐츠
-========================================= -->
 <main id="wrap">
 
-  <!-- =======================
-       배너 + 오버레이 텍스트
-  ======================== -->
   <section id="banner-area">
     <div id="banner-text-overlay">
       💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
     </div>
   </section>
 
-  <!-- =======================
-       오늘의 특가
-  ======================== -->
   <section id="today-deal"></section>
 
-  <!-- =======================
-       입금 안내
-  ======================== -->
   <section class="bank-info-box">
-    <div class="bank-icon">💳</div>
-
+    <div class="bank-icon">🌍</div>
     <div class="bank-text">
-      <div class="bank-label">입금 안내</div>
-      <div id="bankDynamic" class="bank-value">
-        불러오는 중...
+      <div class="bank-label">외국인 전용 구매 안내</div>
+      <div class="bank-value">
+        <span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
+        <span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
+        <span class="shipping-fast highlight-red">
+          <span>🚚</span> FAST SHIPPING
+        </span>
       </div>
     </div>
   </section>
 
-  <!-- =======================
-       상품 목록
-  ======================== -->
   <section id="product-section">
-    <div id="product-area" class="product-grid">
-      <!-- JS에서 상품 카드 동적 생성 -->
-    </div>
+    <div id="product-area" class="product-grid"></div>
   </section>
 
 </main>
 
-<!-- =========================================
-      🔥 토스트 알림
-========================================= -->
 <div id="toast"></div>
-
-<!-- =========================================
-      스크립트
-========================================= -->
 <script type="module" src="./js/index.js"></script>
 
 </body>
 </html>
+
