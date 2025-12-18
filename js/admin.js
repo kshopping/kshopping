@@ -407,11 +407,12 @@ async function loadPrintedPage() {
   const rows = (printed ?? [])
     .map((o) => {
       const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
-
+      const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
       return `
       <tr>
         <td>${o.id}</td>
         <td>${o.name}</td>
+        <td>${agreeText}</td>
         <td>${Number(o.total || 0).toLocaleString()}원</td>
         <td>${qty}</td>
         <td>${o.printed_at?.split("T")[0] ?? ""}</td>
@@ -431,8 +432,14 @@ async function loadPrintedPage() {
 
     <table>
       <tr>
-        <th>주문번호</th><th>고객명</th><th>금액</th>
-        <th>수량</th><th>출력일</th><th>관리</th>
+       <th>주문번호</th>
+       <th>고객명</th>
+       <th>광고동의</th>
+       <th>금액</th>
+       <th>수량</th>
+       <th>출력일</th>
+       <th>관리</th>
+ 
       </tr>
       ${rows}
     </table>
@@ -483,10 +490,13 @@ window.deleteOrder = async function (orderId) {
 };
 
 // ===========================
-// XLSX 엑셀 저장 기능 (안전모드)
+// XLSX 엑셀 저장 기능 (광고동의 포함 최종본)
 // ===========================
 window.exportByPeriod = async function (type) {
-  const { data } = await supabase.from("orders").select("*").eq("printed", true);
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("printed", true);
 
   if (!data || data.length === 0) {
     return alert("출력된 주문이 없습니다.");
@@ -509,13 +519,14 @@ window.exportByPeriod = async function (type) {
 
   Object.keys(groups).forEach((key) => {
     const orders = groups[key];
-
     const rows = [];
 
+    // ✅ 엑셀 헤더 (광고동의 포함)
     rows.push([
       "주문번호",
       "고객명",
       "연락처",
+      "광고동의",
       "주소",
       "요청사항",
       "총금액",
@@ -525,9 +536,9 @@ window.exportByPeriod = async function (type) {
     ]);
 
     orders.forEach((o) => {
-      const qty = o.items.reduce((t, i) => t + i.qty, 0);
+      const qty = (o.items ?? []).reduce((t, i) => t + i.qty, 0);
 
-      const itemText = o.items
+      const itemText = (o.items ?? [])
         .map((i) => `${i.name}(${i.qty}개 × ${i.price}원)`)
         .join(" / ");
 
@@ -535,6 +546,7 @@ window.exportByPeriod = async function (type) {
         o.id,
         o.name,
         o.phone,
+        o.marketing_agree ? "TRUE" : "FALSE", // ✅ 핵심
         o.address,
         o.memo,
         o.total,
@@ -560,6 +572,7 @@ window.exportByPeriod = async function (type) {
 
   alert("엑셀 저장 완료!");
 };
+
 
 /* ===========================================================
    계좌 정보 관리
