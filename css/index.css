@@ -38,9 +38,12 @@ body {
 
 .header-title {
     font-size: 28px;
-    font-weight: 800;
+    font-weight: 900;
     cursor: pointer;
+    color: #ffb700;      /* 브랜드 포인트 */
+    letter-spacing: -0.5px;
 }
+
 
 /* =============================
    🌟 TOP MENU BUTTONS
@@ -515,5 +518,18 @@ body {
 #banner-area .banner-slide.active {
     opacity: 1;
     z-index: 5;
+}
+.header-brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.header-slogan {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-top: 2px;
+    letter-spacing: -0.2px;
 }
 
