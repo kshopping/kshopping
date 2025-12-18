@@ -121,13 +121,19 @@ async function loadProducts(categoryId = null, searchKeyword = null) {
     return;
   }
 
-  let filtered = products;
-  if (searchKeyword && searchKeyword.trim() !== "") {
-    const keyword = searchKeyword.trim().toLowerCase();
-    filtered = products.filter((p) =>
-      p.name.toLowerCase().includes(keyword)
-    );
-  }
+  // 1️⃣ 먼저 품절 상품을 맨 뒤로 정렬
+let filtered = [...products].sort((a, b) => {
+  return (a.sold_out === true) - (b.sold_out === true);
+});
+
+// 2️⃣ 그 다음 검색 필터 적용
+if (searchKeyword && searchKeyword.trim() !== "") {
+  const keyword = searchKeyword.trim().toLowerCase();
+  filtered = filtered.filter((p) =>
+    p.name.toLowerCase().includes(keyword)
+  );
+}
+
 
   if (!filtered.length) {
     area.innerHTML = "<p style='padding:20px;'>검색 결과가 없습니다.</p>";
