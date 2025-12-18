@@ -6,10 +6,9 @@
   <title>주문 정보 입력</title>
 
   <link rel="stylesheet" href="css/order.css">
-  <link rel="stylesheet" href="css/index.css"> <!-- 기본 스타일 활용 -->
+  <link rel="stylesheet" href="css/index.css">
 
   <style>
-    /* 주문 요약 박스 */
     #order-summary {
       background: #fff;
       padding: 18px;
@@ -38,6 +37,27 @@
       text-align: right;
       color: #e74c3c;
     }
+
+    .agree-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .agree-box div {
+      margin-bottom: 10px;
+    }
+
+    .agree-desc {
+      margin-left: 22px;
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 
@@ -54,7 +74,7 @@
     <div class="order-total" id="order-total"></div>
   </div>
 
-  <!-- 주문 입력 폼 -->
+  <!-- 주문 입력 -->
   <div class="form-row">
     <label>이름</label>
     <input id="name" type="text" placeholder="이름을 입력하세요">
@@ -75,14 +95,47 @@
     <textarea id="memo" placeholder="요청사항이 있다면 입력해주세요"></textarea>
   </div>
 
+  <!-- ✅ 비회원 주문 동의 영역 -->
+  <div class="agree-box">
+
+    <!-- 필수 -->
+    <div>
+      <label>
+        <input type="checkbox" id="agree_required">
+        <strong>[필수]</strong> 비회원 주문에 따른 개인정보 수집 및 이용에 동의합니다.
+      </label>
+      <div class="agree-desc">
+        수집 항목: 이름, 휴대전화번호, 배송지 주소<br>
+        이용 목적: 주문 처리, 결제, 배송 및 고객 문의 대응<br>
+        보유 기간: 관련 법령에 따른 보관 기간 후 파기<br>
+        <a href="/privacy.html" target="_blank">개인정보 처리방침 보기</a>
+      </div>
+    </div>
+
+    <!-- 선택 (광고) -->
+    <div>
+      <label>
+        <input type="checkbox" id="agree_marketing">
+        <strong>[선택]</strong> 휴대전화번호를 통한 K-Shopping 상품·이벤트 안내 수신에 동의합니다.
+      </label>
+      <div class="agree-desc">
+        전송 내용: 할인 정보, 신상품, 이벤트 안내<br>
+        전송 수단: 문자(SMS) 또는 메신저<br>
+        ※ 동의하지 않아도 주문은 가능합니다.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 버튼 -->
   <button id="submitOrder" class="btn-order">✔ 주문하기</button>
   <button class="btn-back" onclick="location.href='index.html'">← 메인으로 돌아가기</button>
 
 </div>
 
 <script type="module" src="./js/order.js"></script>
+
 <script>
-  // 주문 요약 로드 (order.js와 구조 분리)
   function loadOrderSummary() {
     const items = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const area = document.getElementById("order-items");
@@ -112,12 +165,12 @@
     });
 
     area.innerHTML = html;
-    totalArea.textContent = `총 ${qty}개 | 총 금액: ${total.toLocaleString()}원`;
+    totalArea.textContent = \`총 ${qty}개 | 총 금액: ${total.toLocaleString()}원\`;
   }
 
   loadOrderSummary();
 </script>
+
 </body>
 </html>
-
 

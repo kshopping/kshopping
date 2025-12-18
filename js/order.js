@@ -22,7 +22,6 @@ function validateInput(name, phone, address) {
   if (!phone) return "연락처를 입력하세요.";
   if (!address) return "주소를 입력하세요.";
 
-  // 전화번호 기본 검증
   const phoneReg = /^[0-9\-]+$/;
   if (!phoneReg.test(phone)) {
     return "연락처는 숫자와 하이폰만 입력 가능합니다.";
@@ -49,7 +48,18 @@ $("submitOrder").addEventListener("click", async () => {
   const address = $("address").value.trim();
   const memo = $("memo").value.trim();
 
+  const agreeRequired = $("agree_required");
+  const agreeMarketing = $("agree_marketing");
+
   const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+  /* ===== 🔐 필수 동의 체크 ===== */
+  if (!agreeRequired || !agreeRequired.checked) {
+    alert("비회원 주문을 위해 개인정보 수집 및 이용에 동의해 주세요.");
+    btn.disabled = false;
+    btn.textContent = "✔ 주문하기";
+    return;
+  }
 
   /* ===== 입력 검증 ===== */
   const errorMsg = validateInput(name, phone, address);
@@ -67,7 +77,7 @@ $("submitOrder").addEventListener("click", async () => {
     return;
   }
 
-  /* ===== 총 금액 & 총 수량 계산 ===== */
+  /* ===== 총 금액 & 총 수량 ===== */
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
 
@@ -83,6 +93,7 @@ $("submitOrder").addEventListener("click", async () => {
     items: cart,
     total,
     total_qty: totalQty,
+    marketing_agree: agreeMarketing ? agreeMarketing.checked : false,
     created_at: new Date().toISOString()
   });
 
@@ -94,7 +105,7 @@ $("submitOrder").addEventListener("click", async () => {
     return;
   }
 
-  /* ===== 주문 완료 처리 ===== */
+  /* ===== 주문 완료 ===== */
   localStorage.removeItem("cartItems");
   location.href = `order_complete.html?id=${orderId}`;
 });
