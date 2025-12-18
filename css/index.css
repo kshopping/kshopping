@@ -532,4 +532,7 @@ body {
     margin-top: 2px;
     letter-spacing: -0.2px;
 }
+#fixed-header-inner {
+    align-items: flex-start;
+}
 
