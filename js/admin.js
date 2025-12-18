@@ -261,10 +261,12 @@ async function loadOrderPage() {
     .map((o) => {
       const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
 
+      const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
       return `
       <tr>
         <td>${o.id}</td>
         <td>${o.name}</td>
+        <td>${agreeText}</td>
         <td>${Number(o.total || 0).toLocaleString()}원</td>
         <td>${qty}</td>
         <td>${o.created_at?.split("T")[0] ?? ""}</td>
@@ -280,8 +282,14 @@ async function loadOrderPage() {
     <h2>주문 관리 (출력 전)</h2>
     <table>
       <tr>
-        <th>주문번호</th><th>고객명</th><th>금액</th>
-        <th>수량</th><th>일자</th><th>관리</th>
+      <th>주문번호</th>
+      <th>고객명</th>
+      <th>광고동의</th>
+      <th>금액</th>
+      <th>수량</th>
+      <th>일자</th>
+      <th>관리</th>
+  
       </tr>
       ${rows}
     </table>
