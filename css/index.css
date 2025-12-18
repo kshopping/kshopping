@@ -150,9 +150,8 @@ body {
     opacity: 1 !important;
 }
 
-
 /* =============================
-   🌟 CATEGORY BAR (최종 추천)
+   🌟 CATEGORY BAR (미세 업그레이드)
 ============================= */
 #category-area {
     display: flex;
@@ -160,23 +159,26 @@ body {
     gap: 10px;
     flex-wrap: wrap;
 
-    margin-top: 16px;
-    padding: 14px 12px;
+    margin: 22px 0 18px;
+    padding: 18px 12px;
 
-    /* ✅ 허전함 해결 핵심 */
+    /* ⭐ 살짝 더 존재감 */
     background: linear-gradient(
         180deg,
         #ffffff 0%,
-        #f6f7f9 100%
+        #f4f6f8 100%
     );
 
-    border-radius: 18px;
-    border: 1px solid #e9ecef;
+    border-radius: 20px;
+
+    /* ⭐ 위쪽만 살짝 강조 */
+    border-top: 1px solid #e5e8eb;
+    border-bottom: 1px solid #eef1f4;
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.9),
-        0 4px 12px rgba(0,0,0,0.06);
+        0 6px 14px rgba(0,0,0,0.06);
 }
+
 
 /* =============================
    🏷 카테고리 버튼
