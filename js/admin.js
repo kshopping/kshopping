@@ -21,7 +21,7 @@ window.showPage = function (page) {
 };
 
 /* ===========================================================
-   상품 관리
+   상품 관리 (일시 품절 관리 추가)
 =========================================================== */
 async function loadProductPage() {
   const main = $("main-area");
@@ -32,10 +32,12 @@ async function loadProductPage() {
   const catMap = {};
   categories?.forEach((c) => (catMap[c.id] = c.name));
 
-  // ✅ 여기부터 변경: inline onclick 제거하고 data-id로만 박음
   const rows = (products ?? [])
-    .map(
-      (p) => `
+    .map((p) => {
+      const stateText = p.sold_out ? "❌ 품절" : "✅ 판매중";
+      const toggleText = p.sold_out ? "판매 재개" : "일시 품절";
+
+      return `
       <tr>
         <td>${p.id}</td>
         <td><img src="${p.image_url}" class="img-thumb"></td>
@@ -43,13 +45,19 @@ async function loadProductPage() {
         <td>${p.price_original.toLocaleString()}원</td>
         <td>${p.price_sale.toLocaleString()}원</td>
         <td>${catMap[p.category_id] ?? "없음"}</td>
+        <td>${stateText}</td>
         <td>
+          <button class="btn gray js-toggle-sold"
+            data-id="${p.id}"
+            data-state="${p.sold_out}">
+            ${toggleText}
+          </button>
           <button class="btn blue js-edit" data-id="${p.id}">수정</button>
           <button class="btn red js-del" data-id="${p.id}">삭제</button>
         </td>
       </tr>
-    `
-    )
+    `;
+    })
     .join("");
 
   main.innerHTML = `
@@ -58,25 +66,45 @@ async function loadProductPage() {
 
     <table>
       <tr>
-        <th>ID</th><th>이미지</th><th>상품명</th>
-        <th>정상가</th><th>판매가</th><th>카테고리</th><th>관리</th>
+        <th>ID</th>
+        <th>이미지</th>
+        <th>상품명</th>
+        <th>정상가</th>
+        <th>판매가</th>
+        <th>카테고리</th>
+        <th>상태</th>
+        <th>관리</th>
       </tr>
       ${rows}
     </table>
   `;
 
-  // ✅ 여기부터 변경: JS에서 클릭 이벤트 연결 (이 방식은 무조건 됨)
+  // 기존 수정 버튼
   main.querySelectorAll(".js-edit").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.editProduct(id);
+      window.editProduct(btn.dataset.id);
     });
   });
 
+  // 기존 삭제 버튼
   main.querySelectorAll(".js-del").forEach((btn) => {
     btn.addEventListener("click", () => {
+      window.deleteProduct(btn.dataset.id);
+    });
+  });
+
+  // ✅ 일시 품절 토글 버튼
+  main.querySelectorAll(".js-toggle-sold").forEach((btn) => {
+    btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
-      window.deleteProduct(id);
+      const current = btn.dataset.state === "true";
+
+      await supabase
+        .from("products")
+        .update({ sold_out: !current })
+        .eq("id", id);
+
+      loadProductPage(); // 즉시 새로고침
     });
   });
 }
@@ -84,6 +112,7 @@ async function loadProductPage() {
 window.addProduct = function () {
   location.href = "product_add.html";
 };
+
 
 /* ===========================================================
    카테고리 관리

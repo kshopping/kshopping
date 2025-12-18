@@ -21,7 +21,7 @@ function updateCartCount() {
 }
 
 /* ===========================================
-   🔥 상세페이지 데이터 불러오기
+   🔥 상세페이지 데이터 불러오기 (품절 대응)
 =========================================== */
 async function loadDetail() {
   const params = new URLSearchParams(location.search);
@@ -56,7 +56,7 @@ async function loadDetail() {
   $("productSale").textContent =
     `파격 세일가 ${Number(data.price_sale).toLocaleString()}원`;
 
-  // 🎯 상세 이미지 표시
+  // 🎯 상세 이미지
   const detailImg = $("detailImage");
   if (data.detail_image_url) {
     detailImg.src = data.detail_image_url;
@@ -65,14 +65,35 @@ async function loadDetail() {
     detailImg.style.display = "none";
   }
 
-  // 🛒 장바구니 담기
-  $("btnAddCart").onclick = () => {
-    addToCart(data.id, data.name, data.price_sale, data.image_url);
-    updateCartCount();  // ← 장바구니 숫자 증가!
-    alert("장바구니에 담겼습니다!");
-  };
+  const btnAdd = $("btnAddCart");
 
-  // 🏠 메인으로 돌아가기
+  // ==================================================
+  // ❌ 일시 품절 처리 (핵심)
+  // ==================================================
+  if (data.sold_out === true) {
+    btnAdd.textContent = "일시 품절";
+    btnAdd.disabled = true;
+    btnAdd.classList.add("sold-out-btn");
+
+    btnAdd.onclick = () => {
+      alert("❌ 현재 일시 품절된 상품입니다.");
+    };
+  } 
+  // ==================================================
+  // ✅ 정상 상품
+  // ==================================================
+  else {
+    btnAdd.disabled = false;
+    btnAdd.textContent = "장바구니 담기";
+
+    btnAdd.onclick = () => {
+      addToCart(data.id, data.name, data.price_sale, data.image_url);
+      updateCartCount();
+      alert("장바구니에 담겼습니다!");
+    };
+  }
+
+  // 🏠 메인으로
   $("btnGoHome").onclick = () => (location.href = "index.html");
 }
 
@@ -92,5 +113,6 @@ function addToCart(id, name, price, image) {
 /* ===========================================
    🚀 초기 실행
 =========================================== */
-updateCartCount();  // 상세페이지 진입 시 카운트 유지
+updateCartCount();
 loadDetail();
+
