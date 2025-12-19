@@ -552,3 +552,19 @@ body {
     color: #ff4d4f;
     font-weight: 700;
 }
+/* 📞 전화 클릭 영역 확장 (모바일/앱 필수) */
+.call-link {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 6px 10px;
+
+    color: #ff4d4f;
+    font-weight: 700;
+    text-decoration: none;
+
+    border-radius: 6px;
+    background: rgba(255, 77, 79, 0.08);
+
+    pointer-events: auto;
+    z-index: 10;
+}
