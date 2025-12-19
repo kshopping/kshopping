@@ -10,7 +10,7 @@ body {
 #wrap {
     max-width: 1280px;
     margin: auto;
-    padding-top: 110px;
+    padding-top: 180px;
 }
 
 /* =============================
@@ -242,7 +242,7 @@ body {
    🌟 TODAY DEAL
 ============================= */
 #today-deal {
-    margin-top: 6px;
+    margin-top: 14px;
     padding: 10px 16px;
     background: #fff7d1;
     border: 1px solid #ffe08a;
@@ -492,7 +492,7 @@ body {
 ============================= */
 @media (max-width: 768px) {
     #wrap {
-        padding-top: 140px;
+        padding-top: 230px;
     }
 
     #product-area {
