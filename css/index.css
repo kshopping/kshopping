@@ -509,6 +509,35 @@ body {
         padding: 8px 0;
     }
 }
+@media (max-width: 768px) {
+
+    /* 🔽 카테고리 영역 높이 줄이기 */
+    #category-area {
+        padding: 8px 8px;      /* 기존 18px → 8px */
+        gap: 6px;
+        border-radius: 14px;
+    }
+
+    .category-btn {
+        padding: 6px 12px;    /* 버튼 높이 축소 */
+        font-size: 13px;
+        border-radius: 18px;
+    }
+
+    /* 🔽 외국인 전용 구매 안내 박스 압축 */
+    .bank-info-box {
+        padding: 8px 10px;
+        margin: 14px 0 18px;
+    }
+
+    .bank-text {
+        font-size: 13px;
+        line-height: 1.25;
+        white-space: normal;  /* 화면 벗어남 방지 */
+        text-align: center;
+    }
+}
+
 /* =========================================
    🌟 혼합 슬라이더 공통 스타일
 ========================================= */
@@ -531,7 +560,7 @@ body {
 }
 
 #fixed-header-inner {
-    align-items: flex-start;
+  align-items: center;
 }
 /* 로고 + 전화번호 묶음 */
 .header-left {
