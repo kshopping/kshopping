@@ -569,37 +569,38 @@ body {
     z-index: 10;
 }
 /* =============================
-   📱 MOBILE 전용 전화 UX 최종 해결
+   📱 MOBILE 전화 한 줄 + 클릭 최종
 ============================= */
 @media (max-width: 768px) {
 
-    /* 🔴 원인 차단: 슬로건이 클릭 덮는 문제 */
+    /* 슬로건 숨김 유지 */
     .header-slogan {
         display: none;
     }
 
-    /* 📞 전화 영역을 명확한 블록으로 */
     .header-call {
         display: flex;
-        flex-direction: column;
-        gap: 4px;
+        align-items: center;
+        gap: 6px;
+
+        font-size: 13px;
+        white-space: nowrap;   /* 🔑 한 줄 고정 */
 
         position: relative;
         z-index: 10000;
-        pointer-events: auto;
     }
 
     .header-call .call-link {
-        display: block;
-        width: max-content;
+        display: inline;
+        padding: 0;
+        margin: 0;
 
-        padding: 6px 10px;
+        background: none;
+        border-radius: 0;
+
         font-size: 13px;
-        line-height: 1.3;
+        font-weight: 700;
 
-        background: rgba(255, 77, 79, 0.12);
-        border-radius: 6px;
-
-        pointer-events: auto;
+        white-space: nowrap;
     }
 }
