@@ -10,7 +10,7 @@ body {
 #wrap {
     max-width: 1280px;
     margin: auto;
-    padding-top: 180px;
+    padding-top: 110px;
 }
 
 /* =============================
@@ -242,7 +242,7 @@ body {
    🌟 TODAY DEAL
 ============================= */
 #today-deal {
-    margin-top: 14px;
+    margin-top: 6px;
     padding: 10px 16px;
     background: #fff7d1;
     border: 1px solid #ffe08a;
@@ -492,7 +492,7 @@ body {
 ============================= */
 @media (max-width: 768px) {
     #wrap {
-        padding-top: 230px;
+        padding-top: 140px;
     }
 
     #product-area {
@@ -631,5 +631,23 @@ body {
         font-weight: 700;
 
         white-space: nowrap;
+    }
+}
+/* 📱 MOBILE 배너 문구 잘림 방지 */
+@media (max-width: 768px) {
+    #banner-area {
+        height: auto;           /* 고정 높이 해제 */
+        min-height: 70px;
+        padding: 8px 0;
+    }
+
+    #banner-text-overlay {
+        position: static;       /* absolute 해제 */
+        transform: none;
+        margin: 8px auto;
+        font-size: 14px;
+        line-height: 1.3;
+        white-space: normal;    /* 줄바꿈 허용 */
+        text-align: center;
     }
 }
