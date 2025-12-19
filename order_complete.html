@@ -75,30 +75,31 @@
       color: #e74c3c;
     }
 
-    /* 여러 계좌 박스 */
+    /* 입금 계좌 박스 (강조 + 중앙 정렬) */
     .account-box {
       margin-top: 30px;
-      padding: 12px;
+      padding: 20px 15px;
       background: #fff4d6;
-      border-left: 5px solid #ffb300;
-      border-radius: 10px;
-      font-size: 15px;
-      color: #0066ff;
-      line-height: 1.6;
-      text-align: left;
+      border: 2px solid #ffb300;
+      border-radius: 14px;
+      font-size: 16px;
+      color: #333;
+      line-height: 1.8;
+      text-align: center;
     }
 
     .account-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 16px;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #ff8c00;
     }
 
     .account-line {
-      margin-bottom: 4px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0066ff;
+      margin-bottom: 6px;
     }
 
     .btn {
@@ -139,7 +140,7 @@
       <div class="summary-total" id="summary-total"></div>
     </div>
 
-    <!-- 여러 계좌 -->
+    <!-- 입금 계좌 -->
     <div class="account-box">
       <div class="account-title">💳 입금 계좌</div>
       <div id="bankInfo">불러오는 중...</div>
@@ -190,7 +191,7 @@
         `총 ${qty}개 | 총 금액: ${total.toLocaleString()}원`;
     }
 
-    /* 여러 계좌 불러오기 */
+    /* 계좌 불러오기 */
     async function loadAccount() {
       const bankInfo = document.getElementById("bankInfo");
 
@@ -208,7 +209,8 @@
       data.forEach(acc => {
         html += `
           <div class="account-line">
-            ${acc.bank_name} ${acc.bank_number} / 예금주: ${acc.bank_owner}
+            ${acc.bank_name} ${acc.bank_number}<br>
+            예금주: ${acc.bank_owner}
           </div>`;
       });
 

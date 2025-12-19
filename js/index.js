@@ -7,12 +7,10 @@ const cartGoBtn = document.getElementById("cartGoBtn");
 if (cartGoBtn) {
   cartGoBtn.addEventListener("click", () => {
     const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
-
     if (cart.length === 0) {
       alert("장바구니가 비어 있습니다.");
       return;
     }
-
     location.href = "cart.html";
   });
 }
@@ -23,7 +21,7 @@ if (cartGoBtn) {
 const cartDropdownBtn = document.getElementById("cartDropdownBtn");
 const cartPreview = document.getElementById("cart-preview");
 
-if (cartDropdownBtn) {
+if (cartDropdownBtn && cartPreview) {
   cartDropdownBtn.addEventListener("click", () => {
     cartPreview.style.display =
       cartPreview.style.display === "block" ? "none" : "block";
@@ -90,12 +88,12 @@ async function loadBanners() {
 =========================================================== */
 async function loadCategories() {
   const area = document.getElementById("category-area");
+  if (!area) return;
+
   const { data: categories } = await supabase.from("categories").select("*");
 
   area.innerHTML = `
-    <button class="category-btn active-cat" data-cat-id="">
-      전체보기
-    </button>
+    <button class="category-btn active-cat" data-cat-id="">전체보기</button>
     ${(categories || [])
       .map(
         (c) =>
@@ -105,12 +103,12 @@ async function loadCategories() {
   `;
 }
 
-
 /* ===========================================================
-   🔥 상품 로드 (✅ 일시 품절 대응)
+   🔥 상품 로드 (품절 대응)
 =========================================================== */
 async function loadProducts(categoryId = null, searchKeyword = null) {
   const area = document.getElementById("product-area");
+  if (!area) return;
 
   let query = supabase.from("products").select("*");
   if (categoryId) query = query.eq("category_id", categoryId);
@@ -121,19 +119,16 @@ async function loadProducts(categoryId = null, searchKeyword = null) {
     return;
   }
 
-  // 1️⃣ 먼저 품절 상품을 맨 뒤로 정렬
-let filtered = [...products].sort((a, b) => {
-  return (a.sold_out === true) - (b.sold_out === true);
-});
-
-// 2️⃣ 그 다음 검색 필터 적용
-if (searchKeyword && searchKeyword.trim() !== "") {
-  const keyword = searchKeyword.trim().toLowerCase();
-  filtered = filtered.filter((p) =>
-    p.name.toLowerCase().includes(keyword)
+  let filtered = [...products].sort(
+    (a, b) => (a.sold_out === true) - (b.sold_out === true)
   );
-}
 
+  if (searchKeyword && searchKeyword.trim()) {
+    const keyword = searchKeyword.toLowerCase();
+    filtered = filtered.filter((p) =>
+      p.name.toLowerCase().includes(keyword)
+    );
+  }
 
   if (!filtered.length) {
     area.innerHTML = "<p style='padding:20px;'>검색 결과가 없습니다.</p>";
@@ -144,24 +139,21 @@ if (searchKeyword && searchKeyword.trim() !== "") {
     .map((p) => {
       const original = Number(p.price_original || 0);
       const sale = Number(p.price_sale || 0);
-      const saleRate =
+      const rate =
         original > 0 ? Math.round((1 - sale / original) * 100) : 0;
-
       const soldOut = p.sold_out === true;
 
       return `
         <div class="product-card ${soldOut ? "sold-out" : ""}">
-
           ${
             soldOut
               ? `<div class="product-badge sold">일시 품절</div>`
-              : saleRate > 0
-              ? `<div class="product-badge">-${saleRate}%</div>`
+              : rate > 0
+              ? `<div class="product-badge">-${rate}%</div>`
               : ""
           }
 
           <img src="${p.image_url}" alt="${p.name}">
-
           <div class="product-name">${p.name}</div>
           <div class="product-desc">${p.desc ?? ""}</div>
 
@@ -171,17 +163,17 @@ if (searchKeyword && searchKeyword.trim() !== "") {
           </div>
 
           <div class="product-buttons">
-            <button class="btn-add"
-              ${soldOut ? "disabled" : ""}
+            <button class="btn-add" ${soldOut ? "disabled" : ""}
               data-id="${p.id}"
               data-name="${encodeURIComponent(p.name)}"
               data-price="${sale}"
-              data-image="${encodeURIComponent(p.image_url)}"
-            >${soldOut ? "품절" : "담기"}</button>
-
+              data-image="${encodeURIComponent(p.image_url)}">
+              ${soldOut ? "품절" : "담기"}
+            </button>
             <button class="btn-detail" data-id="${p.id}">상세보기</button>
           </div>
-        </div>`;
+        </div>
+      `;
     })
     .join("");
 }
@@ -207,14 +199,12 @@ document.addEventListener("click", (e) => {
       return;
     }
 
-    const id = Number(addBtn.dataset.id);
-    const name = decodeURIComponent(addBtn.dataset.name);
-    const price = Number(addBtn.dataset.price);
-    const image = decodeURIComponent(addBtn.dataset.image);
-
-    addToCart(id, name, price, image);
-    addBtn.classList.add("btn-glow");
-    setTimeout(() => addBtn.classList.remove("btn-glow"), 400);
+    addToCart(
+      Number(addBtn.dataset.id),
+      decodeURIComponent(addBtn.dataset.name),
+      Number(addBtn.dataset.price),
+      decodeURIComponent(addBtn.dataset.image)
+    );
     return;
   }
 
@@ -231,41 +221,33 @@ async function loadTodayDeal() {
   const box = document.getElementById("today-deal");
   if (!box) return;
 
-  const { data: products } = await supabase.from("products").select("*");
-  const available = (products || []).filter((p) => !p.sold_out);
+  const { data } = await supabase.from("products").select("*");
+  const available = (data || []).filter((p) => !p.sold_out);
   if (!available.length) return;
 
   const p = available[Math.floor(Math.random() * available.length)];
-
   const original = Number(p.price_original || 0);
   const sale = Number(p.price_sale || 0);
-  const rate = original ? Math.round((1 - sale / original) * 100) : 0;
+  const rate =
+    original > 0 ? Math.round((1 - sale / original) * 100) : 0;
 
   box.innerHTML = `
     🎁 <b>오늘의 특가</b><br>
     ${p.name}<br>
     정상가 ${original.toLocaleString()}원 →
-    <b style="color:red;">파격 세일가 ${sale.toLocaleString()}원</b>
-    ${
-      rate
-        ? `<span style="color:#ff4d4f; font-weight:bold;">(-${rate}%)</span>`
-        : ""
-    }
+    <b style="color:red;">${sale.toLocaleString()}원</b>
+    ${rate ? `<span style="color:#ff4d4f;">(-${rate}%)</span>` : ""}
   `;
 }
 
 /* ===========================================================
-   🛒 장바구니 관련 공통
+   🛒 장바구니 공통
 =========================================================== */
 function updateCartCount() {
   const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
-  const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  const count = cart.reduce((s, i) => s + i.qty, 0);
   const el = document.getElementById("cartCount");
-  if (!el) return;
-
-  el.textContent = count || "";
-  el.classList.add("pop");
-  setTimeout(() => el.classList.remove("pop"), 300);
+  if (el) el.textContent = count || "";
 }
 window.updateCartCount = updateCartCount;
 
@@ -274,16 +256,15 @@ function updateCartPreview() {
   if (!preview) return;
 
   const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
-
   preview.innerHTML = cart.length
     ? cart
         .map(
           (i) => `
-        <div class="cart-item">
-          <img src="${i.image}">
-          <div class="cart-item-name">${i.name}</div>
-          <div>x${i.qty}</div>
-        </div>`
+          <div class="cart-item">
+            <img src="${i.image}">
+            <div>${i.name}</div>
+            <div>x${i.qty}</div>
+          </div>`
         )
         .join("")
     : "<p class='empty-cart'>비어있음</p>";
@@ -293,7 +274,6 @@ window.updateCartPreview = updateCartPreview;
 function showToast(msg) {
   const toast = document.getElementById("toast");
   if (!toast) return;
-
   toast.textContent = msg;
   toast.style.opacity = 1;
   setTimeout(() => (toast.style.opacity = 0), 1800);
@@ -303,8 +283,7 @@ window.showToast = showToast;
 function addToCart(id, name, price, image) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
   const found = cart.find((i) => i.id === id);
-  found ? (found.qty += 1) : cart.push({ id, name, price, image, qty: 1 });
-
+  found ? found.qty++ : cart.push({ id, name, price, image, qty: 1 });
   localStorage.setItem("cartItems", JSON.stringify(cart));
   updateCartCount();
   updateCartPreview();
@@ -313,12 +292,13 @@ function addToCart(id, name, price, image) {
 window.addToCart = addToCart;
 
 /* ===========================================================
-   🔥 계좌 정보 로드
+   🔥 계좌 정보
 =========================================================== */
 async function loadBankInfo() {
-  const { data } = await supabase.from("account_info").select("*");
   const el = document.getElementById("bankDynamic");
+  if (!el) return;
 
+  const { data } = await supabase.from("account_info").select("*");
   if (!data?.length) {
     el.textContent = "입금 계좌 정보를 불러올 수 없습니다.";
     return;
@@ -326,12 +306,9 @@ async function loadBankInfo() {
 
   el.innerHTML = data
     .map(
-      (acc) =>
-        `${acc.bank_name} ${acc.bank_number} <b>/ ${acc.bank_owner}</b>`
+      (a) => `${a.bank_name} ${a.bank_number} <b>/ ${a.bank_owner}</b>`
     )
-    .join(
-      ` <span style="color:#ff4d4d; font-weight:bold;">//</span> `
-    );
+    .join(` <span style="color:red;">//</span> `);
 }
 
 /* ===========================================================
@@ -344,4 +321,3 @@ loadTodayDeal();
 loadBankInfo();
 updateCartCount();
 updateCartPreview();
-
