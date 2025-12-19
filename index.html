@@ -1,159 +1,162 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>K-Shopping</title>
-  <link rel="stylesheet" href="css/index.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>K-Shopping</title>
+<link rel="stylesheet" href="css/index.css">
+<style>
+/* ===== 헤더 레이아웃 ===== */
+#fixed-header-inner {
+display: flex;
+align-items: center;
+}
 
-  <style>
-    /* ===== 헤더 상단 ===== */
-    #fixed-header-inner {
-      display: flex;
-      align-items: center;
-    }
+/* ===== 로고 (크게 + 번개색) ===== */
+.header-title {
+font-size: 26px; /* 크게 */
+font-weight: 900;
+color: #ff4d4f; /* 번개와 동일 */
+cursor: pointer;
+white-space: nowrap;
+}
 
-    .header-title {
-      font-size: 26px;
-      font-weight: 900;
-      color: #ff4d4f;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+.header-title:hover {
+color: #ff6b6d; /* 살짝 밝아짐 */
+}
 
-    .header-slogan {
-      flex: 1;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #ff9900;
-      white-space: nowrap;
-    }
+/* ===== 중앙 슬로건 ===== */
+.header-slogan {
+flex: 1;
+text-align: center;
+font-size: 16px;
+font-weight: 700;
+color: #ff9900;
+letter-spacing: 0.3px;
+white-space: nowrap;
+}
 
-    /* ===== 로고 아래 / 전화 + 카테고리 바 ===== */
-    #category-area {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 12px 16px;
-      background: #fff;
-      border-bottom: 1px solid #eee;
-    }
+/* 🔴 공통 레드 */
+.highlight-red {
+color: #ff4d4f;
+font-weight: 700;
+}
 
-    /* 좌측 전화번호 (항상 고정) */
-    .category-left {
-      display: flex;
-      gap: 14px;
-      font-weight: 800;
-      font-size: 16px;
-      color: #0d6efd;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+/* ⚡ 번개 (깜빡 + 흔들림) */
+.lightning-svg {
+display: inline-block;
+vertical-align: middle;
+margin: 0 8px;
+animation: lightningCombo 0.9s infinite ease-in-out;
+transform-origin: center;
+}
 
-    .category-left a {
-      color: #0d6efd;
-      text-decoration: none;
-    }
+.lightning-svg svg {
+width: 26px;
+height: 34px;
+fill: #ff4d4f;
+}
 
-    .category-left a:hover {
-      text-decoration: underline;
-    }
+@keyframes lightningCombo {
+0% {
+opacity: 0.4;
+transform: rotate(0deg) scale(1);
+}
+30% {
+opacity: 1;
+transform: rotate(-8deg) scale(1.15);
+}
+60% {
+opacity: 1;
+transform: rotate(8deg) scale(1.15);
+}
+100% {
+opacity: 0.4;
+transform: rotate(0deg) scale(1);
+}
+}
 
-    /* 우측 카테고리 영역 (JS 삽입용) */
-    .category-list {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      flex: 1;
-    }
+/* 🚚 배송 강조 */
+.shipping-fast {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
 
-    /* 모바일 */
-    @media (max-width: 768px) {
-      .header-slogan {
-        display: none;
-      }
-
-      #category-area {
-        flex-wrap: wrap;
-      }
-
-      .category-left {
-        width: 100%;
-        justify-content: center;
-        font-size: 15px;
-      }
-
-      .category-list {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+@media (max-width: 768px) {
+.header-slogan {
+display: none;
+}
+}
+</style>
 </head>
-
 <body>
-
-<!-- 🔧 JS 에러 방지용 (반드시 body 최상단) -->
-<div id="bankInfo" style="display:none;"></div>
-
 <header id="fixed-header">
-  <div id="fixed-header-inner">
+<div id="fixed-header-inner">
 
-    <!-- 로고 -->
-    <div class="header-title" onclick="location.href='index.html'">
-      K-Shopping
-    </div>
+<!-- 로고 -->
+<div class="header-title" onclick="location.href='index.html'">
+K-Shopping
+</div>
 
-    <!-- 슬로건 -->
-    <div class="header-slogan">
-      외국인을 위한 ⚡ 초특가 쇼핑몰
-    </div>
+<!-- 중앙 문구 -->
+<div class="header-slogan">
+외국인을 위한
+<span class="lightning-svg">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+</svg>
+</span>
+초특가 쇼핑몰
+</div>
 
-    <!-- 상단 메뉴 -->
-    <div id="top-menu">
-      <button id="cartGoBtn" class="cart-main-btn">
-        🛒 <span id="cartCount"></span>
-      </button>
-      <div id="cart-preview"></div>
-      <button onclick="location.href='admin.html'">🔑 관리자</button>
-    </div>
+<!-- 상단 메뉴 -->
+<div id="top-menu">
+<button id="cartGoBtn" class="cart-main-btn">
+🛒 <span id="cartCount"></span>
+</button>
+<div id="cart-preview"></div>
+<button onclick="location.href='admin.html'">🔑 관리자</button>
+</div>
 
-  </div>
+</div>
 
-  <!-- 🔥 로고 아래 줄 -->
-  <nav id="category-area">
-
-    <!-- 📞 좌측 고정 전화번호 -->
-    <div class="category-left">
-      <a href="tel:0522560994">📞 052-256-0994</a>
-      <a href="tel:01086408732">📞 010-8640-8732</a>
-    </div>
-
-    <!-- 🟡 카테고리 버튼 (index.js가 여기에 삽입) -->
-    <div class="category-list" id="category-list"></div>
-
-  </nav>
+<nav id="category-area"></nav>
 </header>
 
 <main id="wrap">
 
-  <section id="banner-area">
-    <div id="banner-text-overlay">
-      💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
-    </div>
-  </section>
+<section id="banner-area">
+<div id="banner-text-overlay">
+💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
+</div>
+</section>
 
-  <section id="today-deal"></section>
+<section id="today-deal"></section>
 
-  <section id="product-section">
-    <div id="product-area" class="product-grid"></div>
-  </section>
+<section class="bank-info-box">
+<div class="bank-icon">🌍</div>
+<div class="bank-text">
+<div class="bank-label">외국인 전용 구매 안내</div>
+<div class="bank-value">
+<span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
+<span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
+<span class="shipping-fast highlight-red">
+<span>🚚</span> FAST SHIPPING
+</span>
+</div>
+</div>
+</section>
+
+<section id="product-section">
+<div id="product-area" class="product-grid"></div>
+</section>
 
 </main>
 
 <div id="toast"></div>
-<script type="module" src="./js/index.js"></script>
 
+<script type="module" src="./js/index.js"></script>
 </body>
 </html>
+

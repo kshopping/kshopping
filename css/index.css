@@ -156,9 +156,8 @@ body {
     animation: none !important;
     opacity: 1 !important;
 }
-
 /* =============================
-   🌟 CATEGORY BAR (미세 업그레이드)
+   🌟 CATEGORY BAR (정리 버전)
 ============================= */
 #category-area {
     display: flex;
@@ -166,10 +165,9 @@ body {
     gap: 10px;
     flex-wrap: wrap;
 
-    margin: 22px 0 18px;
-    padding: 18px 12px;
+    margin: 0;                 /* ✅ 여백 제거 */
+    padding: 18px 12px;        /* ⭕ 내부 여백은 유지 */
 
-    /* ⭐ 살짝 더 존재감 */
     background: linear-gradient(
         180deg,
         #ffffff 0%,
@@ -178,14 +176,11 @@ body {
 
     border-radius: 20px;
 
-    /* ⭐ 위쪽만 살짝 강조 */
     border-top: 1px solid #e5e8eb;
     border-bottom: 1px solid #eef1f4;
 
-    box-shadow:
-        0 6px 14px rgba(0,0,0,0.06);
+    box-shadow: none;          /* ✅ 떠 보이는 효과 제거 */
 }
-
 
 /* =============================
    🏷 카테고리 버튼
@@ -523,4 +518,3 @@ body {
 #fixed-header-inner {
     align-items: flex-start;
 }
-
