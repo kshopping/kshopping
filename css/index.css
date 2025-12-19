@@ -35,9 +35,24 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+/* =============================
+   🌟 HEADER SLOGAN
+============================= */
+.header-slogan {
+    flex: 1;
+    text-align: center;
+
+    font-size: 18px;      /* ← 기존보다 조금 크게 */
+    font-weight: 700;
+    color: #ff9900;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+
+    margin-right: 80px;  /* ← 중앙에서 왼쪽으로 */
+}
 
 .header-title {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 900;
     cursor: pointer;
     color: #ffb700;      /* 브랜드 포인트 */
@@ -517,4 +532,23 @@ body {
 
 #fixed-header-inner {
     align-items: flex-start;
+}
+/* 로고 + 전화번호 묶음 */
+.header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 전화 주문 안내 */
+.header-call {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.header-call span {
+    color: #ff4d4f;
+    font-weight: 700;
 }
