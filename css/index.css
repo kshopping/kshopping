@@ -1,653 +1,573 @@
-/* =============================
-   🌟 GLOBAL 기본 스타일
-============================= */
+/* ============================= 🌟 GLOBAL 기본 스타일 ============================= */
 body {
-    margin: 0;
-    font-family: Pretendard, sans-serif;
-    background: #fafafa;
+  margin: 0;
+  font-family: Pretendard, sans-serif;
+  background: #fafafa;
 }
 
 #wrap {
-    max-width: 1280px;
-    margin: auto;
-    padding-top: 180px;
+  max-width: 1280px;
+  margin: auto;
+  padding-top: 180px;
 }
 
-/* =============================
-   🌟 FIXED HEADER
-============================= */
+/* ============================= 🌟 FIXED HEADER ============================= */
 #fixed-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(180deg,#ffffffee 0%,#ffffffcc 100%);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
-    padding: 18px 20px 18px;
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg,#ffffffee 0%,#ffffffcc 100%);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+  padding: 18px 20px 18px;
+  z-index: 999;
 }
 
 #fixed-header-inner {
-    max-width: 1280px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  max-width: 1280px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-/* =============================
-   🌟 HEADER SLOGAN
-============================= */
+
+/* ============================= 🌟 HEADER SLOGAN ============================= */
 .header-slogan {
-    flex: 1;
-    text-align: center;
-
-    font-size: 18px;      /* ← 기존보다 조금 크게 */
-    font-weight: 700;
-    color: #ff9900;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-
-    margin-right: 80px;  /* ← 중앙에서 왼쪽으로 */
+  flex: 1;
+  text-align: center;
+  font-size: 18px; /* ← 기존보다 조금 크게 */
+  font-weight: 700;
+  color: #ff9900;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  margin-right: 80px; /* ← 중앙에서 왼쪽으로 */
 }
 
 .header-title {
-    font-size: 32px;
-    font-weight: 900;
-    cursor: pointer;
-    color: #ffb700;      /* 브랜드 포인트 */
-    letter-spacing: -0.5px;
+  font-size: 32px;
+  font-weight: 900;
+  cursor: pointer;
+  color: #ffb700; /* 브랜드 포인트 */
+  letter-spacing: -0.5px;
 }
 
-
-/* =============================
-   🌟 TOP MENU BUTTONS
-============================= */
+/* ============================= 🌟 TOP MENU BUTTONS ============================= */
 #top-menu {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  position: relative;
 }
 
 #top-menu button {
-    padding: 8px 15px;
-    border: none;
-    background: #ffffffcc;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    transition: 0.25s;
+  padding: 8px 15px;
+  border: none;
+  background: #ffffffcc;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: 0.25s;
 }
 
 #top-menu button:hover {
-    background: #ffe28a;
+  background: #ffe28a;
 }
 
 /* 장바구니 버튼(카운터 기준점) */
 .cart-main-btn {
-    position: relative;
+  position: relative;
 }
 
 /* 장바구니 카운트 */
 #cartCount {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: red;
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 12px;
-    border-radius: 50%;
-    font-weight: bold;
-    z-index: 10;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 50%;
+  font-weight: bold;
+  z-index: 10;
 }
 
-/* =============================
-   🌟 CART DROPDOWN
-============================= */
+/* ============================= 🌟 CART DROPDOWN ============================= */
 #cart-preview {
-    position: absolute;
-    right: 0;
-    top: 60px;
-    width: 230px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    padding: 12px;
-    display: none;
-    z-index: 999;
+  position: absolute;
+  right: 0;
+  top: 60px;
+  width: 230px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 12px;
+  display: none;
+  z-index: 999;
 }
 
-/* =============================
-   🌟 BANNER AREA
-============================= */
+/* ============================= 🌟 BANNER AREA ============================= */
 #banner-area {
-    position: relative;
-    width: 100%;
-    height: 70px;              /* ⭐ 배너 존재감 확보 */
-    margin-top: 14px;        /* ⭐ 카테고리와 확실히 분리 */
-    margin-bottom: 18px; 
-    overflow: hidden;
-    border-radius: 14px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
-    z-index: 1;
+  position: relative;
+  width: 100%;
+  height: 70px; /* ⭐ 배너 존재감 확보 */
+  margin-top: 14px; /* ⭐ 카테고리와 확실히 분리 */
+  margin-bottom: 18px;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  z-index: 1;
 }
-
 
 #banner-area video,
 #banner-area img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
 }
 
 #banner-area video.active {
-    opacity: 1;
+  opacity: 1;
 }
 
 #banner-text-overlay {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.45);
-    padding: 10px 20px;
-    border-radius: 12px;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 700;
-    backdrop-filter: blur(4px);
-
-    /* 🔥 항상 배너 위쪽에 고정되도록 하는 핵심 */
-    z-index: 20;
-    pointer-events: none; /* 클릭 방해 방지 */
-
-    /* 🔥 깜박임 방지: 애니메이션 제거 */
-    animation: none !important;
-    opacity: 1 !important;
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.45);
+  padding: 10px 20px;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+  z-index: 20;
+  pointer-events: none;
+  animation: none !important;
+  opacity: 1 !important;
 }
-/* =============================
-   🌟 CATEGORY BAR (정리 버전)
-============================= */
+
+/* ============================= 🌟 CATEGORY BAR (정리 버전) ============================= */
 #category-area {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-
-    margin: 0;                 /* ✅ 여백 제거 */
-    padding: 18px 12px;        /* ⭕ 내부 여백은 유지 */
-
-    background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #f4f6f8 100%
-    );
-
-    border-radius: 20px;
-
-    border-top: 1px solid #e5e8eb;
-    border-bottom: 1px solid #eef1f4;
-
-    box-shadow: none;          /* ✅ 떠 보이는 효과 제거 */
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 18px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f6f8 100%);
+  border-radius: 20px;
+  border-top: 1px solid #e5e8eb;
+  border-bottom: 1px solid #eef1f4;
+  box-shadow: none;
 }
 
-/* =============================
-   🏷 카테고리 버튼
-============================= */
+/* ============================= 🏷 카테고리 버튼 ============================= */
 .category-btn {
-    padding: 8px 18px;
-    background: #ffffff;
-    border-radius: 22px;
-    border: 1px solid #dee2e6;
-
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-
-    cursor: pointer;
-    transition: all 0.22s ease;
-    flex: 0 0 auto;
+  padding: 8px 18px;
+  background: #ffffff;
+  border-radius: 22px;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  flex: 0 0 auto;
 }
 
 .category-btn:hover {
-    background: #fff3bf;
-    border-color: #ffd43b;
-    transform: translateY(-1px);
+  background: #fff3bf;
+  border-color: #ffd43b;
+  transform: translateY(-1px);
 }
 
-/* =============================
-   ✅ 선택된 카테고리
-============================= */
+/* ============================= ✅ 선택된 카테고리 ============================= */
 .category-btn.active-cat {
-    background: linear-gradient(
-        180deg,
-        #ffda5a 0%,
-        #ffc933 100%
-    );
-    border-color: #ffb700;
-    color: #222;
-
-    box-shadow:
-        0 3px 8px rgba(255, 200, 0, 0.45);
+  background: linear-gradient(180deg, #ffda5a 0%, #ffc933 100%);
+  border-color: #ffb700;
+  color: #222;
+  box-shadow: 0 3px 8px rgba(255, 200, 0, 0.45);
 }
 
-
-/* =============================
-   🌟 TODAY DEAL
-============================= */
+/* ============================= 🌟 TODAY DEAL ============================= */
 #today-deal {
-    margin-top: 14px;
-    padding: 10px 16px;
-    background: #fff7d1;
-    border: 1px solid #ffe08a;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.3;
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: #fff7d1;
+  border: 1px solid #ffe08a;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
-/* =============================
-   🌟 PRODUCT GRID
-============================= */
+/* ============================= 🌟 PRODUCT GRID ============================= */
 #product-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 26px;
-    margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 26px;
+  margin-top: 32px;
+  
 }
 
-/* =============================
-   🌟 PRODUCT CARD
-============================= */
+/* ============================= 🌟 PRODUCT CARD ============================= */
 .product-card {
-    position: relative;
-    overflow: hidden;
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    transition: 0.25s ease;
-    border: 1px solid #f1f1f1;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  transition: 0.25s ease;
+  border: 1px solid #f1f1f1;
 }
 
 .product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 14px 28px rgba(0,0,0,0.12);
+  transform: translateY(-8px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.12);
 }
-/* =============================
-   ✅ 메인 상품 이미지 (안 잘리고 정렬 유지)
-============================= */
+
+/* ============================= ✅ 메인 상품 이미지 (안 잘리고 정렬 유지) ============================= */
 .product-card img {
-    width: 100%;
-    height: 220px;        /* 🔑 카드 높이 통일 */
-    border-radius: 14px;
-    object-fit: contain; /* 🔑 절대 자르지 않음 */
-    background: #f5f5f5; /* 여백 보정 */
-    transition: 0.35s ease;
+  width: 100%;
+  height: 220px;
+  border-radius: 14px;
+  object-fit: contain;
+  background: #f5f5f5;
+  transition: 0.35s ease;
 }
 
 .product-card:hover img {
-    transform: scale(1.06);
+  transform: scale(1.06);
 }
-
 
 /* 할인 뱃지 */
 .product-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: #ff4d4f;
-    color: white;
-    padding: 6px 10px;
-    font-size: 13px;
-    border-radius: 10px;
-    font-weight: 700;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    z-index: 10;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ff4d4f;
+  color: white;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  z-index: 10;
 }
 
 /* 상품명 */
 .product-name {
-    margin-top: 14px;
-    font-size: 18px;
-    font-weight: 800;
-    color: #222;
-    min-height: 44px;
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #222;
+  min-height: 44px;
 }
 
 /* 설명 */
 .product-desc {
-    color: #777;
-    font-size: 14px;
-    margin-top: 6px;
-    height: 40px;
-    overflow: hidden;
+  color: #777;
+  font-size: 14px;
+  margin-top: 6px;
+  height: 40px;
+  overflow: hidden;
 }
 
 /* 가격 */
 .price-box {
-    margin-top: 12px;
-    text-align: center;
+  margin-top: 12px;
+  text-align: center;
 }
 
 .price-original {
-    text-decoration: none;
-    color: #888;
-    font-size: 14px;
+  text-decoration: none;
+  color: #888;
+  font-size: 14px;
 }
 
 .price-sale {
-    color: #e03131;
-    font-weight: 900;
-    font-size: 20px;
-    margin-top: 4px;
+  color: #e03131;
+  font-weight: 900;
+  font-size: 20px;
+  margin-top: 4px;
 }
 
 /* 버튼 영역 */
 .product-buttons {
-    margin-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .product-buttons button {
-    flex: 1;
-    padding: 10px 0;
-    background: #ffe083;
-    border-radius: 10px;
-    border: none;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.25s;
+  flex: 1;
+  padding: 10px 0;
+  background: #ffe083;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
 .product-buttons button:hover {
-    background: #ffc933;
+  background: #ffc933;
 }
 
-/* =============================
-   🌟 BANK INFO
-============================= */
+/* ============================= 🌟 BANK INFO ============================= */
 .bank-info-box {
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    background: #fff7df;
-    border: 1px solid #ffe2a8;
-    border-radius: 12px;
-    margin: 22px 0 28px;
-     text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #fff7df;
+  border: 1px solid #ffe2a8;
+  border-radius: 12px;
+  margin: 22px 0 28px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
 }
 
 .bank-icon {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .bank-text {
-    white-space: nowrap;
-    color: #0066ff;
-    font-size: 15px;
-    font-weight: 500;
+  white-space: nowrap;
+  color: #0066ff;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .bank-label,
 .bank-value {
-    display: inline;
-    margin: 0;
-    padding: 0;
-    color: #0066ff;
-    font-size: 15px;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  color: #0066ff;
+  font-size: 15px;
 }
 
 .bank-label::after {
-    content: " : ";
+  content: " : ";
 }
 
 .copy-btn {
-    margin-left: auto;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: none;
-    background: #ffe083;
-    cursor: pointer;
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #ffe083;
+  cursor: pointer;
 }
 
 .copy-btn:hover {
-    background: #ffd48f;
+  background: #ffd48f;
 }
 
-/* =============================
-   🛒 CART 애니메이션
-============================= */
+/* ============================= 🛒 CART 애니메이션 ============================= */
 @keyframes cartPop {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.4); }
-    100% { transform: scale(1); }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }
 
 #cartCount.pop {
-    animation: cartPop 0.35s ease-out;
+  animation: cartPop 0.35s ease-out;
 }
 
 @keyframes cartBounce {
-    0%   { transform: translateY(0); }
-    30%  { transform: translateY(-6px); }
-    60%  { transform: translateY(3px); }
-    100% { transform: translateY(0); }
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  60% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
 }
 
 .cart-bounce {
-    animation: cartBounce 0.45s ease-out;
+  animation: cartBounce 0.45s ease-out;
 }
 
 @keyframes cartShake {
-    0%   { transform: rotate(0deg); }
-    25%  { transform: rotate(-8deg); }
-    50%  { transform: rotate(8deg); }
-    75%  { transform: rotate(-5deg); }
-    100% { transform: rotate(0deg); }
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
 }
 
 .cart-shake {
-    animation: cartShake 0.45s ease-in-out;
+  animation: cartShake 0.45s ease-in-out;
 }
 
-/* =============================
-   📦 PRESS / GLOW EFFECTS
-============================= */
+/* ============================= 📦 PRESS / GLOW EFFECTS ============================= */
 @keyframes cardPress {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(0.94); }
-    100% { transform: scale(1); }
+  0% { transform: scale(1); }
+  40% { transform: scale(0.94); }
+  100% { transform: scale(1); }
 }
 
 .card-press {
-    animation: cardPress 0.22s ease-out;
+  animation: cardPress 0.22s ease-out;
 }
 
 @keyframes btnGlow {
-    0%   { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
-    50%  { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
-    100% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
+  0% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
+  50% { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
+  100% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
 }
 
 .btn-glow {
-    animation: btnGlow 0.45s ease-out;
+  animation: btnGlow 0.45s ease-out;
 }
 
-/* =============================
-   MOBILE
-============================= */
+/* ============================= MOBILE ============================= */
 @media (max-width: 768px) {
-    #wrap {
-        padding-top: 230px;
-    }
-
-    #product-area {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        gap: 20px;
-    }
-
-    .product-card {
-        padding: 12px;
-    }
-
-    .product-buttons button {
-        font-size: 14px;
-        padding: 8px 0;
-    }
+  #wrap { padding-top: 230px; }
+  #product-area {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 20px;
+  }
+  .product-card { padding: 12px; }
+  .product-buttons button {
+    font-size: 14px;
+    padding: 8px 0;
+  }
 }
+
 @media (max-width: 768px) {
+  #category-area {
+    padding: 8px 8px;
+    gap: 6px;
+    border-radius: 14px;
+  }
 
-    /* 🔽 카테고리 영역 높이 줄이기 */
-    #category-area {
-        padding: 8px 8px;      /* 기존 18px → 8px */
-        gap: 6px;
-        border-radius: 14px;
-    }
+  .category-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 18px;
+  }
 
-    .category-btn {
-        padding: 6px 12px;    /* 버튼 높이 축소 */
-        font-size: 13px;
-        border-radius: 18px;
-    }
+  .bank-info-box {
+    padding: 8px 10px;
+    margin: 14px 0 18px;
+  }
 
-    /* 🔽 외국인 전용 구매 안내 박스 압축 */
-    .bank-info-box {
-        padding: 8px 10px;
-        margin: 14px 0 18px;
-    }
-
-    .bank-text {
-        font-size: 13px;
-        line-height: 1.25;
-        white-space: normal;  /* 화면 벗어남 방지 */
-        text-align: center;
-    }
+  .bank-text {
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
-/* =========================================
-   🌟 혼합 슬라이더 공통 스타일
-========================================= */
-
+/* ========================================= 🌟 혼합 슬라이더 공통 스타일 ========================================= */
 #banner-area .banner-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    border-radius: 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  border-radius: 16px;
 }
 
 #banner-area .banner-slide.active {
-    opacity: 1;
-    z-index: 5;
+  opacity: 1;
+  z-index: 5;
 }
 
 #fixed-header-inner {
   align-items: center;
 }
+
 /* 로고 + 전화번호 묶음 */
 .header-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 /* 전화 주문 안내 */
 .header-call {
-    margin-top: 4px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #444;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
 }
 
 .header-call span {
-    color: #ff4d4f;
-    font-weight: 700;
+  color: #ff4d4f;
+  font-weight: 700;
 }
+
 /* 📞 전화 클릭 영역 확장 (모바일/앱 필수) */
 .call-link {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 6px 10px;
-
-    color: #ff4d4f;
-    font-weight: 700;
-    text-decoration: none;
-
-    border-radius: 6px;
-    background: rgba(255, 77, 79, 0.08);
-
-    pointer-events: auto;
-    z-index: 10;
+  display: inline-block;
+  margin-top: 4px;
+  padding: 6px 10px;
+  color: #ff4d4f;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 6px;
+  background: rgba(255, 77, 79, 0.08);
+  pointer-events: auto;
+  z-index: 10;
 }
-/* =============================
-   📱 MOBILE 전화 한 줄 + 클릭 최종
-============================= */
+
+/* ============================= 📱 MOBILE 전화 한 줄 + 클릭 최종 ============================= */
 @media (max-width: 768px) {
+  .header-slogan { display: none; }
 
-    /* 슬로건 숨김 유지 */
-    .header-slogan {
-        display: none;
-    }
+  .header-call {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 10000;
+  }
 
-    .header-call {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        font-size: 13px;
-        white-space: nowrap;   /* 🔑 한 줄 고정 */
-
-        position: relative;
-        z-index: 10000;
-    }
-
-    .header-call .call-link {
-        display: inline;
-        padding: 0;
-        margin: 0;
-
-        background: none;
-        border-radius: 0;
-
-        font-size: 13px;
-        font-weight: 700;
-
-        white-space: nowrap;
-    }
+  .header-call .call-link {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
 }
+
 /* 📱 MOBILE 배너 문구 잘림 방지 */
 @media (max-width: 768px) {
-    #banner-area {
-        height: auto;           /* 고정 높이 해제 */
-        min-height: 70px;
-        padding: 8px 0;
-    }
+  #banner-area {
+    height: auto;
+    min-height: 70px;
+    padding: 8px 0;
+  }
 
-    #banner-text-overlay {
-        position: static;       /* absolute 해제 */
-        transform: none;
-        margin: 8px auto;
-        font-size: 14px;
-        line-height: 1.3;
-        white-space: normal;    /* 줄바꿈 허용 */
-        text-align: center;
-    }
+  #banner-text-overlay {
+    position: static;
+    transform: none;
+    margin: 8px auto;
+    font-size: 14px;
+    line-height: 1.3;
+    white-space: normal;
+    text-align: center;
+  }
 }

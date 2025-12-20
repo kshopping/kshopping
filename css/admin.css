@@ -1,228 +1,174 @@
-/* ===============================
-   관리자 기본 레이아웃
-================================ */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    background: #f6f6f6;
-}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한국 인기 상품 – 바로 구매</title>
 
-/* 사이드바 */
-#sidebar {
-    width: 240px;
-    background: #222;
-    color: white;
-    padding: 20px;
-    min-height: 100vh;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f7f7f7;
+      color: #222;
+    }
 
-#sidebar h2 {
-    margin: 20px 0 10px 0;
-}
+    .landing-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+    }
 
-.menu-btn,
-.home-btn {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 6px;
-    background: #444;
-    color: white;
-    cursor: pointer;
-}
+    /* 🔥 상단 후킹 영역 */
+    .hero {
+      padding: 28px 20px 22px;
+      background: linear-gradient(180deg, #fff4cc, #ffffff);
+      text-align: center;
+    }
 
-.menu-btn:hover,
-.home-btn:hover {
-    background: #666;
-}
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
 
-/* 메인 영역 */
-#main-area {
-    flex: 1;
-    padding: 25px;
-    background: white;
-    min-height: 100vh;
-    box-sizing: border-box;
-}
+    .hero p {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 18px;
+    }
 
-/* 표 */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: white;
-}
+    .cta-btn {
+      display: block;
+      width: 100%;
+      padding: 14px 0;
+      background: #ffcc33;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
-table th, table td {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
+    /* 상품 설명 */
+    .section {
+      padding: 22px 20px;
+    }
 
-/* 이미지 미리보기 */
-.img-thumb {
-    width: 60px;
-    border-radius: 5px;
-}
+    .section h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
 
-/* 버튼 스타일 */
-.btn {
-    padding: 7px 14px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-}
+    .section p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
 
-.btn.green { background: #4CAF50; color: white; }
-.btn.red   { background: #E53935; color: white; }
-.btn.blue  { background: #1E88E5; color: white; }
+    /* 신뢰 요소 */
+    .trust {
+      background: #f9fafb;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
 
-/* 입력 필드 */
-input, select, textarea {
-    width: 280px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 12px;
-}
+    .trust ul {
+      padding-left: 18px;
+      margin: 0;
+    }
 
-textarea {
-    width: 500px;
-    height: 140px;
-}
-/* 상품 수정 이미지 미리보기 크기 조정 */
-.img-preview {
-    width: 320px;        /* 너비 고정 */
-    max-width: 90%;      /* 화면에 따라 자동 줄임 */
-    height: auto;        /* 비율 유지 */
-    border-radius: 10px;
-    display: block;
-    margin-bottom: 20px;
-}
-.img-preview {
-    width: 320px;
-    height: auto;
-    border-radius: 10px;
-    display: block;
-    margin-bottom: 20px;
-}
-/* 배너 관리 미리보기 영상 스타일 */
-.banner-video {
-  width: 300px;
-  height: 170px;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-}
+    .trust li {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
 
-/* 배너 리스트 테이블 정리 */
-#bannerList tr {
-  vertical-align: middle;
-  height: 200px;
-}
+    /* 하단 고정 CTA */
+    .fixed-cta {
+      position: sticky;
+      bottom: 0;
+      background: #ffffffee;
+      padding: 12px 16px;
+      border-top: 1px solid #ddd;
+    }
 
-#bannerList td {
-  padding: 10px;
-}
+    .fixed-cta button {
+      width: 100%;
+      padding: 14px 0;
+      background: #ffb700;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+  </style>
+</head>
 
-.banner-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-/* =======================
-   🔥 전문가용 배너 관리자 UI
-========================= */
+<body>
+  <div class="landing-wrap">
 
-/* 행 전체를 카드처럼 보이도록 */
-.banner-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 12px 10px;
-  background: #fff;
-  border-radius: 10px;
-  margin-bottom: 14px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-}
+    <!-- 🔥 첫 화면 -->
+    <section class="hero">
+      <h1>
+        외국인을 위한<br>
+        한국 인기 상품
+      </h1>
+      <p>
+        한국에서 바로 배송<br>
+        전화 주문 가능
+      </p>
 
-/* 아주 깔끔한 썸네일 사이즈 (전문가 느낌) */
-.banner-thumb {
-  width: 140px;      /* 전문가 UI에서 가장 적당한 크기 */
-  height: 80px;       /* 16:9 비율 유지 */
-  object-fit: cover;
-  border-radius: 8px;
-  background: #ddd;
-  flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-}
+      <button class="cta-btn" onclick="goShop()">
+        지금 구매하기
+      </button>
+    </section>
 
-/* URL 표시 영역 */
-.banner-info {
-  flex: 1;
-  font-size: 13px;
-  color: #333;
-  word-break: break-all;
-  line-height: 1.4;
-}
+    <!-- 설명 -->
+    <section class="section">
+      <h2>이런 분들께 추천</h2>
+      <p>
+        ✔ 한국 상품을 해외에서 구매하고 싶은 분<br>
+        ✔ 한국어 결제가 어려운 외국인 고객<br>
+        ✔ 전화로 바로 주문하고 싶은 분
+      </p>
+    </section>
 
-/* 버튼 오른쪽 정렬 */
-.banner-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
+    <!-- 신뢰 -->
+    <section class="section trust">
+      <h2>안심하고 주문하세요</h2>
+      <ul>
+        <li>✔ 한국 현지 운영</li>
+        <li>✔ 실시간 상담 가능</li>
+        <li>✔ 검증된 상품만 판매</li>
+      </ul>
+    </section>
 
-/* 삭제 버튼을 전문가 풍으로 */
-.banner-delete-btn {
-  background: #ff4d4f;
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  font-size: 13px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.banner-delete-btn:hover {
-  background: #d9363e;
-}
-/* -----------------------------
-   🔒 안전 모드: 배너 미리보기 개선
-   HTML/JS 변경 없음 — CSS만 추가
---------------------------------*/
+    <!-- 혜택 -->
+    <section class="section">
+      <h2>지금 주문 혜택</h2>
+      <p>
+        🎁 오늘 주문 시 빠른 출고<br>
+        🎁 한정 수량 특가 적용
+      </p>
+    </section>
 
-/* 배너 영상의 크기를 적당히 작게 정리 */
-.banner-video {
-  width: 140px !important;   /* 기존 대비 안정적인 소형 */
-  height: 80px !important;
-  object-fit: cover;
-  border-radius: 6px;
-  display: block;
-}
+    <!-- 하단 CTA -->
+    <div class="fixed-cta">
+      <button onclick="goShop()">
+        상품 보러가기
+      </button>
+    </div>
 
-/* 테이블 셀 패딩 정리 */
-#bannerList td {
-  padding: 10px 6px !important;
-  vertical-align: middle;
-}
+  </div>
 
-/* URL 컬럼이 너무 길면 자연스러운 줄바꿈 */
-#bannerList td:nth-child(3) {
-  max-width: 300px;
-  word-break: break-all;
-  font-size: 13px;
-  color: #333;
-}
-
-/* 영상과 텍스트가 너무 붙지 않도록 최소 간격 */
-#bannerList tr td:first-child {
-  width: 40px;
-}
-
-/* 행 간격을 조금 더 여유 있게 */
-#bannerList tr {
-  height: 110px;
-}
+  <script>
+    function goShop() {
+      // 👉 실제 상품 상세 or 쇼핑몰 링크로 교체
+      window.location.href = "https://k-shopping.shop";
+    }
+  </script>
+</body>
+</html>
