@@ -101,3 +101,31 @@ document.getElementById("goOrder").addEventListener("click", () => {
    🚀 초기 실행
 =========================================================== */
 loadCart();
+
+/* ===========================================================
+   🔹 [추가] 빈 장바구니일 때 메인으로 돌아가기 버튼 생성
+   (기존 코드 수정 없음)
+=========================================================== */
+(function addBackButtonWhenEmpty() {
+  const wrap = document.getElementById("cart-wrap");
+  if (!wrap) return;
+
+  const observer = new MutationObserver(() => {
+    const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+    // 장바구니가 비어 있고, 버튼이 아직 없을 때만
+    if (cart.length === 0 && !document.querySelector(".btn-back-main")) {
+      const btn = document.createElement("button");
+      btn.className = "btn-back-main";
+      btn.textContent = "← 메인으로 돌아가기";
+      btn.onclick = () => (location.href = "index.html");
+
+      wrap.appendChild(btn);
+    }
+  });
+
+  observer.observe(wrap, {
+    childList: true,
+    subtree: true
+  });
+})();
