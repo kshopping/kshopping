@@ -65,7 +65,6 @@ window.changeQty = function (index, diff) {
 
   loadCart();
 
-  // index.js와 연동될 경우 카운트 업데이트
   if (window.updateCartCount) updateCartCount();
   if (window.updateCartPreview) updateCartPreview();
 };
@@ -102,4 +101,3 @@ document.getElementById("goOrder").addEventListener("click", () => {
    🚀 초기 실행
 =========================================================== */
 loadCart();
-

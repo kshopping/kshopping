@@ -103,6 +103,24 @@
     #goOrder:hover {
       background: #1f8a4b;
     }
+
+    /* ===== 🔹 추가: 메인으로 돌아가기 버튼 ===== */
+    .btn-back-main {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px 0;
+      border-radius: 12px;
+      border: none;
+      background: #f1f3f5;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-back-main:hover {
+      background: #dee2e6;
+    }
   </style>
 </head>
 
@@ -125,15 +143,36 @@
 
   </div>
 
+  <!-- 기존 JS -->
   <script type="module" src="./js/cart.js"></script>
-<script>
-  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
-  if (cart.length === 0) {
-    alert("장바구니가 비어 있습니다.");
-    location.href = "index.html";
-  }
-</script>
+  <!-- 기존 스크립트 (절대 수정 안 함) -->
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+    if (cart.length === 0) {
+      alert("장바구니가 비어 있습니다.");
+      location.href = "index.html";
+    }
+  </script>
+
+  <!-- ===== 🔹 추가 스크립트 (기존 코드 수정 없음) ===== -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+      if (cart.length !== 0) return;
+
+      const wrap = document.getElementById("cart-wrap");
+      if (!wrap) return;
+
+      const btn = document.createElement("button");
+      btn.textContent = "← 메인으로 돌아가기";
+      btn.className = "btn-back-main";
+      btn.onclick = () => (location.href = "index.html");
+
+      wrap.appendChild(btn);
+    });
+  </script>
 
 </body>
 </html>
