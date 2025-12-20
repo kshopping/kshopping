@@ -487,12 +487,13 @@ font-weight: 700;
 
 <div id="dealer-popup">
   <button class="popup-close" onclick="closeDealerPopup()">×</button>
-  <img
-    id="dealer-popup-img"
-    class="popup-img"
-    src="/images/dealer_popup_select.png"
-    usemap="#dealerMap"
-  >
+ <img
+  id="dealer-popup-img"
+  class="popup-img"
+  src="images/dealer_popup_select.png"
+  usemap="#dealerMap"
+>
+
 
   <map name="dealerMap">
     <area shape="rect" coords="0,0,300,600" onclick="changePopup('en')">
@@ -505,7 +506,7 @@ font-weight: 700;
 <script>
 function changePopup(lang) {
   document.getElementById('dealer-popup-img').src =
-    '/images/dealer_popup_' + lang + '.png';
+    'images/dealer_popup_' + lang + '.png';
 }
 
 function closeDealerPopup() {
