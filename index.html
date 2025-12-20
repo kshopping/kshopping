@@ -5,82 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>K-Shopping</title>
 <link rel="stylesheet" href="css/index.css">
+
 <style>
-/* ===== 헤더 레이아웃 ===== */
+/* ===== 기존 스타일 ===== */
 #fixed-header-inner {
 display: flex;
 align-items: center;
 }
 
-/* ===== 로고 (크게 + 번개색) ===== */
 .header-title {
-font-size: 26px; /* 크게 */
+font-size: 26px;
 font-weight: 900;
-color: #ff4d4f; /* 번개와 동일 */
+color: #ff4d4f;
 cursor: pointer;
 white-space: nowrap;
 }
 
 .header-title:hover {
-color: #ff6b6d; /* 살짝 밝아짐 */
+color: #ff6b6d;
 }
 
-/* ===== 중앙 슬로건 ===== */
 .header-slogan {
 flex: 1;
 text-align: center;
 font-size: 16px;
 font-weight: 700;
 color: #ff9900;
-letter-spacing: 0.3px;
 white-space: nowrap;
 }
 
-/* 🔴 공통 레드 */
 .highlight-red {
 color: #ff4d4f;
 font-weight: 700;
-}
-
-/* ⚡ 번개 (깜빡 + 흔들림) */
-.lightning-svg {
-display: inline-block;
-vertical-align: middle;
-margin: 0 8px;
-animation: lightningCombo 0.9s infinite ease-in-out;
-transform-origin: center;
-}
-
-.lightning-svg svg {
-width: 26px;
-height: 34px;
-fill: #ff4d4f;
-}
-
-@keyframes lightningCombo {
-0% {
-opacity: 0.4;
-transform: rotate(0deg) scale(1);
-}
-30% {
-opacity: 1;
-transform: rotate(-8deg) scale(1.15);
-}
-60% {
-opacity: 1;
-transform: rotate(8deg) scale(1.15);
-}
-100% {
-opacity: 0.4;
-transform: rotate(0deg) scale(1);
-}
-}
-
-/* 🚚 배송 강조 */
-.shipping-fast {
-display: inline-flex;
-align-items: center;
-gap: 6px;
 }
 
 @media (max-width: 768px) {
@@ -88,13 +44,100 @@ gap: 6px;
 display: none;
 }
 }
+
+/* ===============================
+   🇻🇳 베트남 딜러 모집 팝업
+================================ */
+#dealer-popup-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.65);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 9999;
+}
+
+#dealer-popup {
+background: #fff;
+border-radius: 14px;
+width: 92%;
+max-width: 420px;
+overflow: hidden;
+font-family: Arial, sans-serif;
+}
+
+/* 상단 이미지 */
+#dealer-popup img {
+width: 100%;
+height: 170px;
+object-fit: cover;
+}
+
+/* 내용 영역 */
+#dealer-popup .content {
+padding: 20px;
+text-align: center;
+}
+
+#dealer-popup h2 {
+font-size: 18px;
+margin-bottom: 10px;
+}
+
+#dealer-popup p {
+font-size: 14px;
+line-height: 1.6;
+color: #333;
+}
+
+#dealer-popup ul {
+margin: 14px 0;
+padding-left: 18px;
+text-align: left;
+font-size: 14px;
+}
+
+#dealer-popup li {
+margin-bottom: 6px;
+}
+
+#dealer-popup .email-btn {
+display: inline-block;
+margin-top: 10px;
+padding: 10px 18px;
+background: #111;
+color: #fff;
+text-decoration: none;
+border-radius: 6px;
+font-size: 14px;
+}
+
+#dealer-popup .footer {
+margin-top: 10px;
+font-size: 12px;
+color: #666;
+}
+
+#dealer-popup .close-btn {
+margin-top: 8px;
+background: none;
+border: none;
+color: #999;
+font-size: 13px;
+cursor: pointer;
+}
 </style>
 </head>
+
 <body>
+
 <header id="fixed-header">
 <div id="fixed-header-inner">
 
-<!-- 로고 -->
 <div class="header-left">
   <div class="header-title" onclick="location.href='index.html'">
     K-Shopping
@@ -102,31 +145,15 @@ display: none;
 
  <div class="header-call">
   📞 Call / 문의 전화
-
-  <a class="call-link" href="tel:+821086408732">
-    010-8640-8732
-  </a>
-
-  <a class="call-link" href="tel:+82522560994">
-    052-256-0994
-  </a>
+  <a class="call-link" href="tel:+821086408732">010-8640-8732</a>
+  <a class="call-link" href="tel:+82522560994">052-256-0994</a>
+</div>
 </div>
 
-
-</div>
-
-<!-- 중앙 문구 -->
 <div class="header-slogan">
-외국인을 위한
-<span class="lightning-svg">
-<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
-</svg>
-</span>
-초특가 쇼핑몰
+외국인을 위한 초특가 쇼핑몰
 </div>
 
-<!-- 상단 메뉴 -->
 <div id="top-menu">
 <button id="cartGoBtn" class="cart-main-btn">
 🛒 <span id="cartCount"></span>
@@ -136,12 +163,10 @@ display: none;
 </div>
 
 </div>
-
 <nav id="category-area"></nav>
 </header>
 
 <main id="wrap">
-
 <section id="banner-area">
 <div id="banner-text-overlay">
 💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
@@ -155,11 +180,8 @@ display: none;
 <div class="bank-text">
 <div class="bank-label">외국인 전용 구매 안내</div>
 <div class="bank-value">
-<span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
-<span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
-<span class="shipping-fast highlight-red">
-<span>🚚</span> FAST SHIPPING
-</span>
+<span class="highlight-red">NO CARD REQUIRED</span><br>
+<span class="highlight-red">Cash Transfer OK</span>
 </div>
 </div>
 </section>
@@ -167,12 +189,67 @@ display: none;
 <section id="product-section">
 <div id="product-area" class="product-grid"></div>
 </section>
-
 </main>
 
 <div id="toast"></div>
 
+<!-- 🇻🇳 베트남 딜러 모집 팝업 -->
+<div id="dealer-popup-overlay">
+  <div id="dealer-popup">
+
+    <img src="images/korea_trust.jpg" alt="Korea Trust Image">
+
+    <div class="content">
+      <h2>🇰🇷 Tuyển Đại Lý Phân Phối tại Việt Nam</h2>
+
+      <p>
+        <b>K-Shopping</b> là nền tảng mua sắm<br>
+        cung cấp hàng hóa trực tiếp từ <b>Hàn Quốc</b>.<br><br>
+        Chúng tôi đang tìm kiếm <b>đối tác & đại lý tại Việt Nam</b><br>
+        để hợp tác kinh doanh <b>lâu dài và ổn định</b>.
+      </p>
+
+      <ul>
+        <li>✔ Giá sỉ trực tiếp từ Hàn Quốc</li>
+        <li>✔ Nguồn hàng ổn định, xuất khẩu chính ngạch</li>
+        <li>✔ Hỗ trợ hợp tác lâu dài</li>
+      </ul>
+
+      <a class="email-btn"
+         href="mailto:push007nev@gmail.com?subject=Vietnam Dealer Cooperation Inquiry">
+         📩 Liên hệ qua Email
+      </a>
+
+      <div class="footer">
+        <label>
+          <input type="checkbox" id="dealer-popup-today">
+          Không hiển thị hôm nay
+        </label>
+      </div>
+
+      <button class="close-btn" onclick="closeDealerPopup()">Đóng</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.addEventListener("load", function () {
+  if (localStorage.getItem("dealerPopupHidden") === "yes") {
+    document.getElementById("dealer-popup-overlay").style.display = "none";
+  }
+});
+
+function closeDealerPopup() {
+  if (document.getElementById("dealer-popup-today").checked) {
+    localStorage.setItem("dealerPopupHidden", "yes");
+  }
+  document.getElementById("dealer-popup-overlay").style.display = "none";
+}
+</script>
+
 <script type="module" src="./js/index.js"></script>
+
 </body>
 </html>
 
