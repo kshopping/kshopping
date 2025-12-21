@@ -5,22 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>K-SHOP 관리자</title>
 
+  <!-- 관리자 CSS -->
   <link rel="stylesheet" href="/css/admin.css" />
 
-  <!-- ✅ 비밀번호 체크를 "가장 먼저" 실행 (admin.js보다 먼저) -->
+  <!-- ✅ 관리자 비밀번호 체크 (가장 먼저 실행) -->
   <script>
     (function () {
       const adminPass = "100101";
       const okKey = "admin_ok";
 
-      // ✅ 세션에 남아있으면 바로 통과 (원하는 동작이면 유지)
-      // ✅ 매번 물어보게 하려면 아래 if를 무조건 prompt로 바꾸면 됨.
       if (sessionStorage.getItem(okKey) !== "true") {
         const input = prompt("관리자 비밀번호를 입력하세요:");
 
         if (input !== adminPass) {
           alert("비밀번호가 올바르지 않습니다.");
-          location.replace("index.html");
+          location.replace("/index.html");
           return;
         }
         sessionStorage.setItem(okKey, "true");
@@ -28,18 +27,18 @@
     })();
   </script>
 
-  <!-- XLSX (엑셀 저장용) : admin.js에서 사용하므로 먼저 로드 -->
+  <!-- XLSX (엑셀 저장용) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- 관리자 기능 (module) -->
-  <script type="module" src="js/admin.js"></script>
+  <!-- ✅ 관리자 JS (절대경로로 수정됨) -->
+  <script type="module" src="/js/admin.js"></script>
 </head>
 
 <body>
 
   <!-- 사이드바 -->
   <div id="sidebar">
-    <button class="home-btn" onclick="location.href='index.html'">🏠 메인으로</button>
+    <button class="home-btn" onclick="location.href='/index.html'">🏠 메인으로</button>
 
     <h2>관리자 메뉴</h2>
 
