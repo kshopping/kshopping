@@ -207,24 +207,15 @@ font-weight: 700;
 <section id="today-deal"></section>
 
 <section class="bank-info-box">
-  <div class="bank-icon">🌍</div>
-  <div class="bank-text">
-    <div class="bank-label" data-lang="foreign_guide"></div>
-    <div class="bank-value">
-      <span class="highlight-red" data-lang="no_card"></span>
-      ·
-      <span data-lang="no_card_desc"></span><br>
-
-      <span class="highlight-red" data-lang="cash_ok"></span>
-      ·
-      <span data-lang="cash_desc"></span>
-
-      <span class="shipping-fast highlight-red">
-        <span>🚚</span>
-        <span data-lang="fast_shipping"></span>
-      </span>
-    </div>
-  </div>
+<div class="bank-icon">🌍</div>
+<div class="bank-text">
+<div class="bank-label">외국인 전용 구매 안내</div>
+<div class="bank-value">
+<span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
+<span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
+<span class="shipping-fast highlight-red"><span>🚚</span> FAST SHIPPING</span>
+</div>
+</div>
 </section>
 
 <section id="product-section">
@@ -234,10 +225,132 @@ font-weight: 700;
 
 <div id="toast"></div>
 
-<script type="module" src="./js/index.js"></script>
-<script src="./lang/lang.js"></script>
+<!-- DEALER POPUP START -->
+<style>
+#dealer-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dealer-popup-wrap {
+  position: relative;
+  width: 90vw;
+  max-width: 420px;
+  pointer-events: auto;
+}
+
+.dealer-popup-img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* 상단 X */
+.dealer-close-x {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 20;
+}
+
+/* 하단 Close 버튼 (이미지 위 투명 클릭 영역) */
+.dealer-close-bottom {
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 9%;
+  cursor: pointer;
+  z-index: 15;
+}
+
+/* 언어 선택 영역 */
+.dealer-lang-btn {
+  position: absolute;
+  top: 40%;
+  bottom: 20%;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ⭐ hover 효과 (추가된 부분) */
+.dealer-lang-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+}
+
+.lang-en { left: 0%;  width: 25%; }
+.lang-vi { left: 25%; width: 25%; }
+.lang-th { left: 50%; width: 25%; }
+.lang-id { left: 75%; width: 25%; }
+</style>
+
+<div id="dealer-popup">
+  <div class="dealer-popup-wrap" id="dealerWrap">
+    <!-- 상단 X -->
+    <button class="dealer-close-x" onclick="dealerClosePopup()">×</button>
+
+    <img
+      id="dealerPopupImg"
+      class="dealer-popup-img"
+      src="images/dealer_popup_select.png"
+      alt="Dealer Popup"
+    >
+
+    <!-- 언어 선택 -->
+    <div class="dealer-lang-btn lang-en" onclick="dealerChangeLang('en')"></div>
+    <div class="dealer-lang-btn lang-vi" onclick="dealerChangeLang('vi')"></div>
+    <div class="dealer-lang-btn lang-th" onclick="dealerChangeLang('th')"></div>
+    <div class="dealer-lang-btn lang-id" onclick="dealerChangeLang('id')"></div>
+
+    <!-- 하단 Close (첫 화면 전용) -->
+    <div class="dealer-close-bottom" onclick="dealerClosePopup()"></div>
+  </div>
+</div>
+
 <script>
-  applyLang();
+let dealerPopupClosed = false;
+
+function dealerClosePopup() {
+  dealerPopupClosed = true;
+
+  const popup = document.getElementById('dealer-popup');
+  if (popup) popup.remove();
+}
+
+function dealerChangeLang(lang) {
+  if (dealerPopupClosed) return;
+
+  const img = document.getElementById('dealerPopupImg');
+  if (!img) return;
+
+  img.src = 'images/dealer_popup_' + lang + '.png';
+
+  document.querySelectorAll('.dealer-lang-btn').forEach(el => el.remove());
+
+  const closeBottom = document.querySelector('.dealer-close-bottom');
+  if (closeBottom) closeBottom.remove();
+}
+
 </script>
+<!-- DEALER POPUP END -->
+
+<script type="module" src="./js/index.js"></script>
 </body>
 </html>
+
