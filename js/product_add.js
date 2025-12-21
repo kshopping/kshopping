@@ -100,7 +100,9 @@ document.getElementById("saveBtn").addEventListener("click", async function (e) 
   }
 
   alert("상품이 성공적으로 추가되었습니다!");
-  location.replace("admin.html");
+alert("상품이 성공적으로 추가되었습니다!");
+history.back();
+
 });
 
 /* ===========================================================
