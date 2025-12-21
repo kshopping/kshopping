@@ -207,15 +207,24 @@ font-weight: 700;
 <section id="today-deal"></section>
 
 <section class="bank-info-box">
-<div class="bank-icon">🌍</div>
-<div class="bank-text">
-<div class="bank-label">외국인 전용 구매 안내</div>
-<div class="bank-value">
-<span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
-<span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
-<span class="shipping-fast highlight-red"><span>🚚</span> FAST SHIPPING</span>
-</div>
-</div>
+  <div class="bank-icon">🌍</div>
+  <div class="bank-text">
+    <div class="bank-label" data-lang="foreign_guide"></div>
+    <div class="bank-value">
+      <span class="highlight-red" data-lang="no_card"></span>
+      ·
+      <span data-lang="no_card_desc"></span><br>
+
+      <span class="highlight-red" data-lang="cash_ok"></span>
+      ·
+      <span data-lang="cash_desc"></span>
+
+      <span class="shipping-fast highlight-red">
+        <span>🚚</span>
+        <span data-lang="fast_shipping"></span>
+      </span>
+    </div>
+  </div>
 </section>
 
 <section id="product-section">
@@ -226,5 +235,9 @@ font-weight: 700;
 <div id="toast"></div>
 
 <script type="module" src="./js/index.js"></script>
+<script src="./lang/lang.js"></script>
+<script>
+  applyLang();
+</script>
 </body>
 </html>
