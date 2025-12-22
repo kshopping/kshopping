@@ -94,3 +94,37 @@ $("saveBtn").onclick = async function () {
   alert("상품 수정 완료!");
   location.href = "admin.html";
 };
+// 대표 이미지 삭제
+$("deleteMainImage").onclick = async function () {
+  if (!confirm("대표 이미지를 삭제하시겠습니까?")) return;
+
+  const { error } = await supabase
+    .from("products")
+    .update({ image_url: null })
+    .eq("id", productId);
+
+  if (error) {
+    alert("대표 이미지 삭제 실패");
+    console.error(error);
+    return;
+  }
+
+  alert("대표 이미지가 삭제되었습니다.");
+};
+// 상세 이미지 삭제
+$("deleteDetailImage").onclick = async function () {
+  if (!confirm("상세 이미지를 삭제하시겠습니까?")) return;
+
+  const { error } = await supabase
+    .from("products")
+    .update({ detail_image_url: null })
+    .eq("id", productId);
+
+  if (error) {
+    alert("상세 이미지 삭제 실패");
+    console.error(error);
+    return;
+  }
+
+  alert("상세 이미지가 삭제되었습니다.");
+};
