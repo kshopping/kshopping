@@ -76,8 +76,8 @@ document.getElementById("saveBtn").addEventListener("click", async function (e) 
     return;
   }
 
-  const imageFile = document.getElementById("image")?.files[0] || null;
-  const detailFile = document.getElementById("detail_image")?.files[0] || null;
+  const imageFile = document.getElementById("image_file")?.files[0] || null;
+  const detailFile = document.getElementById("detail_file")?.files[0] || null;
 
   const image_url = await uploadImage(imageFile, "products");
   const detail_image_url = await uploadImage(detailFile, "details");
