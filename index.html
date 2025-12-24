@@ -5,222 +5,151 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>K-Shopping</title>
 <link rel="stylesheet" href="css/index.css">
+
 <style>
 /* ===== 헤더 레이아웃 ===== */
 #fixed-header-inner {
-display: flex;
-align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 /* ===== 로고 (크게 + 번개색) ===== */
 .header-title {
-font-size: 26px;
-font-weight: 900;
-color: #ff4d4f;
-cursor: pointer;
-white-space: nowrap;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ff4d4f;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .header-title:hover {
-color: #ff6b6d;
+  color: #ff6b6d;
 }
 
 /* ===== 중앙 슬로건 ===== */
 .header-slogan {
-flex: 1;
-text-align: center;
-font-size: 16px;
-font-weight: 700;
-color: #ff9900;
-letter-spacing: 0.3px;
-white-space: nowrap;
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ff9900;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 /* 🔴 공통 레드 */
 .highlight-red {
-color: #ff4d4f;
-font-weight: 700;
+  color: #ff4d4f;
+  font-weight: 700;
 }
 
 /* ⚡ 번개 (깜빡 + 흔들림) */
 .lightning-svg {
-display: inline-block;
-vertical-align: middle;
-margin: 0 8px;
-animation: lightningCombo 0.9s infinite ease-in-out;
-transform-origin: center;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 8px;
+  animation: lightningCombo 0.9s infinite ease-in-out;
+  transform-origin: center;
 }
 
 .lightning-svg svg {
-width: 26px;
-height: 34px;
-fill: #ff4d4f;
+  width: 26px;
+  height: 34px;
+  fill: #ff4d4f;
 }
 
 @keyframes lightningCombo {
-0% {
-opacity: 0.4;
-transform: rotate(0deg) scale(1);
-}
-30% {
-opacity: 1;
-transform: rotate(-8deg) scale(1.15);
-}
-60% {
-opacity: 1;
-transform: rotate(8deg) scale(1.15);
-}
-100% {
-opacity: 0.4;
-transform: rotate(0deg) scale(1);
-}
+  0% {
+    opacity: 0.4;
+    transform: rotate(0deg) scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1.15);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(8deg) scale(1.15);
+  }
+  100% {
+    opacity: 0.4;
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 /* 🚚 배송 강조 */
 .shipping-fast {
-display: inline-flex;
-align-items: center;
-gap: 6px;
-}
-
-
-/* =========================
-   DEALER POPUP STYLE
-========================= */
-#dealer-popup {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0,0,0,0.6);
-z-index: 9999;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-
-#dealer-popup .popup-box {
-width: 90%;
-max-width: 900px;
-background: #fff;
-border-radius: 12px;
-overflow: hidden;
-}
-
-.popup-header {
-background: url('images/korea-bg.jpg') center/cover no-repeat;
-padding: 30px;
-color: #fff;
-text-align: center;
-}
-
-.popup-header h2 {
-margin: 0;
-font-size: 22px;
-font-weight: 800;
-}
-
-.popup-body {
-padding: 20px;
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-gap: 15px;
-}
-
-.lang-card {
-border: 1px solid #eee;
-border-radius: 8px;
-padding: 15px;
-font-size: 14px;
-}
-
-.lang-card strong {
-display: block;
-margin-bottom: 8px;
-}
-
-.popup-footer {
-padding: 15px;
-text-align: center;
-border-top: 1px solid #eee;
-}
-
-.popup-footer button {
-padding: 8px 16px;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-background: #ff4d4f;
-color: #fff;
-font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 </style>
 </head>
 
 <body>
 <header id="fixed-header">
-<div id="fixed-header-inner">
-<div class="header-left">
-  <div class="header-title" onclick="location.href='index.html'">
-    K-Shopping
+  <div id="fixed-header-inner">
+    <div class="header-left">
+      <div class="header-title" onclick="location.href='index.html'">
+        K-Shopping
+      </div>
+
+      <div class="header-call">
+        📞 Call / 문의 전화
+        <a class="call-link" href="tel:+821086408732">010-8640-8732</a>
+        <a class="call-link" href="tel:+82522560994">052-256-0994</a>
+      </div>
+    </div>
+
+    <div class="header-slogan">
+      외국인을 위한
+      <span class="lightning-svg">
+        <svg viewBox="0 0 24 24">
+          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+        </svg>
+      </span>
+      초특가 쇼핑몰
+    </div>
+
+    <div id="top-menu">
+      <button id="cartGoBtn" class="cart-main-btn">🛒 <span id="cartCount"></span></button>
+      <div id="cart-preview"></div>
+      <button onclick="location.href='admin.html'">🔑 관리자</button>
+    </div>
   </div>
 
- <div class="header-call">
-  📞 Call / 문의 전화
-  <a class="call-link" href="tel:+821086408732">010-8640-8732</a>
-  <a class="call-link" href="tel:+82522560994">052-256-0994</a>
-</div>
-</div>
-
-<div class="header-slogan">
-외국인을 위한
-<span class="lightning-svg">
-<svg viewBox="0 0 24 24">
-<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
-</svg>
-</span>
-초특가 쇼핑몰
-</div>
-
-<div id="top-menu">
-<button id="cartGoBtn" class="cart-main-btn">🛒 <span id="cartCount"></span></button>
-<div id="cart-preview"></div>
-<button onclick="location.href='admin.html'">🔑 관리자</button>
-</div>
-</div>
-<nav id="category-area"></nav>
+  <nav id="category-area"></nav>
 </header>
 
 <main id="wrap">
-<section id="banner-area">
-<div id="banner-text-overlay">
-💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
-</div>
-</section>
+  <section id="banner-area">
+    <div id="banner-text-overlay">
+      💸 지금 이 가격, 놓치면 손해! 전 상품 초특가 할인 중! 🔥
+    </div>
+  </section>
 
-<section id="today-deal"></section>
+  <section id="today-deal"></section>
 
-<section class="bank-info-box">
-<div class="bank-icon">🌍</div>
-<div class="bank-text">
-<div class="bank-label">외국인 전용 구매 안내</div>
-<div class="bank-value">
-<span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
-<span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
-<span class="shipping-fast highlight-red"><span>🚚</span> FAST SHIPPING</span>
-</div>
-</div>
-</section>
+  <section class="bank-info-box">
+    <div class="bank-icon">🌍</div>
+    <div class="bank-text">
+      <div class="bank-label">외국인 전용 구매 안내</div>
+      <div class="bank-value">
+        <span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
+        <span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
+        <span class="shipping-fast highlight-red"><span>🚚</span> FAST SHIPPING</span>
+      </div>
+    </div>
+  </section>
 
-<section id="product-section">
-<div id="product-area" class="product-grid"></div>
-</section>
+  <section id="product-section">
+    <div id="product-area" class="product-grid"></div>
+  </section>
 </main>
 
 <div id="toast"></div>
 
-<!-- DEALER POPUP START -->
+<!-- ✅ DEALER POPUP START -->
 <style>
 #dealer-popup {
   position: fixed;
@@ -283,7 +212,7 @@ font-weight: 700;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* ⭐ hover 효과 (추가된 부분) */
+/* ⭐ hover 효과 */
 .dealer-lang-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 25px rgba(0,0,0,0.25);
@@ -341,11 +270,9 @@ function dealerChangeLang(lang) {
   const closeBottom = document.querySelector('.dealer-close-bottom');
   if (closeBottom) closeBottom.remove();
 }
-
 </script>
-<!-- DEALER POPUP END -->
+<!-- ✅ DEALER POPUP END -->
 
 <script type="module" src="./js/index.js"></script>
 </body>
 </html>
-
