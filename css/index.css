@@ -647,3 +647,10 @@ body {
     min-height: 14px !important;
   }
 }
+/* ✅ [3번] 모바일 장바구니 버튼을 엄청 왼쪽으로 이동 (PC 영향 0%) */
+@media (max-width: 768px) {
+  #top-menu {
+    right: calc(52px + env(safe-area-inset-right)) !important; /* ✅ 확실히 왼쪽으로 */
+    top: calc(12px + env(safe-area-inset-top)) !important;     /* ✅ 아이폰 노치 대응 */
+  }
+}
