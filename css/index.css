@@ -21,10 +21,8 @@ body {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 18px rgba(0,0,0,0.05);
   padding: 18px 20px 18px;
-  z-index: 99999;
-  overflow: visible;
-
-}
+  z-index: 999;
+  }
 
 #fixed-header-inner {
   max-width: 1280px;
@@ -32,6 +30,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  #fixed-header-inner { flex-wrap: nowrap; }
 }
 
 /* ============================= 🌟 HEADER SLOGAN ============================= */
@@ -60,7 +59,8 @@ body {
   gap: 12px;
   align-items: center;
   position: relative;
-}
+   flex-shrink: 0;
+ }
 
 #top-menu button {
   padding: 8px 15px;
@@ -94,7 +94,6 @@ body {
   border-radius: 50%;
   font-weight: bold;
   z-index: 10;
-  z-index: 100000;
 }
 
 /* ============================= 🌟 CART DROPDOWN ============================= */
@@ -108,7 +107,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: 12px;
   display: none;
-  z-index: 999999;
+  z-index: 999;
 }
 
 /* ============================= 🌟 BANNER AREA ============================= */
