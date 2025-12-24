@@ -619,9 +619,4 @@ body {
     padding-right: 0 !important;
   }
 }
-@media (max-width: 768px) {
-  #dealer-popup { z-index: 1 !important; }
-  #top-menu { z-index: 9999999 !important; }
-  #fixed-header { z-index: 9999998 !important; }
-}
 
