@@ -503,22 +503,23 @@ body {
     padding: 8px 0;
   }
 
-    /* ✅ 카테고리 기본(2줄 유지 + 센터 + 좌우 균형 완전 해결) */
-  #category-area {
-    width: calc(100% + 40px) !important;   /* ✅ 헤더 padding(20+20) 만큼 폭 확장 */
-    margin-left: -20px !important;         /* ✅ 왼쪽으로 20px 당겨서 균형 */
-    margin-right: -20px !important;        /* ✅ 오른쪽도 동일하게 균형 */
+   /* ✅ 카테고리 기본(2줄 유지 + 블럭/버튼 모두 왼쪽 정렬) */
+#category-area {
+  width: calc(100% + 40px) !important;
+  margin-left: -20px !important;
+  margin-right: -20px !important;
 
-    padding: 8px 6px !important;
-    gap: 6px !important;
-    flex-wrap: wrap !important;            /* ✅ 2줄 유지 */
-    justify-content: center !important;    /* ✅ 센터 */
-    box-sizing: border-box !important;
+  padding: 8px 10px !important;       /* ✅ 왼쪽 여백 조금 주고 보기 좋게 */
+  gap: 6px !important;
+  flex-wrap: wrap !important;          /* ✅ 2줄 유지 */
 
-    overflow-x: hidden !important;         /* ✅ 폰 밖 튀어나감 방지 */
-    border-radius: 14px !important;
-  }
+  justify-content: flex-start !important; /* ✅ 핵심: 버튼들을 왼쪽으로 */
+  align-items: center !important;
 
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  border-radius: 14px !important;
+}
 
   .category-btn {
     padding: 6px 12px !important;
