@@ -214,7 +214,6 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 26px;
   margin-top: 32px;
-  
 }
 
 /* ============================= 🌟 PRODUCT CARD ============================= */
@@ -529,7 +528,7 @@ body {
 
 /* ============================= 📱 MOBILE 전화 한 줄 + 클릭 최종 ============================= */
 @media (max-width: 768px) {
-  
+
   .header-call {
     display: flex;
     align-items: center;
@@ -609,6 +608,42 @@ body {
   #top-menu button[onclick*="admin.html"] {
     display: none !important;
   }
+}
 
+/* ============================= ✅ [추가] 모바일 장바구니 버튼 100% 보이게 강제 패치 ============================= */
+/* ✅ PC 영향 0% / 모바일에서 “무조건 표시 + 색/배경/클릭” 강제 */
+@media (max-width: 768px) {
+
+  /* 혹시 header가 더 위에 덮는 경우까지 대비 */
+  #fixed-header {
+    z-index: 999999 !important;
   }
 
+  #top-menu {
+    z-index: 10000000 !important;
+  }
+
+  /* 버튼이 존재하지만 투명/배경색 때문에 안 보이는 경우 해결 */
+  #cartGoBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    background: #ffffff !important;
+    color: #111 !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12) !important;
+    border-radius: 16px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* span이 비어있어서 버튼 폭이 줄어드는 것 방지 */
+  #cartCount {
+    display: inline-block !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+  }
+}
