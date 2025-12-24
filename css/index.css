@@ -654,3 +654,9 @@ body {
     top: calc(12px + env(safe-area-inset-top)) !important;     /* ✅ 아이폰 노치 대응 */
   }
 }
+/* ✅ 모바일에서 팝업이 헤더/상단바보다 항상 위에 오도록 (PC 영향 0%) */
+@media (max-width: 768px) {
+  #dealer-popup {
+    z-index: 20000000 !important;  /* ✅ 헤더/장바구니보다 무조건 위 */
+  }
+}
