@@ -622,4 +622,7 @@ body {
     padding-right: 0 !important;
   }
 }
+@media (max-width: 768px) {
+  #top-menu button[onclick*="admin.html"] { display: none !important; }
+}
 
