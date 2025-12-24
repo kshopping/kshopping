@@ -529,8 +529,7 @@ body {
 
 /* ============================= 📱 MOBILE 전화 한 줄 + 클릭 최종 ============================= */
 @media (max-width: 768px) {
-  .header-slogan { display: none; }
-
+  
   .header-call {
     display: flex;
     align-items: center;
@@ -622,7 +621,3 @@ body {
     padding-right: 0 !important;
   }
 }
-@media (max-width: 768px) {
-  #top-menu button[onclick*="admin.html"] { display: none !important; }
-}
-
