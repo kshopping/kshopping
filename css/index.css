@@ -610,13 +610,5 @@ body {
     display: none !important;
   }
 
-  /* ✅ 카테고리 중앙 유지 */
-  #category-area {
-    width: 100% !important;
-    justify-content: center !important;
-    margin: 0 auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
   }
-}
 
