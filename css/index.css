@@ -571,6 +571,8 @@ body {
   }
 }
 @media (max-width: 768px) {
+
+  /* 배너 완전 제거 + 공간 제거 */
   #banner-area {
     display: none !important;
     height: 0 !important;
@@ -578,12 +580,7 @@ body {
     padding: 0 !important;
   }
 
-  #wrap {
-    padding-top: 180px !important;
-  }
-}
-@media (max-width: 768px) {
-
+  /* 문구 보이게 */
   .header-slogan {
     display: block !important;
     width: calc(100vw - 20px) !important;
@@ -597,6 +594,7 @@ body {
     padding: 0 10px !important;
   }
 
+  /* 장바구니 고정 표시 */
   #top-menu {
     position: fixed !important;
     top: 12px !important;
@@ -609,10 +607,18 @@ body {
 
   #cartGoBtn {
     display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     padding: 8px 10px !important;
     font-size: 16px !important;
   }
 
+  /* 관리자 버튼 모바일에서만 숨김 */
+  #top-menu button[onclick*="admin.html"] {
+    display: none !important;
+  }
+
+  /* 카테고리 중앙 */
   #category-area {
     width: 100% !important;
     justify-content: center !important;
@@ -620,12 +626,4 @@ body {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
-}
-@media (max-width: 768px) {
-  #top-menu button[onclick*="admin.html"] { display: none !important; }
-}
-@media (max-width: 768px) {
-  #top-menu { position: fixed !important; top: 12px !important; right: 12px !important; display: flex !important; z-index: 999999 !important; }
-  #cartGoBtn { display: inline-flex !important; visibility: visible !important; opacity: 1 !important; }
-  #top-menu button[onclick*="admin.html"] { display: none !important; }
 }
