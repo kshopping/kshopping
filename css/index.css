@@ -36,19 +36,19 @@ body {
 .header-slogan {
   flex: 1;
   text-align: center;
-  font-size: 18px; /* ← 기존보다 조금 크게 */
+  font-size: 18px;
   font-weight: 700;
   color: #ff9900;
   letter-spacing: 0.3px;
   white-space: nowrap;
-  margin-right: 80px; /* ← 중앙에서 왼쪽으로 */
+  margin-right: 80px;
 }
 
 .header-title {
   font-size: 32px;
   font-weight: 900;
   cursor: pointer;
-  color: #ffb700; /* 브랜드 포인트 */
+  color: #ffb700;
   letter-spacing: -0.5px;
 }
 
@@ -112,8 +112,8 @@ body {
 #banner-area {
   position: relative;
   width: 100%;
-  height: 70px; /* ⭐ 배너 존재감 확보 */
-  margin-top: 14px; /* ⭐ 카테고리와 확실히 분리 */
+  height: 70px;
+  margin-top: 14px;
   margin-bottom: 18px;
   overflow: hidden;
   border-radius: 14px;
@@ -430,46 +430,6 @@ body {
   animation: btnGlow 0.45s ease-out;
 }
 
-/* ============================= MOBILE ============================= */
-@media (max-width: 768px) {
-  #wrap { padding-top: 230px; }
-  #product-area {
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 20px;
-  }
-  .product-card { padding: 12px; }
-  .product-buttons button {
-    font-size: 14px;
-    padding: 8px 0;
-  }
-}
-
-@media (max-width: 768px) {
-  #category-area {
-    padding: 8px 8px;
-    gap: 6px;
-    border-radius: 14px;
-  }
-
-  .category-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: 18px;
-  }
-
-  .bank-info-box {
-    padding: 8px 10px;
-    margin: 14px 0 18px;
-  }
-
-  .bank-text {
-    font-size: 13px;
-    line-height: 1.25;
-    white-space: normal;
-    text-align: center;
-  }
-}
-
 /* ========================================= 🌟 혼합 슬라이더 공통 스타일 ========================================= */
 #banner-area .banner-slide {
   position: absolute;
@@ -526,9 +486,87 @@ body {
   z-index: 10;
 }
 
-/* ============================= 📱 MOBILE 전화 한 줄 + 클릭 최종 ============================= */
+/* ============================= ✅✅✅ MOBILE 최종 정리 블럭 (여기만 수정하면 됨) ============================= */
 @media (max-width: 768px) {
 
+  /* ✅ 전체 wrap 위 여백 */
+  #wrap { padding-top: 230px; }
+
+  /* ✅ 상품 그리드 */
+  #product-area {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 20px;
+  }
+  .product-card { padding: 12px; }
+  .product-buttons button {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+
+  /* ✅ 카테고리 기본(2줄 유지 + 센터) */
+  #category-area {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 8px 6px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;            /* ✅ 2줄 유지 */
+    justify-content: center !important;    /* ✅ 센터 */
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    border-radius: 14px !important;
+  }
+
+  .category-btn {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    border-radius: 18px !important;
+  }
+
+  /* ✅ 은행 박스 */
+  .bank-info-box {
+    padding: 8px 10px;
+    margin: 14px 0 18px;
+  }
+  .bank-text {
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* ✅ 배너 제거 */
+  #banner-area {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ✅ 헤더 줄바꿈 허용 */
+  #fixed-header-inner {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+  }
+
+  /* ✅ 왼쪽 로고/전화 */
+  .header-left {
+    width: auto !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* ✅ 슬로건 줄바꿈 */
+  .header-slogan {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    white-space: normal !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    margin: 6px 0 0 0 !important;
+    padding: 0 10px !important;
+  }
+
+  /* ✅ 모바일 전화 줄 */
   .header-call {
     display: flex;
     align-items: center;
@@ -549,81 +587,19 @@ body {
     font-weight: 700;
     white-space: nowrap;
   }
-}
 
-@media (max-width: 768px) {
-
-  /* ✅ 배너 제거 + 공간 제거 */
-  #banner-area {
-    display: none !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* ✅ 헤더 줄바꿈 허용 (문구 잘림 방지) */
-  #fixed-header-inner {
-    flex-wrap: wrap !important;
-    align-items: flex-start !important;
-  }
-
-  /* ✅ 왼쪽 로고/전화는 한 줄 */
-  .header-left {
-    width: auto !important;
-    flex: 1 1 auto !important;
-  }
-
-  /* ✅ 문구는 아래로 내려서 크게 보이게 */
-  .header-slogan {
-    width: 100% !important;
-    display: block !important;
-    text-align: center !important;
-    white-space: normal !important;
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-    margin: 6px 0 0 0 !important;
-    padding: 0 10px !important;
-  }
-
-  /* ✅ 장바구니는 항상 오른쪽 상단 고정 */
+  /* ✅ 장바구니/메뉴 고정 (왼쪽으로 많이 이동 + safe-area) */
   #top-menu {
     position: fixed !important;
-    top: 12px !important;
-    right: 12px !important;
-    z-index: 999999 !important;
+    top: calc(12px + env(safe-area-inset-top)) !important;
+    right: calc(52px + env(safe-area-inset-right)) !important;
+    z-index: 10000000 !important;
     display: flex !important;
     gap: 8px !important;
     align-items: center !important;
   }
 
-  #cartGoBtn {
-    display: inline-flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    padding: 8px 10px !important;
-    font-size: 16px !important;
-  }
-
-  /* ✅ 관리자 버튼은 모바일에서만 숨김 */
-  #top-menu button[onclick*="admin.html"] {
-    display: none !important;
-  }
-}
-
-/* ============================= ✅ [추가] 모바일 장바구니 버튼 100% 보이게 강제 패치 ============================= */
-/* ✅ PC 영향 0% / 모바일에서 “무조건 표시 + 색/배경/클릭” 강제 */
-@media (max-width: 768px) {
-
-  /* 혹시 header가 더 위에 덮는 경우까지 대비 */
-  #fixed-header {
-    z-index: 999999 !important;
-  }
-
-  #top-menu {
-    z-index: 10000000 !important;
-  }
-
-  /* 버튼이 존재하지만 투명/배경색 때문에 안 보이는 경우 해결 */
+  /* ✅ 장바구니 버튼 강제 표시 + 클릭 */
   #cartGoBtn {
     display: inline-flex !important;
     align-items: center !important;
@@ -638,75 +614,28 @@ body {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    padding: 8px 10px !important;
+    font-size: 16px !important;
   }
 
-  /* span이 비어있어서 버튼 폭이 줄어드는 것 방지 */
   #cartCount {
     display: inline-block !important;
     min-width: 14px !important;
     min-height: 14px !important;
   }
-}
-/* ✅ [3번] 모바일 장바구니 버튼을 엄청 왼쪽으로 이동 (PC 영향 0%) */
-@media (max-width: 768px) {
-  #top-menu {
-    right: calc(52px + env(safe-area-inset-right)) !important; /* ✅ 확실히 왼쪽으로 */
-    top: calc(12px + env(safe-area-inset-top)) !important;     /* ✅ 아이폰 노치 대응 */
+
+  /* ✅ 관리자 버튼 숨김 */
+  #top-menu button[onclick*="admin.html"] {
+    display: none !important;
   }
-}
-/* ✅ 모바일에서 팝업이 헤더/상단바보다 항상 위에 오도록 (PC 영향 0%) */
-@media (max-width: 768px) {
+
+  /* ✅ 팝업이 헤더보다 항상 위 */
   #dealer-popup {
-    z-index: 20000000 !important;  /* ✅ 헤더/장바구니보다 무조건 위 */
-  }
-}
-/* ✅ 모바일 카테고리 바: 좌우 공간 거의 0 + 완전 센터 정렬 (PC 영향 0%) */
-@media (max-width: 768px) {
-
-  #category-area {
-    width: 100vw !important;                  /* ✅ 화면 폭 꽉 채움 */
-    margin: 0 !important;
-    padding: 8px 2px !important;              /* ✅ 좌우 공간 거의 0 */
-    box-sizing: border-box !important;
-
-    position: relative !important;
-    left: 50% !important;                     /* ✅ 헤더 padding 무시하고 */
-    transform: translateX(-50%) !important;   /* ✅ 화면 기준 정확히 센터 */
-
-    justify-content: center !important;       /* ✅ 버튼 중앙 정렬 */
-    gap: 6px !important;                      /* ✅ 모바일에서 살짝 좁게 */
-    border-radius: 14px !important;
+    z-index: 20000000 !important;
   }
 
-}
-/* ✅ 모바일 카테고리 바를 더 왼쪽으로 확 당김 (기존 수정 유지 + 아래에 추가) */
-@media (max-width: 768px) {
-  #category-area {
-    width: calc(100% + 60px) !important;   /* ✅ 폭을 더 키움 */
-    margin-left: -30px !important;         /* ✅ 왼쪽으로 더 당김 */
-    margin-right: -30px !important;        /* ✅ 오른쪽도 균형 */
-    box-sizing: border-box !important;
-
-    justify-content: center !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-
-    overflow-x: hidden !important;
-  }
-}
-/* ✅ 모바일 카테고리 바: 화면폭(100vw) 고정 + 헤더 padding 무시하고 완전 센터 */
-@media (max-width: 768px) {
-  #category-area {
-    width: 100vw !important;                 /* ✅ 화면폭 고정 (절대 안 넘침) */
-    margin-left: calc(50% - 50vw) !important;/* ✅ 화면 기준으로 중앙 이동 */
-    margin-right: 0 !important;
-
-    box-sizing: border-box !important;
-
-    padding-left: 6px !important;            /* ✅ 좌우 여백 최소 */
-    padding-right: 6px !important;
-
-    justify-content: center !important;
-    overflow-x: hidden !important;           /* ✅ 혹시 모를 튀어나감 방지 */
+  /* ✅ 헤더도 충분히 위로 (하지만 팝업보단 낮음) */
+  #fixed-header {
+    z-index: 999999 !important;
   }
 }
