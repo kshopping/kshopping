@@ -571,3 +571,15 @@ body {
     text-align: center;
   }
 }
+@media (max-width: 768px) {
+  #banner-area {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #wrap {
+    padding-top: 180px !important;
+  }
+}
