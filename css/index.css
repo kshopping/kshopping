@@ -21,7 +21,9 @@ body {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 18px rgba(0,0,0,0.05);
   padding: 18px 20px 18px;
-  z-index: 999;
+  z-index: 99999;
+  overflow: visible;
+
 }
 
 #fixed-header-inner {
@@ -92,6 +94,7 @@ body {
   border-radius: 50%;
   font-weight: bold;
   z-index: 10;
+  z-index: 100000;
 }
 
 /* ============================= 🌟 CART DROPDOWN ============================= */
@@ -105,7 +108,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: 12px;
   display: none;
-  z-index: 999;
+  z-index: 999999;
 }
 
 /* ============================= 🌟 BANNER AREA ============================= */
