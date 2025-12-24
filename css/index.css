@@ -22,7 +22,7 @@ body {
   box-shadow: 0 4px 18px rgba(0,0,0,0.05);
   padding: 18px 20px 18px;
   z-index: 999;
-  }
+}
 
 #fixed-header-inner {
   max-width: 1280px;
@@ -30,7 +30,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  #fixed-header-inner { flex-wrap: nowrap; }
 }
 
 /* ============================= 🌟 HEADER SLOGAN ============================= */
@@ -59,8 +58,7 @@ body {
   gap: 12px;
   align-items: center;
   position: relative;
-   flex-shrink: 0;
- }
+}
 
 #top-menu button {
   padding: 8px 15px;
@@ -571,25 +569,5 @@ body {
     line-height: 1.3;
     white-space: normal;
     text-align: center;
-   
   }
-}
-@media (max-width: 768px) {
-  #banner-area {
-    display: none !important;
-  }
-}
-.cart-logo-btn {
-  margin-left: 10px;
-  padding: 6px 12px;
-  border: none;
-  background: #ffffffcc;
-  border-radius: 20px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
 }
