@@ -585,48 +585,40 @@ body {
 }
 @media (max-width: 768px) {
 
-  /* 1) 헤더 자체가 혹시 잘리거나 가려지는 경우 방지 */
-  #fixed-header,
-  #fixed-header-inner {
-    overflow: visible !important;
-  }
-
-  /* 2) 외국인 문구(.header-slogan) 강제 표시 */
   .header-slogan {
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-
+    width: calc(100vw - 20px) !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-align: center !important;
     font-size: 13px !important;
     line-height: 1.2 !important;
-    margin: 6px 0 0 0 !important;
-
-    width: 100% !important;
-    text-align: center !important;
-    white-space: nowrap !important;
+    margin: 6px auto 0 auto !important;
+    padding: 0 10px !important;
   }
 
-  /* 3) 장바구니가 들어있는 top-menu 강제 표시 */
   #top-menu {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-
-    position: relative !important;
+    position: fixed !important;
+    top: 12px !important;
+    right: 12px !important;
     z-index: 999999 !important;
-    flex-shrink: 0 !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
   }
 
-  /* 4) 장바구니 버튼 자체 강제 표시 */
   #cartGoBtn {
     display: inline-flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    padding: 8px 10px !important;
+    font-size: 16px !important;
   }
 
-  /* 5) 장바구니 아이콘 버튼이 모바일에서 너무 작거나 숨으면 강제 크기 */
-  #cartGoBtn {
-    padding: 8px 12px !important;
-    font-size: 16px !important;
+  #category-area {
+    width: 100% !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
