@@ -694,3 +694,19 @@ body {
     overflow-x: hidden !important;
   }
 }
+/* ✅ 모바일 카테고리 바: 화면폭(100vw) 고정 + 헤더 padding 무시하고 완전 센터 */
+@media (max-width: 768px) {
+  #category-area {
+    width: 100vw !important;                 /* ✅ 화면폭 고정 (절대 안 넘침) */
+    margin-left: calc(50% - 50vw) !important;/* ✅ 화면 기준으로 중앙 이동 */
+    margin-right: 0 !important;
+
+    box-sizing: border-box !important;
+
+    padding-left: 6px !important;            /* ✅ 좌우 여백 최소 */
+    padding-right: 6px !important;
+
+    justify-content: center !important;
+    overflow-x: hidden !important;           /* ✅ 혹시 모를 튀어나감 방지 */
+  }
+}
