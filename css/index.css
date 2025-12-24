@@ -624,3 +624,8 @@ body {
 @media (max-width: 768px) {
   #top-menu button[onclick*="admin.html"] { display: none !important; }
 }
+@media (max-width: 768px) {
+  #top-menu { position: fixed !important; top: 12px !important; right: 12px !important; display: flex !important; z-index: 999999 !important; }
+  #cartGoBtn { display: inline-flex !important; visibility: visible !important; opacity: 1 !important; }
+  #top-menu button[onclick*="admin.html"] { display: none !important; }
+}
