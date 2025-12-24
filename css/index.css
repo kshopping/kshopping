@@ -660,3 +660,24 @@ body {
     z-index: 20000000 !important;  /* ✅ 헤더/장바구니보다 무조건 위 */
   }
 }
+/* ✅ 모바일 카테고리 블럭 중앙 정렬 + 좌우 여백 문제 해결 (PC 영향 0%) */
+@media (max-width: 768px) {
+
+  /* ✅ 카테고리 영역을 화면 폭 기준으로 정확히 맞춤 */
+  #category-area {
+    width: 100vw !important;                 /* 화면 폭 기준 */
+    margin-left: calc(50% - 50vw) !important;/* 가운데 정렬 핵심 */
+    box-sizing: border-box !important;
+
+    justify-content: center !important;      /* 버튼들 중앙 정렬 */
+    padding-left: 8px !important;            /* 좌우 균형 */
+    padding-right: 8px !important;
+
+    overflow-x: hidden !important;           /* 오른쪽 짤림 방지 */
+  }
+
+  /* ✅ 버튼이 오른쪽으로 밀려나가거나 잘리지 않게 */
+  .category-btn {
+    max-width: 100% !important;
+  }
+}
