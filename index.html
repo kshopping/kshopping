@@ -83,9 +83,11 @@
   align-items: center;
   gap: 6px;
 }
-/* ✅ 모바일에서만 슬로건 삭제 */
+
+/* ✅ 모바일에서만 슬로건 삭제 + 본문 위로 올리기 */
 @media (max-width: 768px){
   .header-slogan{ display:none !important; }
+  #wrap{ padding-top:170px !important; }
 }
 
 </style>
