@@ -99,10 +99,7 @@ async function loadProductPage() {
       const id = btn.dataset.id;
       const current = btn.dataset.state === "true";
 
-      await supabase
-        .from("products")
-        .update({ sold_out: !current })
-        .eq("id", id);
+      await supabase.from("products").update({ sold_out: !current }).eq("id", id);
 
       loadProductPage(); // 즉시 새로고침
     });
@@ -112,7 +109,6 @@ async function loadProductPage() {
 window.addProduct = function () {
   location.href = "product_add.html";
 };
-
 
 /* ===========================================================
    카테고리 관리
@@ -177,10 +173,7 @@ window.editCategory = async function (id, oldName) {
     return;
   }
 
-  const { error } = await supabase
-    .from("categories")
-    .update({ name: newName.trim() })
-    .eq("id", id);
+  const { error } = await supabase.from("categories").update({ name: newName.trim() }).eq("id", id);
 
   if (error) {
     console.error(error);
@@ -203,10 +196,7 @@ window.deleteCategory = async function (id) {
 async function loadBannerPage() {
   const main = $("main-area");
 
-  const { data: banners } = await supabase
-    .from("banners")
-    .select("*")
-    .order("id", { ascending: false });
+  const { data: banners } = await supabase.from("banners").select("*").order("id", { ascending: false });
 
   const rows = banners
     .map(
@@ -239,9 +229,7 @@ window.addBanner = async function () {
 
   const path = `banners/${Date.now()}_${file.name}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("kshop")
-    .upload(path, file, { upsert: true });
+  const { error: uploadError } = await supabase.storage.from("kshop").upload(path, file, { upsert: true });
 
   if (uploadError) {
     console.error(uploadError);
@@ -270,7 +258,10 @@ window.deleteBanner = async function (id) {
 };
 
 /* ===========================================================
-   주문 관리 (출력 전 주문 목록)  ✅ 안전 수정
+   주문 관리 (출력 전 주문 목록)  ✅ 핵심 수정
+   - printed=false 만이 아니라 printed=null 도 포함해서 불러오기
+   - total / total_price / totalPrice 모두 대응
+   - created_at / createdAt 모두 대응
 =========================================================== */
 async function loadOrderPage() {
   const main = $("main-area");
@@ -278,7 +269,8 @@ async function loadOrderPage() {
   const { data: orders, error } = await supabase
     .from("orders")
     .select("*")
-    .eq("printed", false)
+    // ✅ 핵심: printed가 null인 주문도 출력 전으로 간주하여 보여주기
+    .or("printed.is.null,printed.eq.false")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -291,14 +283,22 @@ async function loadOrderPage() {
       const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
 
       const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
+
+      // ✅ total 컬럼명이 섞여 있어도 안전하게 표시
+      const totalValue = o.total ?? o.total_price ?? o.totalPrice ?? 0;
+
+      // ✅ created_at 컬럼명이 섞여 있어도 안전하게 표시
+      const dateRaw = o.created_at ?? o.createdAt ?? "";
+      const dateText = dateRaw ? String(dateRaw).split("T")[0] : "";
+
       return `
       <tr>
-        <td>${o.id}</td>
-        <td>${o.name}</td>
+        <td>${o.id ?? "-"}</td>
+        <td>${o.name ?? "-"}</td>
         <td>${agreeText}</td>
-        <td>${Number(o.total || 0).toLocaleString()}원</td>
+        <td>${Number(totalValue || 0).toLocaleString()}원</td>
         <td>${qty}</td>
-        <td>${o.created_at?.split("T")[0] ?? ""}</td>
+        <td>${dateText}</td>
         <td>
           <button class="btn blue js-order-print" data-id="${o.id}">출력</button>
           <button class="btn red js-order-del" data-id="${o.id}">삭제</button>
@@ -311,20 +311,19 @@ async function loadOrderPage() {
     <h2>주문 관리 (출력 전)</h2>
     <table>
       <tr>
-      <th>주문번호</th>
-      <th>고객명</th>
-      <th>광고동의</th>
-      <th>금액</th>
-      <th>수량</th>
-      <th>일자</th>
-      <th>관리</th>
-  
+        <th>주문번호</th>
+        <th>고객명</th>
+        <th>광고동의</th>
+        <th>금액</th>
+        <th>수량</th>
+        <th>일자</th>
+        <th>관리</th>
       </tr>
-      ${rows}
+      ${rows || `<tr><td colspan="7" style="text-align:center;">주문이 없습니다.</td></tr>`}
     </table>
   `;
 
-  // ✅ inline onclick 제거: data-id 기반 이벤트 바인딩
+  // ✅ 이벤트 바인딩
   main.querySelectorAll(".js-order-print").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
@@ -349,17 +348,15 @@ window.printOrder = async function (orderId) {
     return;
   }
 
-  const { data: o, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("id", orderId)
-    .single();
+  const { data: o, error } = await supabase.from("orders").select("*").eq("id", orderId).single();
 
   if (error || !o) {
     console.error(error);
     alert("주문 데이터를 불러오지 못했습니다.");
     return;
   }
+
+  const totalValue = o.total ?? o.total_price ?? o.totalPrice ?? 0;
 
   const popup = window.open("", "_blank");
 
@@ -375,10 +372,10 @@ window.printOrder = async function (orderId) {
     <body>
       <h2>주문서 - ${o.id}</h2>
 
-      <p><b>고객명:</b> ${o.name}</p>
-      <p><b>연락처:</b> ${o.phone}</p>
-      <p><b>주소:</b> ${o.address}</p>
-      <p><b>요청사항:</b> ${o.memo}</p>
+      <p><b>고객명:</b> ${o.name ?? ""}</p>
+      <p><b>연락처:</b> ${o.phone ?? ""}</p>
+      <p><b>주소:</b> ${o.address ?? ""}</p>
+      <p><b>요청사항:</b> ${o.memo ?? ""}</p>
 
       <h3>주문 내역</h3>
       <table>
@@ -395,7 +392,7 @@ window.printOrder = async function (orderId) {
           .join("")}
       </table>
 
-      <h3>총액: ${Number(o.total || 0).toLocaleString()}원</h3>
+      <h3>총액: ${Number(totalValue || 0).toLocaleString()}원</h3>
 
       <script>window.print();</script>
     </body>
@@ -417,7 +414,7 @@ window.printOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   출력된 주문 목록  ✅ 삭제 버튼 안전 수정
+   출력된 주문 목록  ✅ printed=true 유지 + 금액/날짜 안전 대응
 =========================================================== */
 async function loadPrintedPage() {
   const main = $("main-area");
@@ -437,14 +434,19 @@ async function loadPrintedPage() {
     .map((o) => {
       const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
       const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
+
+      const totalValue = o.total ?? o.total_price ?? o.totalPrice ?? 0;
+      const printedAtRaw = o.printed_at ?? "";
+      const printedDate = printedAtRaw ? String(printedAtRaw).split("T")[0] : "";
+
       return `
       <tr>
-        <td>${o.id}</td>
-        <td>${o.name}</td>
+        <td>${o.id ?? "-"}</td>
+        <td>${o.name ?? "-"}</td>
         <td>${agreeText}</td>
-        <td>${Number(o.total || 0).toLocaleString()}원</td>
+        <td>${Number(totalValue || 0).toLocaleString()}원</td>
         <td>${qty}</td>
-        <td>${o.printed_at?.split("T")[0] ?? ""}</td>
+        <td>${printedDate}</td>
         <td><button class="btn red js-printed-del" data-id="${o.id}">삭제</button></td>
       </tr>`;
     })
@@ -468,9 +470,8 @@ async function loadPrintedPage() {
        <th>수량</th>
        <th>출력일</th>
        <th>관리</th>
- 
       </tr>
-      ${rows}
+      ${rows || `<tr><td colspan="7" style="text-align:center;">출력된 주문이 없습니다.</td></tr>`}
     </table>
   `;
 
@@ -495,10 +496,7 @@ window.deleteOrder = async function (orderId) {
 
   if (!confirm("정말 이 주문을 삭제하시겠습니까?")) return;
 
-  const { error, count } = await supabase
-    .from("orders")
-    .delete({ count: "exact" })
-    .eq("id", orderId);
+  const { error, count } = await supabase.from("orders").delete({ count: "exact" }).eq("id", orderId);
 
   if (error) {
     console.error(error);
@@ -506,7 +504,6 @@ window.deleteOrder = async function (orderId) {
     return;
   }
 
-  // count가 1이 아니면, 조건이 이상하다는 뜻(대량삭제 방지)
   if (count !== 1) {
     alert("⚠️ 비정상 삭제 감지 – 작업 중단");
     console.warn("deleteOrder count:", count, "orderId:", orderId);
@@ -515,17 +512,13 @@ window.deleteOrder = async function (orderId) {
 
   alert("삭제 완료");
   loadOrderPage();
- 
 };
 
 // ===========================
 // XLSX 엑셀 저장 기능 (광고동의 포함 최종본)
 // ===========================
 window.exportByPeriod = async function (type) {
-  const { data } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("printed", true);
+  const { data } = await supabase.from("orders").select("*").eq("printed", true);
 
   if (!data || data.length === 0) {
     return alert("출력된 주문이 없습니다.");
@@ -550,7 +543,6 @@ window.exportByPeriod = async function (type) {
     const orders = groups[key];
     const rows = [];
 
-    // ✅ 엑셀 헤더 (광고동의 포함)
     rows.push([
       "주문번호",
       "고객명",
@@ -575,10 +567,10 @@ window.exportByPeriod = async function (type) {
         o.id,
         o.name,
         o.phone,
-        o.marketing_agree ? "TRUE" : "FALSE", // ✅ 핵심
+        o.marketing_agree ? "TRUE" : "FALSE",
         o.address,
         o.memo,
-        o.total,
+        o.total ?? o.total_price ?? o.totalPrice ?? 0,
         qty,
         o.printed_at.split("T")[0],
         itemText,
@@ -601,7 +593,6 @@ window.exportByPeriod = async function (type) {
 
   alert("엑셀 저장 완료!");
 };
-
 
 /* ===========================================================
    계좌 정보 관리
@@ -679,10 +670,7 @@ window.deleteAccount = async function (id) {
 async function loadDetailImagesPage() {
   const main = $("main-area");
 
-  const { data: products, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("id", { ascending: true });
+  const { data: products, error } = await supabase.from("products").select("*").order("id", { ascending: true });
 
   if (error) {
     console.error(error);
@@ -729,9 +717,7 @@ window.uploadDetailImage = async function (productId) {
 
   const filePath = `details/${productId}_${Date.now()}.jpg`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("kshop")
-    .upload(filePath, file, { upsert: true });
+  const { error: uploadError } = await supabase.storage.from("kshop").upload(filePath, file, { upsert: true });
 
   if (uploadError) {
     console.error(uploadError);
@@ -747,11 +733,7 @@ window.uploadDetailImage = async function (productId) {
 };
 
 window.deleteDetailImage = async function (productId) {
-  const { data: product } = await supabase
-    .from("products")
-    .select("detail_image_url")
-    .eq("id", productId)
-    .single();
+  const { data: product } = await supabase.from("products").select("detail_image_url").eq("id", productId).single();
 
   if (product?.detail_image_url) {
     const path = product.detail_image_url.split("/").slice(4).join("/");
