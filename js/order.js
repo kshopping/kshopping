@@ -1,72 +1,163 @@
- // /js/order.js
-// ✅ 주문페이지 전용 JS (장바구니 → 주문정보 입력 → 주문완료 저장)
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-Shopping | 외국인 전용 한국 쇼핑</title>
 
-document.addEventListener("DOMContentLoaded", () => {
-  const submitBtn = document.getElementById("submitOrder");
-  if (!submitBtn) return;
+  <style>
+    body {
+      margin: 0;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
 
-  submitBtn.addEventListener("click", handleSubmitOrder);
-});
+    .landing-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+    }
 
-// ✅ 주문하기 버튼 클릭 처리
-function handleSubmitOrder() {
-  // 1) 입력값 가져오기
-  const name = document.getElementById("name")?.value.trim();
-  const phone = document.getElementById("phone")?.value.trim();
-  const address = document.getElementById("address")?.value.trim();
-  const memo = document.getElementById("memo")?.value.trim();
+    /* 상단 후킹 */
+    .hero {
+      padding: 28px 20px;
+      background: linear-gradient(180deg, #fff4cc, #ffffff);
+      text-align: center;
+    }
 
-  // 2) 필수 동의 체크
-  const agreeRequired = document.getElementById("agree_required");
-  if (!agreeRequired?.checked) {
-    alert("⚠️ [필수] 개인정보 수집 및 이용 동의가 필요합니다.");
-    return;
-  }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
 
-  // 3) 기본 입력 검증
-  if (!name || !phone || !address) {
-    alert("⚠️ 이름/연락처/주소는 필수 입력입니다.");
-    return;
-  }
+    .hero p {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 18px;
+    }
 
-  // 4) 장바구니 가져오기
-  const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
-  if (!cartItems.length) {
-    alert("⚠️ 장바구니가 비어 있습니다.");
-    location.href = "index.html";
-    return;
-  }
+    .cta-btn {
+      width: 100%;
+      padding: 14px 0;
+      background: #ffcc33;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
-  // 5) 총액 계산
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
+    .section {
+      padding: 22px 20px;
+    }
 
-  // 6) 주문 데이터 생성
-  const orderData = {
-    id: "ORDER_" + Date.now(),
-    createdAt: new Date().toISOString(),
-    customer: {
-      name,
-      phone,
-      address,
-      memo,
-      marketingAgree: document.getElementById("agree_marketing")?.checked || false,
-    },
-    items: cartItems,
-    totalQty,
-    totalPrice,
-    status: "결제대기",
-  };
+    .section h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
 
-  // 7) 주문 저장 (localStorage)
-  const orderList = JSON.parse(localStorage.getItem("orderList") || "[]");
-  orderList.push(orderData);
-  localStorage.setItem("orderList", JSON.stringify(orderList));
+    .section p,
+    .section li {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
 
-  // 8) 장바구니 비우기
-  localStorage.removeItem("cartItems");
+    .trust {
+      background: #f9fafb;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
 
-  // 9) 주문완료 페이지로 이동
-  localStorage.setItem("lastOrder", JSON.stringify(orderData));
-  location.href = "order_complete.html";
-}
+    .trust ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .fixed-cta {
+      position: sticky;
+      bottom: 0;
+      background: #ffffffee;
+      padding: 12px 16px;
+      border-top: 1px solid #ddd;
+    }
+
+    .fixed-cta button {
+      width: 100%;
+      padding: 14px 0;
+      background: #ffb700;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="landing-wrap">
+
+    <!-- 첫 화면 -->
+    <section class="hero">
+      <h1>
+        외국인을 위한<br>
+        한국 인기 상품 쇼핑
+      </h1>
+      <p>
+        카드 없이 구매 가능<br>
+        한국에서 바로 배송
+      </p>
+      <button class="cta-btn" onclick="goShop()">지금 구매하기</button>
+    </section>
+
+    <!-- 대상 -->
+    <section class="section">
+      <h2>이런 분께 추천합니다</h2>
+      <p>
+        ✔ 한국 상품을 믿고 구매하고 싶은 분<br>
+        ✔ 해외 카드 결제가 어려운 외국인<br>
+        ✔ 전화·현금 송금으로 빠르게 주문하고 싶은 분
+      </p>
+    </section>
+
+    <!-- 신뢰 -->
+    <section class="section trust">
+      <h2>안심 포인트</h2>
+      <ul>
+        <li>✔ 한국 현지 운영 쇼핑몰</li>
+        <li>✔ 실시간 상담 가능</li>
+        <li>✔ 검증된 정품 상품</li>
+      </ul>
+    </section>
+
+    <!-- 혜택 -->
+    <section class="section">
+      <h2>지금 주문 혜택</h2>
+      <p>
+        🎁 한정 수량 특가<br>
+        🚚 빠른 출고 진행
+      </p>
+    </section>
+
+    <!-- 하단 CTA -->
+    <div class="fixed-cta">
+      <button onclick="goShop()">상품 보러가기</button>
+    </div>
+
+  </div>
+
+  <script>
+    function goShop() {
+      // 👉 메인 쇼핑몰 또는 특정 상품 상세로 연결
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
+
