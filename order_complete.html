@@ -129,7 +129,7 @@
     <div class="title">🎉 주문이 완료되었습니다!</div>
 
     <p class="sub-text">
-      주문번호: <span id="orderId"></span><br>
+      주문번호: <span id="orderId">-</span><br>
       주문해주셔서 감사합니다. 관리자 확인 후 빠르게 처리됩니다.
     </p>
 
@@ -152,21 +152,34 @@
   <script type="module">
     import { supabase } from "./js/supabaseClient.js";
 
-    /* 주문번호 */
+    const orderIdEl = document.getElementById("orderId");
+    const summaryItemsEl = document.getElementById("summary-items");
+    const summaryTotalEl = document.getElementById("summary-total");
+    const bankInfoEl = document.getElementById("bankInfo");
+
+    // ✅ 1) URL 파라미터 id 확인
     const params = new URLSearchParams(location.search);
     const orderId = params.get("id");
-    document.getElementById("orderId").textContent = orderId;
 
-    /* 주문 상세 */
-    async function loadOrder() {
-      const { data: order } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", orderId)
-        .single();
+    // ✅ 2) localStorage lastOrder 확인
+    const lastOrderRaw = localStorage.getItem("lastOrder");
+    let lastOrder = null;
+    if (lastOrderRaw) {
+      try {
+        lastOrder = JSON.parse(lastOrderRaw);
+      } catch (e) {
+        lastOrder = null;
+      }
+    }
 
-      if (!order) {
-        document.getElementById("summary-items").innerHTML = "<p>주문 정보를 불러올 수 없습니다.</p>";
+    // ✅ 주문 렌더링 함수 (공통)
+    function renderOrder(order) {
+      // 주문번호
+      orderIdEl.textContent = order?.id ? order.id : "-";
+
+      if (!order || !order.items || order.items.length === 0) {
+        summaryItemsEl.innerHTML = "<p>주문 정보를 불러올 수 없습니다.</p>";
+        summaryTotalEl.textContent = "";
         return;
       }
 
@@ -175,9 +188,9 @@
       let qty = 0;
 
       order.items.forEach((item) => {
-        const itemTotal = item.price * item.qty;
+        const itemTotal = Number(item.price || 0) * Number(item.qty || 0);
         total += itemTotal;
-        qty += item.qty;
+        qty += Number(item.qty || 0);
 
         html += `
           <div class="summary-item">
@@ -186,22 +199,56 @@
           </div>`;
       });
 
-      document.getElementById("summary-items").innerHTML = html;
-      document.getElementById("summary-total").textContent =
+      summaryItemsEl.innerHTML = html;
+      summaryTotalEl.textContent =
         `총 ${qty}개 | 총 금액: ${total.toLocaleString()}원`;
     }
 
-    /* 계좌 불러오기 */
-    async function loadAccount() {
-      const bankInfo = document.getElementById("bankInfo");
+    // ✅ Supabase에서 주문 불러오기
+    async function loadOrderFromSupabase(id) {
+      const { data: order, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", id)
+        .single();
 
+      if (error || !order) {
+        console.error("주문 조회 실패:", error);
+        return null;
+      }
+      return order;
+    }
+
+    // ✅ 주문 로딩 흐름
+    async function loadOrder() {
+      // 1) URL에 id가 있으면 그걸로 우선 조회
+      if (orderId) {
+        const order = await loadOrderFromSupabase(orderId);
+        if (order) {
+          renderOrder(order);
+          return;
+        }
+      }
+
+      // 2) URL id 없거나 조회 실패면 lastOrder 사용
+      if (lastOrder) {
+        renderOrder(lastOrder);
+        return;
+      }
+
+      // 3) 둘 다 없으면 에러 표시
+      renderOrder(null);
+    }
+
+    // ✅ 계좌 불러오기 (기존 로직 유지)
+    async function loadAccount() {
       const { data, error } = await supabase
         .from("account_info")
         .select("*")
         .order("id");
 
       if (error || !data || data.length === 0) {
-        bankInfo.textContent = "계좌 정보를 불러올 수 없습니다.";
+        bankInfoEl.textContent = "계좌 정보를 불러올 수 없습니다.";
         return;
       }
 
@@ -211,16 +258,20 @@
           <div class="account-line">
             ${acc.bank_name} ${acc.bank_number}<br>
             예금주: ${acc.bank_owner}
-          </div>`;
+          </div>
+        `;
       });
 
-      bankInfo.innerHTML = html;
+      bankInfoEl.innerHTML = html;
     }
 
+    // 실행
     loadOrder();
     loadAccount();
   </script>
 
 </body>
+</html>
+
 </html>
 
