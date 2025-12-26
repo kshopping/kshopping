@@ -51,6 +51,11 @@ body {
   color: #ffb700;
   letter-spacing: -0.5px;
 }
+@media (max-width: 768px) {
+  .header-slogan {
+    display: none !important;
+  }
+}
 
 /* ============================= 🌟 TOP MENU BUTTONS ============================= */
 #top-menu {
