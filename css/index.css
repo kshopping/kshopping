@@ -362,135 +362,11 @@ body {
   content: " : ";
 }
 
-.copy-btn {
-  margin-left: auto;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: none;
-  background: #ffe083;
-  cursor: pointer;
-}
-
-.copy-btn:hover {
-  background: #ffd48f;
-}
-
-/* ============================= 🛒 CART 애니메이션 ============================= */
-@keyframes cartPop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.4); }
-  100% { transform: scale(1); }
-}
-
-#cartCount.pop {
-  animation: cartPop 0.35s ease-out;
-}
-
-@keyframes cartBounce {
-  0% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
-  60% { transform: translateY(3px); }
-  100% { transform: translateY(0); }
-}
-
-.cart-bounce {
-  animation: cartBounce 0.45s ease-out;
-}
-
-@keyframes cartShake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-8deg); }
-  50% { transform: rotate(8deg); }
-  75% { transform: rotate(-5deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.cart-shake {
-  animation: cartShake 0.45s ease-in-out;
-}
-
-/* ============================= 📦 PRESS / GLOW EFFECTS ============================= */
-@keyframes cardPress {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.94); }
-  100% { transform: scale(1); }
-}
-
-.card-press {
-  animation: cardPress 0.22s ease-out;
-}
-
-@keyframes btnGlow {
-  0% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
-  50% { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
-  100% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
-}
-
-.btn-glow {
-  animation: btnGlow 0.45s ease-out;
-}
-
-/* ========================================= 🌟 혼합 슬라이더 공통 스타일 ========================================= */
-#banner-area .banner-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-  border-radius: 16px;
-}
-
-#banner-area .banner-slide.active {
-  opacity: 1;
-  z-index: 5;
-}
-
-#fixed-header-inner {
-  align-items: center;
-}
-
-/* 로고 + 전화번호 묶음 */
-.header-left {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* 전화 주문 안내 */
-.header-call {
-  margin-top: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #444;
-}
-
-.header-call span {
-  color: #ff4d4f;
-  font-weight: 700;
-}
-
-/* 📞 전화 클릭 영역 확장 (모바일/앱 필수) */
-.call-link {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 6px 10px;
-  color: #ff4d4f;
-  font-weight: 700;
-  text-decoration: none;
-  border-radius: 6px;
-  background: rgba(255, 77, 79, 0.08);
-  pointer-events: auto;
-  z-index: 10;
-}
-
-/* ============================= ✅✅✅ MOBILE 최종 정리 블럭 (핵심 수정 완료) ============================= */
+/* ============================= ✅✅✅ MOBILE 정답 블럭 (로고 왼쪽 + 장바구니 보임 + 관리자 숨김) ============================= */
 @media (max-width: 768px) {
 
-  /* ✅ wrap 위 여백: 헤더 높이에 맞춰 안정적으로 */
-  #wrap { padding-top: 240px; }
+  /* ✅ 헤더 높이가 늘어나므로 여백 확보 */
+  #wrap { padding-top: 250px; }
 
   /* ✅ 배너 제거 */
   #banner-area {
@@ -511,35 +387,32 @@ body {
     padding: 8px 0;
   }
 
-  /* ✅ 헤더: 세로 정렬로 고정 (겹침/깨짐 방지) */
+  /* ✅ 헤더 내부: 2줄 구조로 강제 */
   #fixed-header-inner {
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
     gap: 8px !important;
-    flex-wrap: nowrap !important;
   }
 
-  /* ✅ 왼쪽 로고/전화: 가운데 정렬 */
+  /* ✅ 왼쪽 로고/전화는 왼쪽 유지 */
   .header-left {
-    width: 100% !important;
-    align-items: center !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    align-items: flex-start !important;
   }
 
-  /* ✅ 전화 줄바꿈 허용 */
+  /* ✅ 전화는 줄바꿈 허용 (밀림 방지) */
   .header-call {
-    width: 100% !important;
     display: flex !important;
-    justify-content: center !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
     font-size: 13px !important;
     white-space: normal !important;
-    text-align: center !important;
     margin-top: 4px !important;
   }
 
-  .header-call .call-link {
+  .call-link {
     display: inline-block !important;
     padding: 6px 10px !important;
     margin: 0 !important;
@@ -550,24 +423,48 @@ body {
     white-space: nowrap !important;
   }
 
-  /* ✅ 슬로건 줄바꿈 허용 */
-  .header-slogan {
-    width: 100% !important;
-    display: block !important;
-    text-align: center !important;
-    white-space: normal !important;
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-    margin: 0 !important;
-    padding: 0 10px !important;
+  /* ✅ 오른쪽 메뉴는 "고정 fixed" 금지! (겹침 원인) → 그냥 오른쪽 정렬 */
+  #top-menu {
+    position: static !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    margin-top: 2px !important;
   }
 
-  /* ✅ 모바일에서는 top-menu 전체 숨김 (고니 요청: 관리자모드 없어도 됨) */
-  #top-menu {
+  /* ✅ 장바구니 버튼은 항상 보이게 */
+  #cartGoBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12) !important;
+  }
+
+  /* ✅ 관리자 버튼만 숨김 (고니 요청) */
+  #top-menu button[onclick*="admin.html"] {
     display: none !important;
   }
 
-  /* ✅ 카테고리: 음수 margin/확장 제거 → 기종별 깨짐 방지 */
+  /* ✅ 슬로건은 2번째 줄 전체폭으로 아래로 내려서 안정화 */
+  .header-slogan {
+    width: 100% !important;
+    order: 99 !important;
+    margin: 8px 0 0 0 !important;
+    padding: 0 10px !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+  }
+
+  /* ✅ 카테고리: 음수 margin 제거(기종별 깨짐 방지) */
   #category-area {
     width: 100% !important;
     margin: 0 !important;
@@ -587,24 +484,12 @@ body {
     border-radius: 18px !important;
   }
 
-  /* ✅ 은행 박스 */
-  .bank-info-box {
-    padding: 8px 10px;
-    margin: 14px 0 18px;
-  }
-  .bank-text {
-    font-size: 13px;
-    line-height: 1.25;
-    white-space: normal;
-    text-align: center;
-  }
-
   /* ✅ 팝업이 헤더보다 항상 위 */
   #dealer-popup {
     z-index: 20000000 !important;
   }
 
-  /* ✅ 헤더도 충분히 위로 */
+  /* ✅ 헤더 z-index 안정 */
   #fixed-header {
     z-index: 999999 !important;
   }
