@@ -1,7 +1,8 @@
 // /js/order.js
 // ✅ 주문페이지 전용 JS (장바구니 → 주문정보 입력 → 주문완료 저장)
 // ✅ 웹만 수정 (앱/모바일 영향 없음)
-// ✅ Supabase 저장 실패 시 절대 주문완료로 넘어가지 않음 (주문 누락 방지)
+// ✅ orders 테이블 id(text) 자동생성이 없으므로 id를 직접 생성하여 저장
+// ✅ Supabase 저장 성공시에만 장바구니 삭제 + 완료페이지 이동 (주문 누락 방지)
 
 import { supabase } from "./supabaseClient.js";
 
@@ -58,24 +59,32 @@ async function handleSubmitOrder(e) {
   );
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-  // 6) 주문 데이터 생성 (Supabase용)
+  // ✅ 핵심: id 직접 생성 (orders.id가 text이고 자동생성 없음)
+  const orderId = "ORDER_" + Date.now();
+  const createdAt = new Date().toISOString();
+
+  // 6) 주문 데이터 생성 (Supabase 컬럼 구조에 정확히 맞춤)
   const orderPayload = {
+    id: orderId,                 // ✅ 필수
+    created_at: createdAt,       // ✅ created_at은 default now() 있어도 명시하면 안전
     name,
     phone,
     address,
     memo: memo || "",
+    items: cartItems,
+
+    // ✅ 관리자 주문관리에서 사용
+    total: total,
+    total_qty: totalQty,
     marketing_agree: marketingAgree,
-
-    items: cartItems,     // jsonb
-    total: total,         // 금액
-    total_qty: totalQty,  // 수량
-
     status: "결제대기",
+
+    // ✅ 관리자에서 eq("printed", false)로 불러오므로 필수
     printed: false,
   };
 
-  // ✅ Supabase 저장 (실패하면 절대 주문완료로 넘어가지 않음)
   try {
+    // ✅ Supabase 저장
     const { data, error } = await supabase
       .from("orders")
       .insert([orderPayload])
@@ -97,13 +106,10 @@ async function handleSubmitOrder(e) {
       return;
     }
 
-    // ✅ 성공했을 때만 장바구니 삭제
+    // ✅ 성공했을 때만 장바구니 삭제 + 완료 이동
     localStorage.removeItem("cartItems");
-
-    // 주문완료 페이지 표시용
     localStorage.setItem("lastOrder", JSON.stringify(data));
 
-    // ✅ 완료 페이지 이동 (id 포함)
     location.href = `order_complete.html?id=${data.id}`;
 
   } catch (err) {
@@ -121,3 +127,4 @@ async function handleSubmitOrder(e) {
     return;
   }
 }
+
