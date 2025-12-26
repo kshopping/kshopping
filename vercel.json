@@ -2,7 +2,10 @@
   "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
+    { "source": "/", "destination": "/landing.html" },
+
+    { "source": "/landing", "destination": "/landing.html" },
+    { "source": "/landing/", "destination": "/landing.html" },
 
     { "source": "/cart", "destination": "/cart.html" },
     { "source": "/cart/", "destination": "/cart.html" },
