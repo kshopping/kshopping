@@ -51,11 +51,7 @@ body {
   color: #ffb700;
   letter-spacing: -0.5px;
 }
-@media (max-width: 768px) {
-  .header-slogan {
-    display: none !important;
-  }
-}
+
 
 /* ============================= 🌟 TOP MENU BUTTONS ============================= */
 #top-menu {
@@ -510,9 +506,9 @@ body {
 
    /* ✅ 카테고리 기본(2줄 유지 + 블럭/버튼 모두 왼쪽 정렬) */
 #category-area {
-  width: calc(100% + 40px) !important;
-  margin-left: -20px !important;
-  margin-right: -20px !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 
   padding: 8px 10px !important;       /* ✅ 왼쪽 여백 조금 주고 보기 좋게 */
   gap: 6px !important;
