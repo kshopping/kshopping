@@ -64,8 +64,7 @@ function calcFallbackTotalPrice(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
   const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
 
-  // ✅ 묶음 제외 조건: 컴퓨터/노트북 OR bundle_enabled=false
-  const bundleEnabled = item.bundle_enabled !== false; // undefined/null이면 true로 간주
+  const bundleEnabled = item.bundle_enabled !== false;
   const excluded = isComputerItem(item) || !bundleEnabled;
 
   if (excluded) {
@@ -93,15 +92,12 @@ function calcOrderTotalByItems(items) {
 }
 
 /* ===========================================================
-   ✅ 주문 item에 bundle_enabled 주입 (핵심 해결)
-   - 주문 데이터 items에는 bundle_enabled가 없는 경우가 많음
-   - products 테이블에서 bundle_enabled 상태를 가져와 items에 넣어준다
+   ✅ 주문 item에 bundle_enabled 주입
 =========================================================== */
 let _productBundleMapCache = null;
 let _productBundleMapCacheTime = 0;
 
 async function getProductBundleMap() {
-  // ✅ 너무 자주 불러오지 않도록 30초 캐시
   const now = Date.now();
   if (_productBundleMapCache && (now - _productBundleMapCacheTime) < 30000) {
     return _productBundleMapCache;
@@ -127,7 +123,6 @@ async function getProductBundleMap() {
   return map;
 }
 
-// ✅ item.productId / item.product_id / item.id 어느쪽으로 들어오든 잡기
 function getItemProductId(item) {
   return (
     item?.productId ??
@@ -144,13 +139,11 @@ async function applyBundleEnabledToOrderItems(orderItems) {
   const items = (orderItems ?? []).map(it => ({ ...it }));
 
   items.forEach(it => {
-    // 이미 item에 bundle_enabled가 있으면 존중
     if (it.bundle_enabled === true || it.bundle_enabled === false) return;
 
     const pid = getItemProductId(it);
-    if (pid === null || pid === undefined) return;
+    if (!pid) return;
 
-    // products 테이블 기준 묶음 상태 주입
     const on = map[String(pid)];
     if (on === false) it.bundle_enabled = false;
     if (on === true) it.bundle_enabled = true;
@@ -160,7 +153,7 @@ async function applyBundleEnabledToOrderItems(orderItems) {
 }
 
 /* ===========================================================
-   페이지 전환 (✅ 전역 등록 + 안정화)
+   페이지 전환 (전역 등록)
 =========================================================== */
 function showPage(page) {
   const main = $("main-area");
@@ -177,10 +170,8 @@ function showPage(page) {
   if (page === "detailImages") loadDetailImagesPage();
 }
 
-// ✅ 핵심: module에서도 onclick에서 바로 찾을 수 있도록 전역 등록
 window.showPage = showPage;
 
-// ✅ 첫 진입 기본 페이지 설정
 document.addEventListener("DOMContentLoaded", () => {
   if ($("main-area") && $("main-area").innerHTML.trim() === "") {
     showPage("products");
@@ -188,13 +179,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ===========================================================
-   ✅ 상품 관리 (일시 품절 + 묶음 ON/OFF 토글 추가)
+   ✅ 상품 관리 (정렬 고정 적용 완료)
 =========================================================== */
 async function loadProductPage() {
   const main = $("main-area");
 
-  const { data: products } = await supabase.from("products").select("*");
-  const { data: categories } = await supabase.from("categories").select("*");
+  // ✅ 핵심 수정: 항상 ID 기준 정렬로 고정
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .order("id", { ascending: true });
+
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("id", { ascending: true });
 
   const catMap = {};
   categories?.forEach((c) => (catMap[c.id] = c.name));
@@ -204,7 +203,6 @@ async function loadProductPage() {
       const stateText = p.sold_out ? "❌ 품절" : "✅ 판매중";
       const toggleText = p.sold_out ? "판매 재개" : "일시 품절";
 
-      // ✅ 묶음 ON/OFF 상태
       const bundleOn = p.bundle_enabled !== false;
       const bundleText = bundleOn ? "✅ 묶음ON" : "❌ 묶음OFF";
 
@@ -269,8 +267,10 @@ async function loadProductPage() {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       const current = btn.dataset.state === "true";
+
       await supabase.from("products").update({ sold_out: !current }).eq("id", id);
-      _productBundleMapCache = null; // 캐시 무효화
+
+      _productBundleMapCache = null;
       loadProductPage();
     });
   });
@@ -283,7 +283,7 @@ async function loadProductPage() {
 
       await supabase.from("products").update({ bundle_enabled: next }).eq("id", id);
 
-      _productBundleMapCache = null; // ✅ 묶음 토글 변경 시 캐시 무효화
+      _productBundleMapCache = null;
       loadProductPage();
     });
   });
@@ -299,7 +299,7 @@ window.addProduct = function () {
 async function loadCategoryPage() {
   const main = $("main-area");
 
-  const { data: cats } = await supabase.from("categories").select("*");
+  const { data: cats } = await supabase.from("categories").select("*").order("id", { ascending: true });
 
   const rows = (cats ?? [])
     .map(
@@ -334,7 +334,10 @@ window.addCategory = async function () {
 
   const newId = "cat_" + Date.now();
 
-  const { error } = await supabase.from("categories").insert({ id: newId, name });
+  const { error } = await supabase.from("categories").insert({
+    id: newId,
+    name,
+  });
 
   if (error) {
     console.error(error);
@@ -347,13 +350,18 @@ window.addCategory = async function () {
 
 window.editCategory = async function (id, oldName) {
   const newName = prompt("새 카테고리 이름을 입력하세요:", oldName);
-  if (!newName || newName.trim() === "") return alert("수정이 취소되었습니다.");
+
+  if (!newName || newName.trim() === "") {
+    alert("수정이 취소되었습니다.");
+    return;
+  }
 
   const { error } = await supabase.from("categories").update({ name: newName.trim() }).eq("id", id);
 
   if (error) {
     console.error(error);
-    return alert("카테고리 수정 실패!");
+    alert("카테고리 수정 실패!");
+    return;
   }
 
   alert("수정 완료!");
@@ -403,6 +411,7 @@ window.addBanner = async function () {
   if (!file) return alert("파일을 선택하세요.");
 
   const path = `banners/${Date.now()}_${file.name}`;
+
   const { error: uploadError } = await supabase.storage.from("kshop").upload(path, file, { upsert: true });
 
   if (uploadError) {
@@ -412,7 +421,10 @@ window.addBanner = async function () {
 
   const { data: { publicUrl } } = supabase.storage.from("kshop").getPublicUrl(path);
 
-  const { error } = await supabase.from("banners").insert({ video_url: publicUrl, sort_order: 1 });
+  const { error } = await supabase.from("banners").insert({
+    video_url: publicUrl,
+    sort_order: 1,
+  });
 
   if (error) {
     console.error(error);
@@ -446,12 +458,10 @@ async function loadOrderPage() {
   }
 
   const rows = await Promise.all((orders ?? []).map(async (o) => {
-    // ✅ 핵심: 주문 items에 bundle_enabled 주입
     const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
     const { total, totalQty } = calcOrderTotalByItems(items);
 
     const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
-
     const dateRaw = o.created_at ?? o.createdAt ?? "";
     const dateText = dateRaw ? String(dateRaw).split("T")[0] : "";
 
@@ -496,7 +506,7 @@ async function loadOrderPage() {
 }
 
 /* ===========================================================
-   ✅ 주문 출력 기능 (금액 통일 + 묶음OFF 반영)
+   ✅ 주문 출력 기능
 =========================================================== */
 window.printOrder = async function (orderId) {
   if (!orderId) return alert("❌ 주문 ID가 없습니다.");
@@ -508,7 +518,6 @@ window.printOrder = async function (orderId) {
     return alert("주문 데이터를 불러오지 못했습니다.");
   }
 
-  // ✅ 핵심: 출력도 bundle_enabled 주입해서 계산
   const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
   const { total, items: fixedItems } = calcOrderTotalByItems(items);
   const finalTotal = total;
@@ -556,7 +565,10 @@ window.printOrder = async function (orderId) {
 
   await supabase
     .from("orders")
-    .update({ printed: true, printed_at: new Date().toISOString() })
+    .update({
+      printed: true,
+      printed_at: new Date().toISOString(),
+    })
     .eq("id", orderId);
 
   loadOrderPage();
@@ -564,7 +576,7 @@ window.printOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   출력된 주문 목록 (묶음OFF 반영)
+   출력된 주문 목록
 =========================================================== */
 async function loadPrintedPage() {
   const main = $("main-area");
@@ -585,7 +597,6 @@ async function loadPrintedPage() {
     const { total, totalQty } = calcOrderTotalByItems(items);
 
     const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
-
     const printedAtRaw = o.printed_at ?? "";
     const printedDate = printedAtRaw ? String(printedAtRaw).split("T")[0] : "";
 
@@ -630,7 +641,7 @@ async function loadPrintedPage() {
 }
 
 /* ===========================================================
-   주문 삭제 (전체삭제 방지)
+   주문 삭제
 =========================================================== */
 window.deleteOrder = async function (orderId) {
   if (!orderId) {
@@ -645,7 +656,8 @@ window.deleteOrder = async function (orderId) {
 
   if (error) {
     console.error(error);
-    return alert("삭제 실패");
+    alert("삭제 실패");
+    return;
   }
 
   if (count !== 1) {
@@ -659,7 +671,7 @@ window.deleteOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   XLSX 엑셀 저장 기능 (광고동의 포함 + 묶음OFF 반영)
+   XLSX 엑셀 저장
 =========================================================== */
 window.exportByPeriod = async function (type) {
   const { data } = await supabase.from("orders").select("*").eq("printed", true);
@@ -892,16 +904,10 @@ window.deleteDetailImage = async function (productId) {
   loadDetailImagesPage();
 };
 
-/* ===========================================================
-   상품 수정 페이지 이동
-=========================================================== */
 window.editProduct = function (id) {
   location.href = `product_edit.html?id=${id}`;
 };
 
-/* ===========================================================
-   🗑 상품 삭제 (정식 버전)
-=========================================================== */
 window.deleteProduct = async function (productId) {
   if (!confirm("정말 이 상품을 삭제하시겠습니까?")) return;
 
@@ -909,7 +915,8 @@ window.deleteProduct = async function (productId) {
 
   if (error) {
     console.error(error);
-    return alert("상품 삭제 실패");
+    alert("상품 삭제 실패");
+    return;
   }
 
   alert("상품이 삭제되었습니다.");
