@@ -21,7 +21,111 @@ function updateCartCount() {
 }
 
 /* ===========================================
-   🔥 상세페이지 데이터 불러오기 (품절 대응)
+   ✅ 유틸
+=========================================== */
+function safeNumber(v, fallback = 0) {
+  const n = Number(v);
+  return isNaN(n) ? fallback : n;
+}
+
+function formatWon(n) {
+  if (n === null || n === undefined || isNaN(n)) return "-";
+  return Number(n).toLocaleString("ko-KR") + "원";
+}
+
+/* ===========================================
+   ✅ 컴퓨터(노트북) 제외 판별
+   - category / name 기준
+=========================================== */
+function isComputerProduct(product) {
+  const excludeCategories = ["노트북", "컴퓨터", "데스크탑", "전자기기", "PC"];
+  const excludeKeywords = [
+    "노트북", "laptop", "notebook", "macbook",
+    "hp", "lenovo", "asus", "dell", "msi", "acer",
+    "ssd", "ram", "cpu", "i5", "i7", "i9", "ryzen",
+    "그래픽", "gpu", "rtx", "gtx"
+  ];
+
+  const cat = (product?.category || "").toLowerCase();
+  const name = (product?.name || "").toLowerCase();
+
+  const matchCategory = excludeCategories.some(c => cat.includes(c.toLowerCase()));
+  const matchKeyword = excludeKeywords.some(k => name.includes(k.toLowerCase()));
+
+  return matchCategory || matchKeyword;
+}
+
+/* ===========================================
+   ✅ 묶음가격 공식 계산
+   기준: 1개=13,900 / 2개=19,900 / 3개=26,900
+   4개 이상 규칙: 3개 가격 + 추가 1개당 7,900원
+=========================================== */
+function calcBundlePrice(unitPrice, qty) {
+  const ratio2 = 19900 / 13900;
+  const ratio3 = 26900 / 13900;
+
+  const u = safeNumber(unitPrice, 0);
+  const q = Math.max(1, safeNumber(qty, 1));
+
+  if (q === 1) return Math.round(u);
+  if (q === 2) return Math.round(u * ratio2);
+  if (q === 3) return Math.round(u * ratio3);
+
+  const addPrice = 7900; // ✅ 4개 이상 추가 단가
+  return Math.round(u * ratio3) + (q - 3) * addPrice;
+}
+
+/* ===========================================
+   ✅ 최종가격 계산(컴퓨터 제외)
+=========================================== */
+function getFinalItemPrice(product, qty) {
+  const unitPrice = safeNumber(product?.price_sale ?? 0, 0);
+  const q = Math.max(1, safeNumber(qty, 1));
+
+  // 컴퓨터/노트북이면 기본 단가×수량
+  if (isComputerProduct(product)) {
+    return Math.round(unitPrice * q);
+  }
+
+  // 그 외는 묶음가격
+  return calcBundlePrice(unitPrice, q);
+}
+
+/* ===========================================
+   🛒 장바구니 저장 (묶음가격 반영)
+=========================================== */
+function addToCart(product, qty) {
+  let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+  const unitPrice = safeNumber(product.price_sale, 0);
+  const q = Math.max(1, safeNumber(qty, 1));
+  const finalPrice = getFinalItemPrice(product, q);
+
+  const found = cart.find((i) => String(i.id) === String(product.id));
+  if (found) {
+    found.qty += q;
+    found.unitPrice = unitPrice;
+    found.bundleApplied = !isComputerProduct(product);
+    found.totalPrice = getFinalItemPrice(product, found.qty);
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      image: product.image_url,
+      qty: q,
+      unitPrice: unitPrice,                 // ✅ 단품 세일가
+      totalPrice: finalPrice,               // ✅ 묶음 반영 총액
+      bundleApplied: !isComputerProduct(product),
+      category: product.category || "",
+      updatedAt: Date.now()
+    });
+  }
+
+  localStorage.setItem("cartItems", JSON.stringify(cart));
+}
+
+/* ===========================================
+   🔥 상세페이지 데이터 불러오기 (품절 대응 + 묶음가격)
 =========================================== */
 async function loadDetail() {
   const params = new URLSearchParams(location.search);
@@ -65,10 +169,73 @@ async function loadDetail() {
     detailImg.style.display = "none";
   }
 
+  // ✅ 수량 UI가 있으면 연결 (없어도 기존 기능 유지)
+  const qtyInput = $("qtyInput");
+  const btnMinus = $("btnQtyMinus");
+  const btnPlus = $("btnQtyPlus");
+  const calcPriceText = $("calcPriceText");
+  const bundleHint = $("bundleHint");
+  const tierTable = $("tierTable");
+  const tier1 = $("tier1");
+  const tier2 = $("tier2");
+  const tier3 = $("tier3");
+
+  function updatePriceUI() {
+    if (!qtyInput || !calcPriceText) return;
+
+    let qty = Math.max(1, safeNumber(qtyInput.value, 1));
+    qtyInput.value = qty;
+
+    const unitPrice = safeNumber(data.price_sale, 0);
+    const isComputer = isComputerProduct(data);
+
+    if (bundleHint) {
+      if (isComputer) {
+        bundleHint.textContent = "※ 컴퓨터/노트북 상품은 묶음가격이 적용되지 않습니다.";
+      } else {
+        bundleHint.textContent = "✅ 묶음가격 자동 적용 (2개/3개 할인). 4개 이상은 추가 규칙 적용";
+      }
+    }
+
+    if (tierTable && tier1 && tier2 && tier3) {
+      if (isComputer) {
+        tierTable.style.display = "none";
+      } else {
+        tierTable.style.display = "block";
+        tier1.textContent = `1개: ${formatWon(calcBundlePrice(unitPrice, 1))}`;
+        tier2.textContent = `2개: ${formatWon(calcBundlePrice(unitPrice, 2))}`;
+        tier3.textContent = `3개: ${formatWon(calcBundlePrice(unitPrice, 3))}`;
+      }
+    }
+
+    const finalPrice = getFinalItemPrice(data, qty);
+    calcPriceText.textContent = formatWon(finalPrice);
+  }
+
+  if (qtyInput && calcPriceText) {
+    qtyInput.value = 1;
+    updatePriceUI();
+
+    btnMinus?.addEventListener("click", () => {
+      qtyInput.value = Math.max(1, safeNumber(qtyInput.value, 1) - 1);
+      updatePriceUI();
+    });
+
+    btnPlus?.addEventListener("click", () => {
+      qtyInput.value = Math.max(1, safeNumber(qtyInput.value, 1) + 1);
+      updatePriceUI();
+    });
+
+    qtyInput.addEventListener("input", () => {
+      if (safeNumber(qtyInput.value, 1) < 1) qtyInput.value = 1;
+      updatePriceUI();
+    });
+  }
+
   const btnAdd = $("btnAddCart");
 
   // ==================================================
-  // ❌ 일시 품절 처리 (핵심)
+  // ❌ 일시 품절 처리
   // ==================================================
   if (data.sold_out === true) {
     btnAdd.textContent = "일시 품절";
@@ -87,7 +254,10 @@ async function loadDetail() {
     btnAdd.textContent = "장바구니 담기";
 
     btnAdd.onclick = () => {
-      addToCart(data.id, data.name, data.price_sale, data.image_url);
+      // ✅ 수량 UI가 있으면 그 값, 없으면 1개
+      const qty = qtyInput ? Math.max(1, safeNumber(qtyInput.value, 1)) : 1;
+
+      addToCart(data, qty);
       updateCartCount();
       alert("장바구니에 담겼습니다!");
     };
@@ -98,21 +268,7 @@ async function loadDetail() {
 }
 
 /* ===========================================
-   🛒 장바구니 저장
-=========================================== */
-function addToCart(id, name, price, image) {
-  let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
-
-  const found = cart.find((i) => i.id === id);
-  if (found) found.qty++;
-  else cart.push({ id, name, price, image, qty: 1 });
-
-  localStorage.setItem("cartItems", JSON.stringify(cart));
-}
-
-/* ===========================================
    🚀 초기 실행
 =========================================== */
 updateCartCount();
 loadDetail();
-
