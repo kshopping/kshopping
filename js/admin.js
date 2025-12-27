@@ -547,7 +547,7 @@ window.printOrder = async function (orderId) {
         <tr><th>상품</th><th>수량</th><th>금액(확정)</th></tr>
         ${fixedItems.map(i => `
           <tr>
-            <td>${i.name ?? ""}</td>
+            <td>${i.name ?? ""} ${(isComputerItem(i) || i?.bundle_enabled === false) ? "(묶음 제외 ❌)" : "(묶음 적용 ✅)"}</td>
             <td>${safeNumber(i.qty ?? 1, 1)}</td>
             <td>${Number(i.totalPrice || 0).toLocaleString()}원</td>
           </tr>
