@@ -159,6 +159,13 @@
     const summaryTotalEl = document.getElementById("summary-total");
     const bankInfoEl = document.getElementById("bankInfo");
 
+    /* ===========================================================
+       ✅ 100원 단위 무조건 올림 (확정값)
+    =========================================================== */
+    function ceil100(price) {
+      return Math.ceil(Number(price || 0) / 100) * 100;
+    }
+
     function safeNumber(v, fallback = 0) {
       const n = Number(v);
       return isNaN(n) ? fallback : n;
@@ -187,7 +194,11 @@
       return matchCategory || matchKeyword;
     }
 
-    // ✅ 고니 규칙 적용
+    /* ===========================================================
+       ✅ 과거 주문 데이터 대비용 "보정 계산" (표시만)
+       ⚠️ 신규 주문은 order.js에서 totalPrice 확정값 저장됨.
+       여기서는 totalPrice가 없을 때만 계산하며, ceil100 포함.
+    =========================================================== */
     function calcBundlePrice(unitPrice, qty) {
       const ratio2 = 19900 / 13900;
       const ratio3 = 26900 / 13900;
@@ -199,28 +210,27 @@
       const price2 = Math.round(u * ratio2);
       const price3 = Math.round(u * ratio3);
 
-      if (q === 1) return price1;
-      if (q === 2) return price2;
-      if (q === 3) return price3;
+      let result = 0;
 
-      const diff = price3 - price2;
-      return price3 + (q - 3) * diff;
+      if (q === 1) result = price1;
+      else if (q === 2) result = price2;
+      else if (q === 3) result = price3;
+      else {
+        const diff = price3 - price2;
+        result = price3 + (q - 3) * diff;
+      }
+
+      return ceil100(result);
     }
 
-    function recalcItemTotal(item) {
+    function calcFallbackTotalPrice(item) {
       const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
       const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
 
-      item.unitPrice = unitPrice;
-      item.qty = qty;
-
       if (isComputerItem(item)) {
-        item.bundleApplied = false;
-        item.totalPrice = Math.round(unitPrice * qty);
-      } else {
-        item.bundleApplied = true;
-        item.totalPrice = calcBundlePrice(unitPrice, qty);
+        return ceil100(Math.round(unitPrice * qty));
       }
+      return calcBundlePrice(unitPrice, qty);
     }
 
     const params = new URLSearchParams(location.search);
@@ -236,6 +246,12 @@
       }
     }
 
+    /* ===========================================================
+       ✅ 주문 렌더 (핵심: totalPrice 그대로 표시)
+       - order.total이 있으면 무조건 그 값을 사용
+       - order.total이 없다면 sum(item.totalPrice)로 계산
+       - item.totalPrice가 없을 때만 fallback 계산(ceil100 포함)
+    =========================================================== */
     function renderOrder(order) {
       orderIdEl.textContent = order?.id ? order.id : "-";
 
@@ -246,13 +262,6 @@
       }
 
       const items = order.items.map(it => ({ ...it }));
-      items.forEach(item => {
-        if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
-        if (item.qty === undefined) item.qty = 1;
-        if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
-          recalcItemTotal(item);
-        }
-      });
 
       let html = "";
       let total = 0;
@@ -261,26 +270,41 @@
       const hasOrderTotal = order.total !== undefined && order.total !== null;
       const hasOrderQty = order.total_qty !== undefined && order.total_qty !== null;
 
+      // ✅ total / qty는 저장된 값을 최우선 사용
       if (hasOrderTotal) total = safeNumber(order.total, 0);
       if (hasOrderQty) qty = safeNumber(order.total_qty, 0);
 
       items.forEach((item) => {
-        const itemTotal = safeNumber(item.totalPrice ?? 0, 0);
+        const itemQty = Math.max(1, safeNumber(item.qty ?? 1, 1));
 
+        // ✅ 핵심: totalPrice는 저장된 확정값을 최우선
+        let itemTotal = safeNumber(item.totalPrice ?? 0, 0);
+
+        // ✅ 과거 데이터(총액 없는 경우)만 fallback 계산
+        if (!itemTotal || itemTotal <= 0) {
+          itemTotal = calcFallbackTotalPrice(item);
+        }
+
+        // ✅ order.total이 없을 때만 합산으로 계산
         if (!hasOrderTotal) total += itemTotal;
-        if (!hasOrderQty) qty += safeNumber(item.qty, 0);
+
+        // ✅ order.total_qty가 없을 때만 계산
+        if (!hasOrderQty) qty += itemQty;
 
         const bundleText = isComputerItem(item) ? "묶음 제외" : "묶음 적용";
 
         html += `
           <div class="summary-item">
             <span>
-              ${item.name} x ${item.qty}
+              ${item.name} x ${itemQty}
               <span class="bundle-badge">(${bundleText})</span>
             </span>
             <span>${formatWon(itemTotal)}</span>
           </div>`;
       });
+
+      // ✅ 최종 total도 혹시 모를 보정 (표시용)
+      total = ceil100(total);
 
       summaryItemsEl.innerHTML = html;
       summaryTotalEl.textContent = `총 ${qty}개 | 총 금액: ${formatWon(total)}`;
@@ -347,5 +371,6 @@
 
 </body>
 </html>
+
 
 

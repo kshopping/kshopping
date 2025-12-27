@@ -1,4 +1,11 @@
 /* ===========================================================
+   ✅ 100원 단위 무조건 올림 (확정값)
+=========================================================== */
+function ceil100(price) {
+  return Math.ceil(Number(price || 0) / 100) * 100;
+}
+
+/* ===========================================================
    ✅ 유틸
 =========================================================== */
 function safeNumber(v, fallback = 0) {
@@ -9,6 +16,20 @@ function safeNumber(v, fallback = 0) {
 function formatWon(n) {
   if (n === null || n === undefined || isNaN(n)) return "-";
   return Number(n).toLocaleString("ko-KR") + "원";
+}
+
+/* ===========================================================
+   🛒 헤더 장바구니 아이콘 아래 총액 업데이트
+   - detail.js와 동일하게 cartTotal 엘리먼트를 사용
+=========================================================== */
+function updateCartTotalBadge() {
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const total = cart.reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
+
+  const el = document.getElementById("cartTotal");
+  if (!el) return;
+
+  el.textContent = total > 0 ? formatWon(total) : "";
 }
 
 /* ===========================================================
@@ -36,6 +57,7 @@ function isComputerItem(item) {
    ✅ 묶음가격 공식 계산 (고니 규칙 반영)
    1~3개: 비율 적용
    4개 이상: (3개-2개) 차액만큼 일률 증가
+   ⚠️ 결과는 반드시 ceil100 확정값 처리
 =========================================================== */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
@@ -48,16 +70,21 @@ function calcBundlePrice(unitPrice, qty) {
   const price2 = Math.round(u * ratio2);
   const price3 = Math.round(u * ratio3);
 
-  if (q === 1) return price1;
-  if (q === 2) return price2;
-  if (q === 3) return price3;
+  let result = 0;
 
-  const diff = price3 - price2;
-  return price3 + (q - 3) * diff;
+  if (q === 1) result = price1;
+  else if (q === 2) result = price2;
+  else if (q === 3) result = price3;
+  else {
+    const diff = price3 - price2;
+    result = price3 + (q - 3) * diff;
+  }
+
+  return ceil100(result);
 }
 
 /* ===========================================================
-   ✅ 아이템 totalPrice 재계산
+   ✅ 아이템 totalPrice 재계산 (무조건 ceil100 확정값)
 =========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
@@ -68,11 +95,18 @@ function recalcItemTotal(item) {
 
   if (isComputerItem(item)) {
     item.bundleApplied = false;
-    item.totalPrice = Math.round(unitPrice * qty);
+
+    // ✅ 컴퓨터/노트북: 단가×수량 후 ceil100 확정값
+    item.totalPrice = ceil100(Math.round(unitPrice * qty));
   } else {
     item.bundleApplied = true;
+
+    // ✅ 묶음가격: calcBundlePrice 내부에서 ceil100 처리됨
     item.totalPrice = calcBundlePrice(unitPrice, qty);
   }
+
+  // ✅ 최종 확정값 저장
+  item.totalPrice = ceil100(item.totalPrice);
 }
 
 /* ===========================================================
@@ -84,6 +118,7 @@ function getCart() {
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
+
     recalcItemTotal(item);
   });
 
@@ -98,6 +133,9 @@ function loadCart() {
   const cart = getCart();
   const listArea = document.getElementById("cartList");
   const totalArea = document.getElementById("cartTotal");
+
+  // ✅ 헤더 총액 배지 업데이트
+  updateCartTotalBadge();
 
   if (cart.length === 0) {
     listArea.innerHTML = `
@@ -168,7 +206,10 @@ window.changeQty = function (index, diff) {
 
   loadCart();
 
+  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
+  updateCartTotalBadge();
+
   if (window.updateCartPreview) updateCartPreview();
 };
 
@@ -183,7 +224,10 @@ window.removeItem = function (index) {
 
   loadCart();
 
+  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
+  updateCartTotalBadge();
+
   if (window.updateCartPreview) updateCartPreview();
 };
 
@@ -202,7 +246,12 @@ document.getElementById("goOrder").addEventListener("click", () => {
     if (item.qty === undefined) item.qty = 1;
     recalcItemTotal(item);
   });
+
+  // ✅ 최종 확정값 저장
   localStorage.setItem("cartItems", JSON.stringify(cart));
+
+  // ✅ 배지도 업데이트하고 이동
+  updateCartTotalBadge();
 
   location.href = "order.html";
 });

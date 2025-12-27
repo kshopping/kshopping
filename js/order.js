@@ -11,11 +11,24 @@ if (submitBtn) {
   submitBtn.addEventListener("click", handleSubmitOrder);
 }
 
+/* ===========================================================
+   ✅ 100원 단위 무조건 올림 (확정값)
+=========================================================== */
+function ceil100(price) {
+  return Math.ceil(Number(price || 0) / 100) * 100;
+}
+
+/* ===========================================================
+   ✅ 유틸
+=========================================================== */
 function safeNumber(v, fallback = 0) {
   const n = Number(v);
   return isNaN(n) ? fallback : n;
 }
 
+/* ===========================================================
+   ✅ 컴퓨터(노트북) 제외 판별
+=========================================================== */
 function isComputerItem(item) {
   const excludeCategories = ["노트북", "컴퓨터", "데스크탑", "전자기기", "PC"];
   const excludeKeywords = [
@@ -34,7 +47,12 @@ function isComputerItem(item) {
   return matchCategory || matchKeyword;
 }
 
-// ✅ 고니 규칙 적용
+/* ===========================================================
+   ✅ 묶음가격 공식 계산 (고니 규칙 반영)
+   1~3개: 비율 적용
+   4개 이상: (3개-2개) 차액만큼 일률 증가
+   ⚠️ 결과는 반드시 ceil100 확정값 처리
+=========================================================== */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
   const ratio3 = 26900 / 13900;
@@ -46,14 +64,22 @@ function calcBundlePrice(unitPrice, qty) {
   const price2 = Math.round(u * ratio2);
   const price3 = Math.round(u * ratio3);
 
-  if (q === 1) return price1;
-  if (q === 2) return price2;
-  if (q === 3) return price3;
+  let result = 0;
 
-  const diff = price3 - price2;
-  return price3 + (q - 3) * diff;
+  if (q === 1) result = price1;
+  else if (q === 2) result = price2;
+  else if (q === 3) result = price3;
+  else {
+    const diff = price3 - price2;
+    result = price3 + (q - 3) * diff;
+  }
+
+  return ceil100(result);
 }
 
+/* ===========================================================
+   ✅ 아이템 totalPrice 재계산 (무조건 ceil100 확정값)
+=========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
   const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
@@ -63,13 +89,23 @@ function recalcItemTotal(item) {
 
   if (isComputerItem(item)) {
     item.bundleApplied = false;
-    item.totalPrice = Math.round(unitPrice * qty);
+
+    // ✅ 컴퓨터/노트북: 단가×수량 후 ceil100 확정값
+    item.totalPrice = ceil100(Math.round(unitPrice * qty));
   } else {
     item.bundleApplied = true;
+
+    // ✅ 묶음가격: calcBundlePrice 내부에서 ceil100 처리됨
     item.totalPrice = calcBundlePrice(unitPrice, qty);
   }
+
+  // ✅ 최종 확정값 강제
+  item.totalPrice = ceil100(item.totalPrice);
 }
 
+/* ===========================================================
+   ✅ 주문 제출
+=========================================================== */
 async function handleSubmitOrder(e) {
   if (e) e.preventDefault();
 
@@ -106,15 +142,15 @@ async function handleSubmitOrder(e) {
     return;
   }
 
-  // ✅ 주문 직전 보정
+  // ✅ 주문 직전 보정 (무조건 recalc + ceil100 확정값 강제)
   cartItems.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
 
-    if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
-      recalcItemTotal(item);
-    }
+    recalcItemTotal(item); // ✅ 무조건 재계산해서 확정값 통일
   });
+
+  // ✅ 확정값 저장
   localStorage.setItem("cartItems", JSON.stringify(cartItems));
 
   // ✅ totalPrice 기준 총액/수량
@@ -122,7 +158,10 @@ async function handleSubmitOrder(e) {
     (sum, item) => sum + safeNumber(item.totalPrice ?? 0, 0),
     0
   );
-  const totalQty = cartItems.reduce((sum, item) => sum + safeNumber(item.qty ?? 0, 0), 0);
+  const totalQty = cartItems.reduce(
+    (sum, item) => sum + safeNumber(item.qty ?? 0, 0),
+    0
+  );
 
   const orderId = "ORDER_" + Date.now();
   const createdAt = new Date().toISOString();
@@ -134,8 +173,8 @@ async function handleSubmitOrder(e) {
     phone,
     address,
     memo: memo || "",
-    items: cartItems,
-    total: total,
+    items: cartItems,               // ✅ totalPrice 확정값 포함
+    total: total,                   // ✅ sum(item.totalPrice)
     total_qty: totalQty,
     marketing_agree: marketingAgree,
     status: "결제대기",
