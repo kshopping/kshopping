@@ -93,6 +93,73 @@ function calcOrderTotalByItems(items) {
 }
 
 /* ===========================================================
+   ✅ 주문 item에 bundle_enabled 주입 (핵심 해결)
+   - 주문 데이터 items에는 bundle_enabled가 없는 경우가 많음
+   - products 테이블에서 bundle_enabled 상태를 가져와 items에 넣어준다
+=========================================================== */
+let _productBundleMapCache = null;
+let _productBundleMapCacheTime = 0;
+
+async function getProductBundleMap() {
+  // ✅ 너무 자주 불러오지 않도록 30초 캐시
+  const now = Date.now();
+  if (_productBundleMapCache && (now - _productBundleMapCacheTime) < 30000) {
+    return _productBundleMapCache;
+  }
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("id, bundle_enabled");
+
+  if (error) {
+    console.error("getProductBundleMap error:", error);
+    return {};
+  }
+
+  const map = {};
+  (products ?? []).forEach(p => {
+    map[String(p.id)] = (p.bundle_enabled !== false);
+  });
+
+  _productBundleMapCache = map;
+  _productBundleMapCacheTime = now;
+
+  return map;
+}
+
+// ✅ item.productId / item.product_id / item.id 어느쪽으로 들어오든 잡기
+function getItemProductId(item) {
+  return (
+    item?.productId ??
+    item?.product_id ??
+    item?.pid ??
+    item?.id ??
+    item?.productIdStr ??
+    null
+  );
+}
+
+async function applyBundleEnabledToOrderItems(orderItems) {
+  const map = await getProductBundleMap();
+  const items = (orderItems ?? []).map(it => ({ ...it }));
+
+  items.forEach(it => {
+    // 이미 item에 bundle_enabled가 있으면 존중
+    if (it.bundle_enabled === true || it.bundle_enabled === false) return;
+
+    const pid = getItemProductId(it);
+    if (pid === null || pid === undefined) return;
+
+    // products 테이블 기준 묶음 상태 주입
+    const on = map[String(pid)];
+    if (on === false) it.bundle_enabled = false;
+    if (on === true) it.bundle_enabled = true;
+  });
+
+  return items;
+}
+
+/* ===========================================================
    페이지 전환 (✅ 전역 등록 + 안정화)
 =========================================================== */
 function showPage(page) {
@@ -113,10 +180,8 @@ function showPage(page) {
 // ✅ 핵심: module에서도 onclick에서 바로 찾을 수 있도록 전역 등록
 window.showPage = showPage;
 
-// ✅ 첫 진입 기본 페이지 설정 (원하면 변경 가능)
+// ✅ 첫 진입 기본 페이지 설정
 document.addEventListener("DOMContentLoaded", () => {
-  // admin.html에서 이미 showPage 호출을 해도 되지만,
-  // 혹시 초기 페이지가 비어있을 경우를 대비해 기본 1회 호출
   if ($("main-area") && $("main-area").innerHTML.trim() === "") {
     showPage("products");
   }
@@ -140,7 +205,7 @@ async function loadProductPage() {
       const toggleText = p.sold_out ? "판매 재개" : "일시 품절";
 
       // ✅ 묶음 ON/OFF 상태
-      const bundleOn = p.bundle_enabled !== false; // null/undefined 포함
+      const bundleOn = p.bundle_enabled !== false;
       const bundleText = bundleOn ? "✅ 묶음ON" : "❌ 묶음OFF";
 
       return `
@@ -159,7 +224,6 @@ async function loadProductPage() {
             ${toggleText}
           </button>
 
-          <!-- ✅ 묶음 ON/OFF 토글 버튼 -->
           <button class="btn gray js-toggle-bundle"
             data-id="${p.id}"
             data-bundle="${bundleOn}">
@@ -193,41 +257,33 @@ async function loadProductPage() {
     </table>
   `;
 
-  // 수정 버튼
   main.querySelectorAll(".js-edit").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.editProduct(btn.dataset.id);
-    });
+    btn.addEventListener("click", () => window.editProduct(btn.dataset.id));
   });
 
-  // 삭제 버튼
   main.querySelectorAll(".js-del").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.deleteProduct(btn.dataset.id);
-    });
+    btn.addEventListener("click", () => window.deleteProduct(btn.dataset.id));
   });
 
-  // ✅ 일시 품절 토글
   main.querySelectorAll(".js-toggle-sold").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       const current = btn.dataset.state === "true";
-
       await supabase.from("products").update({ sold_out: !current }).eq("id", id);
-
+      _productBundleMapCache = null; // 캐시 무효화
       loadProductPage();
     });
   });
 
-  // ✅ 묶음 ON/OFF 토글
   main.querySelectorAll(".js-toggle-bundle").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
-      const current = btn.dataset.bundle === "true"; // 현재 ON 여부
+      const current = btn.dataset.bundle === "true";
       const next = !current;
 
       await supabase.from("products").update({ bundle_enabled: next }).eq("id", id);
 
+      _productBundleMapCache = null; // ✅ 묶음 토글 변경 시 캐시 무효화
       loadProductPage();
     });
   });
@@ -278,10 +334,7 @@ window.addCategory = async function () {
 
   const newId = "cat_" + Date.now();
 
-  const { error } = await supabase.from("categories").insert({
-    id: newId,
-    name,
-  });
+  const { error } = await supabase.from("categories").insert({ id: newId, name });
 
   if (error) {
     console.error(error);
@@ -294,18 +347,13 @@ window.addCategory = async function () {
 
 window.editCategory = async function (id, oldName) {
   const newName = prompt("새 카테고리 이름을 입력하세요:", oldName);
-
-  if (!newName || newName.trim() === "") {
-    alert("수정이 취소되었습니다.");
-    return;
-  }
+  if (!newName || newName.trim() === "") return alert("수정이 취소되었습니다.");
 
   const { error } = await supabase.from("categories").update({ name: newName.trim() }).eq("id", id);
 
   if (error) {
     console.error(error);
-    alert("카테고리 수정 실패!");
-    return;
+    return alert("카테고리 수정 실패!");
   }
 
   alert("수정 완료!");
@@ -355,7 +403,6 @@ window.addBanner = async function () {
   if (!file) return alert("파일을 선택하세요.");
 
   const path = `banners/${Date.now()}_${file.name}`;
-
   const { error: uploadError } = await supabase.storage.from("kshop").upload(path, file, { upsert: true });
 
   if (uploadError) {
@@ -365,10 +412,7 @@ window.addBanner = async function () {
 
   const { data: { publicUrl } } = supabase.storage.from("kshop").getPublicUrl(path);
 
-  const { error } = await supabase.from("banners").insert({
-    video_url: publicUrl,
-    sort_order: 1,
-  });
+  const { error } = await supabase.from("banners").insert({ video_url: publicUrl, sort_order: 1 });
 
   if (error) {
     console.error(error);
@@ -401,18 +445,17 @@ async function loadOrderPage() {
     return alert("주문 목록을 불러오지 못했습니다.");
   }
 
-  // ✅ 핵심 수정: (orders ??) → (orders ?? [])
-  const rows = (orders ?? [])
-    .map((o) => {
-      const items = (o.items ?? []).map(it => ({ ...it }));
-      const { total, totalQty } = calcOrderTotalByItems(items);
+  const rows = await Promise.all((orders ?? []).map(async (o) => {
+    // ✅ 핵심: 주문 items에 bundle_enabled 주입
+    const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
+    const { total, totalQty } = calcOrderTotalByItems(items);
 
-      const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
+    const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
 
-      const dateRaw = o.created_at ?? o.createdAt ?? "";
-      const dateText = dateRaw ? String(dateRaw).split("T")[0] : "";
+    const dateRaw = o.created_at ?? o.createdAt ?? "";
+    const dateText = dateRaw ? String(dateRaw).split("T")[0] : "";
 
-      return `
+    return `
       <tr>
         <td>${o.id ?? "-"}</td>
         <td>${o.name ?? "-"}</td>
@@ -425,8 +468,7 @@ async function loadOrderPage() {
           <button class="btn red js-order-del" data-id="${o.id}">삭제</button>
         </td>
       </tr>`;
-    })
-    .join("");
+  }));
 
   main.innerHTML = `
     <h2>주문 관리 (출력 전)</h2>
@@ -440,41 +482,34 @@ async function loadOrderPage() {
         <th>일자</th>
         <th>관리</th>
       </tr>
-      ${rows || `<tr><td colspan="7" style="text-align:center;">주문이 없습니다.</td></tr>`}
+      ${rows.join("") || `<tr><td colspan="7" style="text-align:center;">주문이 없습니다.</td></tr>`}
     </table>
   `;
 
   main.querySelectorAll(".js-order-print").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.printOrder(btn.dataset.id);
-    });
+    btn.addEventListener("click", () => window.printOrder(btn.dataset.id));
   });
 
   main.querySelectorAll(".js-order-del").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.deleteOrder(btn.dataset.id);
-    });
+    btn.addEventListener("click", () => window.deleteOrder(btn.dataset.id));
   });
 }
 
 /* ===========================================================
-   ✅ 주문 출력 기능 (금액 통일)
+   ✅ 주문 출력 기능 (금액 통일 + 묶음OFF 반영)
 =========================================================== */
 window.printOrder = async function (orderId) {
-  if (!orderId) {
-    alert("❌ 주문 ID가 없습니다.");
-    return;
-  }
+  if (!orderId) return alert("❌ 주문 ID가 없습니다.");
 
   const { data: o, error } = await supabase.from("orders").select("*").eq("id", orderId).single();
 
   if (error || !o) {
     console.error(error);
-    alert("주문 데이터를 불러오지 못했습니다.");
-    return;
+    return alert("주문 데이터를 불러오지 못했습니다.");
   }
 
-  const items = (o.items ?? []).map(it => ({ ...it }));
+  // ✅ 핵심: 출력도 bundle_enabled 주입해서 계산
+  const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
   const { total, items: fixedItems } = calcOrderTotalByItems(items);
   const finalTotal = total;
 
@@ -521,10 +556,7 @@ window.printOrder = async function (orderId) {
 
   await supabase
     .from("orders")
-    .update({
-      printed: true,
-      printed_at: new Date().toISOString(),
-    })
+    .update({ printed: true, printed_at: new Date().toISOString() })
     .eq("id", orderId);
 
   loadOrderPage();
@@ -532,7 +564,7 @@ window.printOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   출력된 주문 목록
+   출력된 주문 목록 (묶음OFF 반영)
 =========================================================== */
 async function loadPrintedPage() {
   const main = $("main-area");
@@ -548,17 +580,16 @@ async function loadPrintedPage() {
     return alert("출력된 주문 목록을 불러오지 못했습니다.");
   }
 
-  const rows = (printed ?? [])
-    .map((o) => {
-      const items = (o.items ?? []).map(it => ({ ...it }));
-      const { total, totalQty } = calcOrderTotalByItems(items);
+  const rows = await Promise.all((printed ?? []).map(async (o) => {
+    const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
+    const { total, totalQty } = calcOrderTotalByItems(items);
 
-      const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
+    const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
 
-      const printedAtRaw = o.printed_at ?? "";
-      const printedDate = printedAtRaw ? String(printedAtRaw).split("T")[0] : "";
+    const printedAtRaw = o.printed_at ?? "";
+    const printedDate = printedAtRaw ? String(printedAtRaw).split("T")[0] : "";
 
-      return `
+    return `
       <tr>
         <td>${o.id ?? "-"}</td>
         <td>${o.name ?? "-"}</td>
@@ -568,8 +599,7 @@ async function loadPrintedPage() {
         <td>${printedDate}</td>
         <td><button class="btn red js-printed-del" data-id="${o.id}">삭제</button></td>
       </tr>`;
-    })
-    .join("");
+  }));
 
   main.innerHTML = `
     <h2>출력된 주문 관리</h2>
@@ -590,14 +620,12 @@ async function loadPrintedPage() {
        <th>출력일</th>
        <th>관리</th>
       </tr>
-      ${rows || `<tr><td colspan="7" style="text-align:center;">출력된 주문이 없습니다.</td></tr>`}
+      ${rows.join("") || `<tr><td colspan="7" style="text-align:center;">출력된 주문이 없습니다.</td></tr>`}
     </table>
   `;
 
   main.querySelectorAll(".js-printed-del").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      window.deleteOrder(btn.dataset.id);
-    });
+    btn.addEventListener("click", () => window.deleteOrder(btn.dataset.id));
   });
 }
 
@@ -617,8 +645,7 @@ window.deleteOrder = async function (orderId) {
 
   if (error) {
     console.error(error);
-    alert("삭제 실패");
-    return;
+    return alert("삭제 실패");
   }
 
   if (count !== 1) {
@@ -632,7 +659,7 @@ window.deleteOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   XLSX 엑셀 저장 기능 (광고동의 포함)
+   XLSX 엑셀 저장 기능 (광고동의 포함 + 묶음OFF 반영)
 =========================================================== */
 window.exportByPeriod = async function (type) {
   const { data } = await supabase.from("orders").select("*").eq("printed", true);
@@ -656,7 +683,7 @@ window.exportByPeriod = async function (type) {
     groups[key].push(o);
   });
 
-  Object.keys(groups).forEach((key) => {
+  for (const key of Object.keys(groups)) {
     const orders = groups[key];
     const rows = [];
 
@@ -673,8 +700,8 @@ window.exportByPeriod = async function (type) {
       "상품목록(확정금액)",
     ]);
 
-    orders.forEach((o) => {
-      const items = (o.items ?? []).map(it => ({ ...it }));
+    for (const o of orders) {
+      const items = await applyBundleEnabledToOrderItems((o.items ?? []).map(it => ({ ...it })));
       const { total, totalQty, items: fixedItems } = calcOrderTotalByItems(items);
       const finalTotal = total;
 
@@ -694,7 +721,7 @@ window.exportByPeriod = async function (type) {
         o.printed_at.split("T")[0],
         itemText,
       ]);
-    });
+    }
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -708,7 +735,7 @@ window.exportByPeriod = async function (type) {
         : `orders_year_${key}.xlsx`;
 
     XLSX.writeFile(wb, filename);
-  });
+  }
 
   alert("엑셀 저장 완료!");
 };
@@ -882,10 +909,10 @@ window.deleteProduct = async function (productId) {
 
   if (error) {
     console.error(error);
-    alert("상품 삭제 실패");
-    return;
+    return alert("상품 삭제 실패");
   }
 
   alert("상품이 삭제되었습니다.");
+  _productBundleMapCache = null;
   loadProductPage();
 };
