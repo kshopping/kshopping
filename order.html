@@ -16,20 +16,17 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       margin-bottom: 25px;
     }
-
     #order-summary h3 {
       margin-bottom: 12px;
       font-size: 20px;
       font-weight: 700;
     }
-
     .order-item {
       display: flex;
       justify-content: space-between;
       margin-bottom: 6px;
       font-size: 15px;
     }
-
     .order-total {
       margin-top: 14px;
       font-size: 18px;
@@ -37,7 +34,6 @@
       text-align: right;
       color: #e74c3c;
     }
-
     .agree-box {
       border: 1px solid #ddd;
       padding: 15px;
@@ -46,11 +42,9 @@
       border-radius: 8px;
       background: #fafafa;
     }
-
     .agree-box div {
       margin-bottom: 10px;
     }
-
     .agree-desc {
       margin-left: 22px;
       font-size: 12px;
@@ -136,10 +130,6 @@
 <script type="module" src="./js/order.js"></script>
 
 <script>
-  /* ===========================================================
-     ✅ 주문 요약: 묶음가격(totalPrice) 반영 + 컴퓨터 제외 보정
-  =========================================================== */
-
   function safeNumber(v, fallback = 0) {
     const n = Number(v);
     return isNaN(n) ? fallback : n;
@@ -168,6 +158,7 @@
     return matchCategory || matchKeyword;
   }
 
+  // ✅ 고니 규칙 적용
   function calcBundlePrice(unitPrice, qty) {
     const ratio2 = 19900 / 13900;
     const ratio3 = 26900 / 13900;
@@ -175,12 +166,16 @@
     const u = safeNumber(unitPrice, 0);
     const q = Math.max(1, safeNumber(qty, 1));
 
-    if (q === 1) return Math.round(u);
-    if (q === 2) return Math.round(u * ratio2);
-    if (q === 3) return Math.round(u * ratio3);
+    const price1 = Math.round(u);
+    const price2 = Math.round(u * ratio2);
+    const price3 = Math.round(u * ratio3);
 
-    const addPrice = 7900;
-    return Math.round(u * ratio3) + (q - 3) * addPrice;
+    if (q === 1) return price1;
+    if (q === 2) return price2;
+    if (q === 3) return price3;
+
+    const diff = price3 - price2;
+    return price3 + (q - 3) * diff;
   }
 
   function recalcItemTotal(item) {
@@ -210,18 +205,14 @@
       return;
     }
 
-    // ✅ 주문 직전 안전 보정
+    // ✅ 보정
     items.forEach(item => {
       if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
       if (item.qty === undefined) item.qty = 1;
-
-      // totalPrice가 없거나 0이면 재계산
       if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
         recalcItemTotal(item);
       }
     });
-
-    // ✅ 보정된 장바구니 저장
     localStorage.setItem("cartItems", JSON.stringify(items));
 
     let html = "";
@@ -252,3 +243,4 @@
 
 </body>
 </html>
+

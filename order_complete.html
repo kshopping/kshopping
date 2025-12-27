@@ -43,7 +43,6 @@
       margin-bottom: 20px;
     }
 
-    /* 주문 요약 박스 */
     #order-summary-box {
       background: #fff;
       padding: 18px;
@@ -75,7 +74,6 @@
       color: #e74c3c;
     }
 
-    /* 입금 계좌 박스 (강조 + 중앙 정렬) */
     .account-box {
       margin-top: 30px;
       padding: 20px 15px;
@@ -121,7 +119,6 @@
       background: #004bcc;
     }
 
-    /* ✅ 묶음 표시 스타일 */
     .bundle-badge {
       font-size: 12px;
       color: #777;
@@ -140,14 +137,12 @@
       주문해주셔서 감사합니다. 관리자 확인 후 빠르게 처리됩니다.
     </p>
 
-    <!-- 주문 요약 -->
     <div id="order-summary-box">
       <div class="summary-title">🛍 주문 상품 내역</div>
       <div id="summary-items"></div>
       <div class="summary-total" id="summary-total"></div>
     </div>
 
-    <!-- 입금 계좌 -->
     <div class="account-box">
       <div class="account-title">💳 입금 계좌</div>
       <div id="bankInfo">불러오는 중...</div>
@@ -164,9 +159,6 @@
     const summaryTotalEl = document.getElementById("summary-total");
     const bankInfoEl = document.getElementById("bankInfo");
 
-    /* ===========================================================
-       ✅ 유틸
-    =========================================================== */
     function safeNumber(v, fallback = 0) {
       const n = Number(v);
       return isNaN(n) ? fallback : n;
@@ -177,9 +169,6 @@
       return Number(n).toLocaleString("ko-KR") + "원";
     }
 
-    /* ===========================================================
-       ✅ 컴퓨터(노트북) 제외 판별 (item 기준)
-    =========================================================== */
     function isComputerItem(item) {
       const excludeCategories = ["노트북", "컴퓨터", "데스크탑", "전자기기", "PC"];
       const excludeKeywords = [
@@ -198,11 +187,7 @@
       return matchCategory || matchKeyword;
     }
 
-    /* ===========================================================
-       ✅ 묶음가격 공식 계산
-       기준: 1개=13,900 / 2개=19,900 / 3개=26,900
-       4개 이상: 3개 가격 + 추가 1개당 7,900원
-    =========================================================== */
+    // ✅ 고니 규칙 적용
     function calcBundlePrice(unitPrice, qty) {
       const ratio2 = 19900 / 13900;
       const ratio3 = 26900 / 13900;
@@ -210,12 +195,16 @@
       const u = safeNumber(unitPrice, 0);
       const q = Math.max(1, safeNumber(qty, 1));
 
-      if (q === 1) return Math.round(u);
-      if (q === 2) return Math.round(u * ratio2);
-      if (q === 3) return Math.round(u * ratio3);
+      const price1 = Math.round(u);
+      const price2 = Math.round(u * ratio2);
+      const price3 = Math.round(u * ratio3);
 
-      const addPrice = 7900;
-      return Math.round(u * ratio3) + (q - 3) * addPrice;
+      if (q === 1) return price1;
+      if (q === 2) return price2;
+      if (q === 3) return price3;
+
+      const diff = price3 - price2;
+      return price3 + (q - 3) * diff;
     }
 
     function recalcItemTotal(item) {
@@ -234,11 +223,9 @@
       }
     }
 
-    // ✅ 1) URL 파라미터 id 확인
     const params = new URLSearchParams(location.search);
     const orderId = params.get("id");
 
-    // ✅ 2) localStorage lastOrder 확인
     const lastOrderRaw = localStorage.getItem("lastOrder");
     let lastOrder = null;
     if (lastOrderRaw) {
@@ -249,11 +236,7 @@
       }
     }
 
-    /* ===========================================================
-       ✅ 주문 렌더링 (total / total_qty 있으면 그걸 우선 사용)
-    =========================================================== */
     function renderOrder(order) {
-      // 주문번호
       orderIdEl.textContent = order?.id ? order.id : "-";
 
       if (!order || !order.items || order.items.length === 0) {
@@ -262,12 +245,10 @@
         return;
       }
 
-      // ✅ items 보정 (구버전 포함)
       const items = order.items.map(it => ({ ...it }));
       items.forEach(item => {
         if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
         if (item.qty === undefined) item.qty = 1;
-
         if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
           recalcItemTotal(item);
         }
@@ -277,18 +258,15 @@
       let total = 0;
       let qty = 0;
 
-      // ✅ Supabase order.total / total_qty 우선 사용 (가장 정확)
       const hasOrderTotal = order.total !== undefined && order.total !== null;
       const hasOrderQty = order.total_qty !== undefined && order.total_qty !== null;
 
       if (hasOrderTotal) total = safeNumber(order.total, 0);
       if (hasOrderQty) qty = safeNumber(order.total_qty, 0);
 
-      // ✅ item 렌더 (표시는 item.totalPrice 기준)
       items.forEach((item) => {
         const itemTotal = safeNumber(item.totalPrice ?? 0, 0);
 
-        // order.total/qty가 없으면 item 기반 합산
         if (!hasOrderTotal) total += itemTotal;
         if (!hasOrderQty) qty += safeNumber(item.qty, 0);
 
@@ -305,11 +283,9 @@
       });
 
       summaryItemsEl.innerHTML = html;
-      summaryTotalEl.textContent =
-        `총 ${qty}개 | 총 금액: ${formatWon(total)}`;
+      summaryTotalEl.textContent = `총 ${qty}개 | 총 금액: ${formatWon(total)}`;
     }
 
-    // ✅ Supabase에서 주문 불러오기
     async function loadOrderFromSupabase(id) {
       const { data: order, error } = await supabase
         .from("orders")
@@ -324,9 +300,7 @@
       return order;
     }
 
-    // ✅ 주문 로딩 흐름
     async function loadOrder() {
-      // 1) URL에 id가 있으면 그걸로 우선 조회
       if (orderId) {
         const order = await loadOrderFromSupabase(orderId);
         if (order) {
@@ -335,17 +309,14 @@
         }
       }
 
-      // 2) URL id 없거나 조회 실패면 lastOrder 사용
       if (lastOrder) {
         renderOrder(lastOrder);
         return;
       }
 
-      // 3) 둘 다 없으면 에러 표시
       renderOrder(null);
     }
 
-    // ✅ 계좌 불러오기 (기존 로직 유지)
     async function loadAccount() {
       const { data, error } = await supabase
         .from("account_info")
@@ -370,7 +341,6 @@
       bankInfoEl.innerHTML = html;
     }
 
-    // 실행
     loadOrder();
     loadAccount();
   </script>

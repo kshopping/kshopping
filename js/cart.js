@@ -33,9 +33,9 @@ function isComputerItem(item) {
 }
 
 /* ===========================================================
-   ✅ 묶음가격 공식 계산
-   기준: 1개=13,900 / 2개=19,900 / 3개=26,900
-   4개 이상: 3개 가격 + 추가 1개당 7,900원
+   ✅ 묶음가격 공식 계산 (고니 규칙 반영)
+   1~3개: 비율 적용
+   4개 이상: (3개-2개) 차액만큼 일률 증가
 =========================================================== */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
@@ -44,24 +44,25 @@ function calcBundlePrice(unitPrice, qty) {
   const u = safeNumber(unitPrice, 0);
   const q = Math.max(1, safeNumber(qty, 1));
 
-  if (q === 1) return Math.round(u);
-  if (q === 2) return Math.round(u * ratio2);
-  if (q === 3) return Math.round(u * ratio3);
+  const price1 = Math.round(u);
+  const price2 = Math.round(u * ratio2);
+  const price3 = Math.round(u * ratio3);
 
-  const addPrice = 7900; // ✅ 4개 이상 추가 단가
-  return Math.round(u * ratio3) + (q - 3) * addPrice;
+  if (q === 1) return price1;
+  if (q === 2) return price2;
+  if (q === 3) return price3;
+
+  const diff = price3 - price2;
+  return price3 + (q - 3) * diff;
 }
 
 /* ===========================================================
-   ✅ 아이템 총액 재계산
-   - 컴퓨터(노트북)면 unitPrice * qty
-   - 그 외는 묶음가격 적용
+   ✅ 아이템 totalPrice 재계산
 =========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
   const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
 
-  // unitPrice 보정
   item.unitPrice = unitPrice;
   item.qty = qty;
 
@@ -80,7 +81,6 @@ function recalcItemTotal(item) {
 function getCart() {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
-  // ✅ 기존 구조(price만 있는 경우)도 자동 보정해서 totalPrice 생성
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
@@ -99,7 +99,6 @@ function loadCart() {
   const listArea = document.getElementById("cartList");
   const totalArea = document.getElementById("cartTotal");
 
-  // 장바구니 비었을 때
   if (cart.length === 0) {
     listArea.innerHTML = `
       <div style="text-align:center; padding:40px 0; color:#666; font-size:18px;">
@@ -114,7 +113,6 @@ function loadCart() {
   let totalPrice = 0;
 
   cart.forEach((item, index) => {
-    // ✅ totalPrice 사용 (묶음 반영)
     const itemTotal = safeNumber(item.totalPrice ?? 0, 0);
     totalPrice += itemTotal;
 
@@ -156,7 +154,7 @@ function loadCart() {
 }
 
 /* ===========================================================
-   🔼 수량 증가/감소 (묶음가격 재계산 포함)
+   🔼 수량 증가/감소
 =========================================================== */
 window.changeQty = function (index, diff) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
@@ -164,7 +162,6 @@ window.changeQty = function (index, diff) {
 
   cart[index].qty = Math.max(1, safeNumber(cart[index].qty, 1) + diff);
 
-  // ✅ totalPrice 재계산
   recalcItemTotal(cart[index]);
 
   localStorage.setItem("cartItems", JSON.stringify(cart));
@@ -200,7 +197,6 @@ document.getElementById("goOrder").addEventListener("click", () => {
     return;
   }
 
-  // ✅ 주문 직전에도 한 번 보정 저장 (안전)
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
@@ -217,8 +213,7 @@ document.getElementById("goOrder").addEventListener("click", () => {
 loadCart();
 
 /* ===========================================================
-   🔹 [추가] 빈 장바구니일 때 메인으로 돌아가기 버튼 생성
-   (기존 코드 유지)
+   🔹 빈 장바구니일 때 메인으로 돌아가기 버튼 생성
 =========================================================== */
 (function addBackButtonWhenEmpty() {
   const wrap = document.getElementById("cart-wrap");
@@ -227,7 +222,6 @@ loadCart();
   const observer = new MutationObserver(() => {
     const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
-    // 장바구니가 비어 있고, 버튼이 아직 없을 때만
     if (cart.length === 0 && !document.querySelector(".btn-back-main")) {
       const btn = document.createElement("button");
       btn.className = "btn-back-main";

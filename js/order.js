@@ -1,6 +1,6 @@
 // /js/order.js
 // ✅ 주문페이지 전용 JS (장바구니 → 주문정보 입력 → 주문완료 저장)
-// ✅ 웹만 수정 (앱/모바일 영향 없음)
+// ✅ 묶음가격(totalPrice) 반영 + 컴퓨터(노트북) 제외 규칙 포함
 // ✅ orders 테이블 id(text) 자동생성이 없으므로 id를 직접 생성하여 저장
 // ✅ Supabase 저장 성공시에만 장바구니 삭제 + 완료페이지 이동 (주문 누락 방지)
 
@@ -11,21 +11,77 @@ if (submitBtn) {
   submitBtn.addEventListener("click", handleSubmitOrder);
 }
 
+function safeNumber(v, fallback = 0) {
+  const n = Number(v);
+  return isNaN(n) ? fallback : n;
+}
+
+function isComputerItem(item) {
+  const excludeCategories = ["노트북", "컴퓨터", "데스크탑", "전자기기", "PC"];
+  const excludeKeywords = [
+    "노트북", "laptop", "notebook", "macbook",
+    "hp", "lenovo", "asus", "dell", "msi", "acer",
+    "ssd", "ram", "cpu", "i5", "i7", "i9", "ryzen",
+    "그래픽", "gpu", "rtx", "gtx"
+  ];
+
+  const cat = (item?.category || "").toLowerCase();
+  const name = (item?.name || "").toLowerCase();
+
+  const matchCategory = excludeCategories.some(c => cat.includes(c.toLowerCase()));
+  const matchKeyword = excludeKeywords.some(k => name.includes(k.toLowerCase()));
+
+  return matchCategory || matchKeyword;
+}
+
+// ✅ 고니 규칙 적용
+function calcBundlePrice(unitPrice, qty) {
+  const ratio2 = 19900 / 13900;
+  const ratio3 = 26900 / 13900;
+
+  const u = safeNumber(unitPrice, 0);
+  const q = Math.max(1, safeNumber(qty, 1));
+
+  const price1 = Math.round(u);
+  const price2 = Math.round(u * ratio2);
+  const price3 = Math.round(u * ratio3);
+
+  if (q === 1) return price1;
+  if (q === 2) return price2;
+  if (q === 3) return price3;
+
+  const diff = price3 - price2;
+  return price3 + (q - 3) * diff;
+}
+
+function recalcItemTotal(item) {
+  const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
+  const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
+
+  item.unitPrice = unitPrice;
+  item.qty = qty;
+
+  if (isComputerItem(item)) {
+    item.bundleApplied = false;
+    item.totalPrice = Math.round(unitPrice * qty);
+  } else {
+    item.bundleApplied = true;
+    item.totalPrice = calcBundlePrice(unitPrice, qty);
+  }
+}
+
 async function handleSubmitOrder(e) {
   if (e) e.preventDefault();
 
-  // 버튼 잠금
   submitBtn.disabled = true;
   submitBtn.textContent = "주문 저장 중...";
 
-  // 1) 입력값 가져오기
   const name = document.getElementById("name")?.value.trim();
   const phone = document.getElementById("phone")?.value.trim();
   const address = document.getElementById("address")?.value.trim();
   const memo = document.getElementById("memo")?.value.trim();
   const marketingAgree = document.getElementById("agree_marketing")?.checked || false;
 
-  // 2) 필수 동의 체크
   const agreeRequired = document.getElementById("agree_required");
   if (!agreeRequired?.checked) {
     alert("⚠️ [필수] 개인정보 수집 및 이용 동의가 필요합니다.");
@@ -34,7 +90,6 @@ async function handleSubmitOrder(e) {
     return;
   }
 
-  // 3) 기본 입력 검증
   if (!name || !phone || !address) {
     alert("⚠️ 이름/연락처/주소는 필수 입력입니다.");
     submitBtn.disabled = false;
@@ -42,7 +97,6 @@ async function handleSubmitOrder(e) {
     return;
   }
 
-  // 4) 장바구니 가져오기
   const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
   if (!cartItems.length) {
     alert("⚠️ 장바구니가 비어 있습니다.");
@@ -52,39 +106,43 @@ async function handleSubmitOrder(e) {
     return;
   }
 
-  // 5) 총액/수량 계산
+  // ✅ 주문 직전 보정
+  cartItems.forEach(item => {
+    if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
+    if (item.qty === undefined) item.qty = 1;
+
+    if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
+      recalcItemTotal(item);
+    }
+  });
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+  // ✅ totalPrice 기준 총액/수량
   const total = cartItems.reduce(
-    (sum, item) => sum + (Number(item.price || 0) * Number(item.qty || 0)),
+    (sum, item) => sum + safeNumber(item.totalPrice ?? 0, 0),
     0
   );
-  const totalQty = cartItems.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const totalQty = cartItems.reduce((sum, item) => sum + safeNumber(item.qty ?? 0, 0), 0);
 
-  // ✅ 핵심: id 직접 생성 (orders.id가 text이고 자동생성 없음)
   const orderId = "ORDER_" + Date.now();
   const createdAt = new Date().toISOString();
 
-  // 6) 주문 데이터 생성 (Supabase 컬럼 구조에 정확히 맞춤)
   const orderPayload = {
-    id: orderId,                 // ✅ 필수
-    created_at: createdAt,       // ✅ created_at은 default now() 있어도 명시하면 안전
+    id: orderId,
+    created_at: createdAt,
     name,
     phone,
     address,
     memo: memo || "",
     items: cartItems,
-
-    // ✅ 관리자 주문관리에서 사용
     total: total,
     total_qty: totalQty,
     marketing_agree: marketingAgree,
     status: "결제대기",
-
-    // ✅ 관리자에서 eq("printed", false)로 불러오므로 필수
     printed: false,
   };
 
   try {
-    // ✅ Supabase 저장
     const { data, error } = await supabase
       .from("orders")
       .insert([orderPayload])
@@ -106,7 +164,6 @@ async function handleSubmitOrder(e) {
       return;
     }
 
-    // ✅ 성공했을 때만 장바구니 삭제 + 완료 이동
     localStorage.removeItem("cartItems");
     localStorage.setItem("lastOrder", JSON.stringify(data));
 

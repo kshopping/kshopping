@@ -56,9 +56,9 @@ function isComputerProduct(product) {
 }
 
 /* ===========================================
-   ✅ 묶음가격 공식 계산
-   기준: 1개=13,900 / 2개=19,900 / 3개=26,900
-   4개 이상 규칙: 3개 가격 + 추가 1개당 7,900원
+   ✅ 묶음가격 공식 계산 (고니 규칙 반영)
+   1~3개: 비율 적용
+   4개 이상: (3개-2개) 차액만큼 일률 증가
 =========================================== */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
@@ -67,12 +67,17 @@ function calcBundlePrice(unitPrice, qty) {
   const u = safeNumber(unitPrice, 0);
   const q = Math.max(1, safeNumber(qty, 1));
 
-  if (q === 1) return Math.round(u);
-  if (q === 2) return Math.round(u * ratio2);
-  if (q === 3) return Math.round(u * ratio3);
+  const price1 = Math.round(u);
+  const price2 = Math.round(u * ratio2);
+  const price3 = Math.round(u * ratio3);
 
-  const addPrice = 7900; // ✅ 4개 이상 추가 단가
-  return Math.round(u * ratio3) + (q - 3) * addPrice;
+  if (q === 1) return price1;
+  if (q === 2) return price2;
+  if (q === 3) return price3;
+
+  // ✅ 4개 이상: (3개-2개) 차액만큼 일률 증가
+  const diff = price3 - price2;
+  return price3 + (q - 3) * diff;
 }
 
 /* ===========================================
@@ -103,10 +108,12 @@ function addToCart(product, qty) {
 
   const found = cart.find((i) => String(i.id) === String(product.id));
   if (found) {
-    found.qty += q;
+    const newQty = found.qty + q;
+    found.qty = newQty;
     found.unitPrice = unitPrice;
     found.bundleApplied = !isComputerProduct(product);
-    found.totalPrice = getFinalItemPrice(product, found.qty);
+    found.totalPrice = getFinalItemPrice(product, newQty);
+    found.updatedAt = Date.now();
   } else {
     cart.push({
       id: product.id,
@@ -169,7 +176,7 @@ async function loadDetail() {
     detailImg.style.display = "none";
   }
 
-  // ✅ 수량 UI가 있으면 연결 (없어도 기존 기능 유지)
+  // ✅ 수량 UI 연결
   const qtyInput = $("qtyInput");
   const btnMinus = $("btnQtyMinus");
   const btnPlus = $("btnQtyPlus");
@@ -193,7 +200,7 @@ async function loadDetail() {
       if (isComputer) {
         bundleHint.textContent = "※ 컴퓨터/노트북 상품은 묶음가격이 적용되지 않습니다.";
       } else {
-        bundleHint.textContent = "✅ 묶음가격 자동 적용 (2개/3개 할인). 4개 이상은 추가 규칙 적용";
+        bundleHint.textContent = "✅ 묶음가격 자동 적용 (2개/3개 할인). 4개 이상은 동일 증가 규칙 적용";
       }
     }
 
@@ -254,7 +261,6 @@ async function loadDetail() {
     btnAdd.textContent = "장바구니 담기";
 
     btnAdd.onclick = () => {
-      // ✅ 수량 UI가 있으면 그 값, 없으면 1개
       const qty = qtyInput ? Math.max(1, safeNumber(qtyInput.value, 1)) : 1;
 
       addToCart(data, qty);
