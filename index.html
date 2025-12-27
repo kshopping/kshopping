@@ -192,22 +192,26 @@
   }
 }
 
-/* ✅✅✅ 장바구니 총액 표시 영역 (PC 기본 유지) */
-#cartTotalPrice {
-  position: absolute;
-  top: 42px;
-  right: 0;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  background: rgba(0,0,0,0.82);
-  color: #fff;
-  line-height: 1;
-  display: none;
-  white-space: nowrap;
-  z-index: 999;
+/* ✅✅✅ [모바일 전용] 총액이 우측에서 안 짤리게 + 장바구니 덮지 않게 */
+@media (max-width: 768px){
+  #cartTotalPrice{
+    position: fixed; /* ✅ 모바일에서 absolute → fixed */
+    top: calc(env(safe-area-inset-top) + 58px); /* ✅ 장바구니 아래 안정 */
+    right: 12px;
+
+    transform: translateX(-18px); /* ✅ 살짝 왼쪽으로 이동 (우측 잘림 방지) */
+    max-width: calc(100vw - 24px); /* ✅ 화면 밖으로 절대 안 나가게 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 11px;
+    padding: 7px 10px;
+    z-index: 99999;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+  }
 }
+
 
 /* ✅✅✅ [핵심 수정] 모바일에서는 항상 잘 보이도록 FIXED로 변경 */
 @media (max-width: 768px){
