@@ -13,81 +13,170 @@
   align-items: center;
 }
 
-/* ===== 로고 (크게 + 번개색) ===== */
-.header-title {
-  font-size: 26px;
-  font-weight: 900;
-  color: #ff4d4f;
+/* ============================= ✅✅✅ 1안 번개형 로고 업그레이드 (프로급) ============================= */
+.brand-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 로고 버튼 */
+.logo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
+  user-select: none;
   white-space: nowrap;
 }
 
-.header-title:hover {
-  color: #ff6b6d;
+/* ⚡ 로고 아이콘 */
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffe083 0%, #ffc933 100%);
+  box-shadow: 0 10px 24px rgba(255, 200, 0, 0.18);
+  position: relative;
+  overflow: hidden;
 }
 
-/* ===== 중앙 슬로건 ===== */
-.header-slogan {
-  flex: 1;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 700;
-  color: #ff9900;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
+.logo-icon::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.65), rgba(255,255,255,0) 60%);
+  transform: rotate(20deg);
 }
 
-/* 🔴 공통 레드 */
-.highlight-red {
-  color: #ff4d4f;
-  font-weight: 700;
-}
-
-/* ⚡ 번개 (깜빡 + 흔들림) */
-.lightning-svg {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 8px;
-  animation: lightningCombo 0.9s infinite ease-in-out;
+.logo-icon svg {
+  width: 20px;
+  height: 26px;
+  fill: #ff4d4f;
+  z-index: 2;
+  position: relative;
+  animation: logoZap 1.15s ease-in-out infinite;
   transform-origin: center;
 }
 
-.lightning-svg svg {
-  width: 26px;
-  height: 34px;
+@keyframes logoZap {
+  0%   { transform: rotate(0deg) scale(1); opacity: 0.85; }
+  30%  { transform: rotate(-8deg) scale(1.12); opacity: 1; }
+  60%  { transform: rotate(8deg) scale(1.12); opacity: 1; }
+  100% { transform: rotate(0deg) scale(1); opacity: 0.85; }
+}
+
+/* K-Shopping 타이포 */
+.logo-text {
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -0.6px;
+  color: #ff4d4f;
+  line-height: 1;
+}
+
+.logo-sub {
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0,0,0,0.55);
+  letter-spacing: 0.2px;
+}
+
+/* 슬로건 배지 */
+.slogan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff7d1 0%, #ffe083 100%);
+  border: 1px solid rgba(255, 200, 0, 0.45);
+  font-size: 14px;
+  font-weight: 900;
+  color: #ff7a00;
+  box-shadow: 0 10px 26px rgba(255, 200, 0, 0.14);
+  white-space: nowrap;
+}
+
+.slogan-badge .zap {
+  color: #ff4d4f;
+  font-weight: 900;
+}
+
+.slogan-badge .mini-zap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slogan-badge .mini-zap svg {
+  width: 14px;
+  height: 18px;
   fill: #ff4d4f;
 }
 
-@keyframes lightningCombo {
-  0% {
-    opacity: 0.4;
-    transform: rotate(0deg) scale(1);
-  }
-  30% {
-    opacity: 1;
-    transform: rotate(-8deg) scale(1.15);
-  }
-  60% {
-    opacity: 1;
-    transform: rotate(8deg) scale(1.15);
-  }
-  100% {
-    opacity: 0.4;
-    transform: rotate(0deg) scale(1);
-  }
+/* 전화/문의 (CTA 느낌) */
+.header-call {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(0,0,0,0.6);
+  white-space: nowrap;
 }
 
-/* 🚚 배송 강조 */
-.shipping-fast {
+.header-call .call-label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  color: rgba(0,0,0,0.58);
+  font-weight: 800;
 }
 
-/* ✅ 모바일에서만 슬로건 삭제 + 본문 위로 올리기 */
+.call-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 900;
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.08);
+  border: 1px solid rgba(255, 77, 79, 0.18);
+  box-shadow: 0 8px 18px rgba(255, 77, 79, 0.10);
+  transition: 0.22s ease;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.call-link:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 77, 79, 0.12);
+}
+
+/* ✅ 모바일에서 배지/전화 줄 정리 */
 @media (max-width: 768px){
-  .header-slogan{ display:none !important; }
-  #wrap{ padding-top:170px !important; }
+  .brand-row { gap: 10px; }
+  .logo-text { font-size: 26px; }
+  .slogan-badge {
+    font-size: 13px;
+    padding: 7px 10px;
+  }
 }
 </style>
 </head>
@@ -95,34 +184,49 @@
 <body>
 <header id="fixed-header">
   <div id="fixed-header-inner">
-    <div class="header-left">
-      <div class="header-title" onclick="location.href='index.html'">
-        K-Shopping
+
+    <!-- ✅ LEFT: 프로급 로고 + 배지 + 상담 CTA -->
+    <div class="header-left brand-area">
+
+      <div class="brand-row">
+        <div class="logo-btn" onclick="location.href='index.html'">
+          <span class="logo-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+          </span>
+
+          <div class="logo-typo">
+            <div class="logo-text">K-Shopping</div>
+            <div class="logo-sub">Korea Lightning Deal Market</div>
+          </div>
+        </div>
+
+        <div class="slogan-badge" title="대한민국 번개 초특가 쇼핑몰">
+          <span class="zap">대한민국 번개</span>
+          <span class="mini-zap" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+          </span>
+          <span>초특가 쇼핑몰</span>
+        </div>
       </div>
 
       <div class="header-call">
-        📞 Call / 문의 전화
+        <span class="call-label">📞 Call / 문의</span>
         <a class="call-link" href="tel:+821086408732">010-8640-8732</a>
         <a class="call-link" href="tel:+82522560994">052-256-0994</a>
       </div>
+
     </div>
 
-    <div class="header-slogan">
-      대한민국 번개
-      <span class="lightning-svg">
-        <svg viewBox="0 0 24 24">
-          <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
-        </svg>
-      </span>
-      초특가 쇼핑몰
-    </div>
-
-    <!-- ✅ 모바일에서는 숨길 영역 (장바구니/관리자) -->
+    <!-- ✅ RIGHT: 장바구니만 유지 / 관리자 버튼 완전 숨김 -->
     <div id="top-menu">
       <button id="cartGoBtn" class="cart-main-btn">🛒 <span id="cartCount"></span></button>
       <div id="cart-preview"></div>
-      <button onclick="location.href='admin.html'">🔑 관리자</button>
     </div>
+
   </div>
 
   <nav id="category-area"></nav>
@@ -505,6 +609,26 @@ function showCouponToast(text) {
   }, 1400);
 }
 
+/* ============================= ✅✅✅ 헤더 높이 자동 계산 (배너 가림 완전 제거) ============================= */
+function applyHeaderOffset() {
+  const header = document.getElementById("fixed-header");
+  const wrap = document.getElementById("wrap");
+  if (!header || !wrap) return;
+
+  const headerH = header.offsetHeight || 0;
+  wrap.style.paddingTop = (headerH + 38) + "px";  // ✅ [수정] 여유 18px → 38px (배너 절대 안 가림)
+}
+
+window.addEventListener("load", () => {
+  applyHeaderOffset();
+  setTimeout(applyHeaderOffset, 120);
+  setTimeout(applyHeaderOffset, 300);
+});
+
+window.addEventListener("resize", () => {
+  applyHeaderOffset();
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   dealerPopupConfig = loadDealerPopupConfig();
 
@@ -515,6 +639,9 @@ document.addEventListener("DOMContentLoaded", () => {
   dealerApplyCouponOverlay();
 
   if (dealerShouldShowPopup()) dealerOpenPopup();
+
+  applyHeaderOffset();
+  setTimeout(applyHeaderOffset, 120);
 });
 </script>
 <!-- ✅ DEALER POPUP END -->
@@ -522,3 +649,4 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="./js/index.js"></script>
 </body>
 </html>
+
