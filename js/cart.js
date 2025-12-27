@@ -1,3 +1,5 @@
+import { supabase } from "./supabaseClient.js";
+
 /* ===========================================================
    ✅ 100원 단위 무조건 올림 (확정값)
 =========================================================== */
@@ -19,8 +21,72 @@ function formatWon(n) {
 }
 
 /* ===========================================================
+   ✅ cartItem에서 productId 추출 (여러 형태 대응)
+   - item.productId / item.product_id / item.id / item.pid 등
+=========================================================== */
+function getItemProductId(item) {
+  return (
+    item?.productId ??
+    item?.product_id ??
+    item?.pid ??
+    item?.id ??
+    item?.productIdStr ??
+    null
+  );
+}
+
+/* ===========================================================
+   ✅ products 테이블에서 bundle_enabled 상태를 받아서
+   cartItems에 주입 (핵심)
+=========================================================== */
+let _bundleMapCache = null;
+let _bundleMapCacheTime = 0;
+
+async function getProductBundleMap() {
+  // ✅ 30초 캐시
+  const now = Date.now();
+  if (_bundleMapCache && (now - _bundleMapCacheTime) < 30000) {
+    return _bundleMapCache;
+  }
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("id, bundle_enabled");
+
+  if (error) {
+    console.error("getProductBundleMap error:", error);
+    return {};
+  }
+
+  const map = {};
+  (products ?? []).forEach(p => {
+    map[String(p.id)] = (p.bundle_enabled !== false);
+  });
+
+  _bundleMapCache = map;
+  _bundleMapCacheTime = now;
+  return map;
+}
+
+async function applyBundleEnabledToCartItems(cart) {
+  const map = await getProductBundleMap();
+  const items = (cart ?? []).map(it => ({ ...it }));
+
+  items.forEach(it => {
+    const pid = getItemProductId(it);
+    if (!pid) return;
+
+    // ✅ DB 기준 bundle_enabled 주입
+    const on = map[String(pid)];
+    if (on === false) it.bundle_enabled = false;
+    if (on === true) it.bundle_enabled = true;
+  });
+
+  return items;
+}
+
+/* ===========================================================
    🛒 헤더 장바구니 아이콘 아래 총액 업데이트
-   - detail.js와 동일하게 cartTotal 엘리먼트를 사용
 =========================================================== */
 function updateCartTotalBadge() {
   const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
@@ -66,9 +132,6 @@ function isBundleEnabledItem(item) {
 
 /* ===========================================================
    ✅ 묶음가격 공식 계산 (고니 규칙 반영)
-   1~3개: 비율 적용
-   4개 이상: (3개-2개) 차액만큼 일률 증가
-   ⚠️ 결과는 반드시 ceil100 확정값 처리
 =========================================================== */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
@@ -96,7 +159,6 @@ function calcBundlePrice(unitPrice, qty) {
 
 /* ===========================================================
    ✅ 아이템 totalPrice 재계산 (무조건 ceil100 확정값)
-   - 묶음 적용 여부는 isBundleEnabledItem(item) 기준
 =========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
@@ -109,36 +171,29 @@ function recalcItemTotal(item) {
 
   if (!bundleOk) {
     item.bundleApplied = false;
-
-    // ✅ 묶음 제외: 단가×수량 후 ceil100 확정값
     item.totalPrice = ceil100(Math.round(unitPrice * qty));
   } else {
     item.bundleApplied = true;
-
-    // ✅ 묶음가격: calcBundlePrice 내부에서 ceil100 처리됨
     item.totalPrice = calcBundlePrice(unitPrice, qty);
   }
 
-  // ✅ 최종 확정값 저장
   item.totalPrice = ceil100(item.totalPrice);
-
-  // ✅ bundle_enabled 값이 없으면 기본 true로 보정
-  if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
-    item.bundle_enabled = true;
-  }
 }
 
 /* ===========================================================
-   🛒 장바구니 로드 + 자동 보정
+   🛒 장바구니 로드 + DB 반영 + 자동 보정 (핵심 수정)
 =========================================================== */
-function getCart() {
+async function getCart() {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+
+  // ✅ DB에서 bundle_enabled 주입
+  cart = await applyBundleEnabledToCartItems(cart);
 
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
 
-    // ✅ bundle_enabled 값 없으면 true로 보정
+    // ✅ bundle_enabled가 DB에서도 못 찾으면 기존 로직대로 true (fallback)
     if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
       item.bundle_enabled = true;
     }
@@ -153,12 +208,11 @@ function getCart() {
 /* ===========================================================
    🛒 장바구니 렌더
 =========================================================== */
-function loadCart() {
-  const cart = getCart();
+async function loadCart() {
+  const cart = await getCart();
   const listArea = document.getElementById("cartList");
   const totalArea = document.getElementById("cartTotal");
 
-  // ✅ 헤더 총액 배지 업데이트
   updateCartTotalBadge();
 
   if (cart.length === 0) {
@@ -180,7 +234,6 @@ function loadCart() {
 
     const unitText = `단품 ${formatWon(item.unitPrice)}`;
 
-    // ✅ 안내 문구 최종 분기
     let bundleText = "";
     if (isComputerItem(item)) {
       bundleText = " (묶음 제외 - 컴퓨터/노트북)";
@@ -227,64 +280,60 @@ function loadCart() {
 
 /* ===========================================================
    🔼 수량 증가/감소
+   - DB 반영된 bundle_enabled 기준으로 다시 계산
 =========================================================== */
-window.changeQty = function (index, diff) {
+window.changeQty = async function (index, diff) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
   if (!cart[index]) return;
 
-  // ✅ bundle_enabled 보정
-  if (cart[index].bundle_enabled === undefined || cart[index].bundle_enabled === null) {
-    cart[index].bundle_enabled = true;
-  }
+  // ✅ DB 반영
+  cart = await applyBundleEnabledToCartItems(cart);
 
   cart[index].qty = Math.max(1, safeNumber(cart[index].qty, 1) + diff);
-
   recalcItemTotal(cart[index]);
 
   localStorage.setItem("cartItems", JSON.stringify(cart));
 
-  loadCart();
+  await loadCart();
 
-  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
   updateCartTotalBadge();
-
   if (window.updateCartPreview) updateCartPreview();
 };
 
 /* ===========================================================
    ❌ 삭제
 =========================================================== */
-window.removeItem = function (index) {
+window.removeItem = async function (index) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
 
   cart.splice(index, 1);
   localStorage.setItem("cartItems", JSON.stringify(cart));
 
-  loadCart();
+  await loadCart();
 
-  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
   updateCartTotalBadge();
-
   if (window.updateCartPreview) updateCartPreview();
 };
 
 /* ===========================================================
    🧾 주문 페이지 이동
+   - 이동 전에도 DB bundle_enabled 반영 후 저장
 =========================================================== */
-document.getElementById("goOrder").addEventListener("click", () => {
-  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+document.getElementById("goOrder").addEventListener("click", async () => {
+  let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
   if (cart.length === 0) {
     alert("장바구니가 비어 있습니다.");
     return;
   }
 
+  cart = await applyBundleEnabledToCartItems(cart);
+
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
 
-    // ✅ bundle_enabled 보정
     if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
       item.bundle_enabled = true;
     }
@@ -292,19 +341,18 @@ document.getElementById("goOrder").addEventListener("click", () => {
     recalcItemTotal(item);
   });
 
-  // ✅ 최종 확정값 저장
   localStorage.setItem("cartItems", JSON.stringify(cart));
-
-  // ✅ 배지도 업데이트하고 이동
   updateCartTotalBadge();
 
   location.href = "order.html";
 });
 
 /* ===========================================================
-   🚀 초기 실행
+   🚀 초기 실행 (async)
 =========================================================== */
-loadCart();
+(async function initCart() {
+  await loadCart();
+})();
 
 /* ===========================================================
    🔹 빈 장바구니일 때 메인으로 돌아가기 버튼 생성
