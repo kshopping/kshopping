@@ -8,7 +8,7 @@ body {
 #wrap {
   max-width: 1280px;
   margin: auto;
-  padding-top: 180px;
+  padding-top: 180px; /* ✅ 기본값만 유지 (실제 값은 JS가 헤더 높이에 맞춰 자동 조정) */
 }
 
 /* ============================= 🌟 FIXED HEADER ============================= */
@@ -271,12 +271,12 @@ body {
   color: #222;
   min-height: 44px;
   text-align: center;
-   word-break:keep-all;
-   display: -webkit-box;
+  word-break:keep-all;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-   text-overflow: ellipsis;
+  text-overflow: ellipsis;
 }
 
 /* 설명 */
@@ -498,7 +498,7 @@ body {
 @media (max-width: 768px) {
 
   /* ✅ 전체 wrap 위 여백 */
-  #wrap { padding-top: 230px; }
+  #wrap { padding-top: 230px; } /* ✅ 기본값만 (실제는 JS가 자동 조정) */
 
   /* ✅ 상품 그리드 */
   #product-area {
@@ -517,11 +517,11 @@ body {
   margin-left: 0 !important;
   margin-right: 0 !important;
 
-  padding: 8px 10px !important;       /* ✅ 왼쪽 여백 조금 주고 보기 좋게 */
+  padding: 8px 10px !important;
   gap: 6px !important;
-  flex-wrap: wrap !important;          /* ✅ 2줄 유지 */
+  flex-wrap: wrap !important;
 
-  justify-content: flex-start !important; /* ✅ 핵심: 버튼들을 왼쪽으로 */
+  justify-content: flex-start !important;
   align-items: center !important;
 
   box-sizing: border-box !important;
@@ -637,11 +637,6 @@ body {
     min-height: 14px !important;
   }
 
-  /* ✅ 관리자 버튼 숨김 */
-  #top-menu button[onclick*="admin.html"] {
-    display: none !important;
-  }
-
   /* ✅ 팝업이 헤더보다 항상 위 */
   #dealer-popup {
     z-index: 20000000 !important;
@@ -652,3 +647,4 @@ body {
     z-index: 999999 !important;
   }
 }
+
