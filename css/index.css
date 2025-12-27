@@ -270,6 +270,13 @@ body {
   font-weight: 800;
   color: #222;
   min-height: 44px;
+  text-align: center;
+   word-break:keep-all;
+   display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+   text-overflow: ellipsis;
 }
 
 /* 설명 */
