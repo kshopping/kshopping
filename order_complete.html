@@ -299,11 +299,11 @@
         // ✅ 표시 문구 최종 분기
         let bundleText = "";
         if (isComputerItem(item)) {
-          bundleText = "묶음 제외";
+          bundleText = "묶음 제외 ❌";
         } else if (item?.bundle_enabled === false) {
-          bundleText = "묶음 제외";
+          bundleText = "묶음 제외 ❌";
         } else {
-          bundleText = "묶음 적용";
+          bundleText = "묶음 적용 ✅";
         }
 
         html += `
