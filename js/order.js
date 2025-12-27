@@ -247,4 +247,3 @@ async function handleSubmitOrder(e) {
     return;
   }
 }
-
