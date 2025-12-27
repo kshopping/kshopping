@@ -154,7 +154,7 @@ async function loadProducts(categoryId = null, searchKeyword = null) {
             ? `<div class="product-badge">-${saleRate}%</div>`
             : ""
         }
-        <img src="${p.image_url}" alt="${p.name}">
+        <img src="${p.image_url}" alt="${p.name}" class="product-img-link" data-id="${p.id}">
         <div class="product-name">${p.name}</div>
         <div class="product-desc">${p.desc ?? ""}</div>
         <div class="price-box">
@@ -189,6 +189,13 @@ document.addEventListener("click", (e) => {
       .forEach((b) => b.classList.remove("active-cat"));
     catBtn.classList.add("active-cat");
     loadProducts(catBtn.dataset.catId);
+    return;
+  }
+
+  /* ✅ 상품 이미지 클릭 → 상세페이지 이동 */
+  const productImg = e.target.closest(".product-img-link");
+  if (productImg) {
+    location.href = `detail.html?id=${productImg.dataset.id}`;
     return;
   }
 
