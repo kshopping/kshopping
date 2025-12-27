@@ -181,7 +181,7 @@ function recalcItemTotal(item) {
 }
 
 /* ===========================================================
-   🛒 장바구니 로드 + DB 반영 + 자동 보정 (핵심 수정)
+   🛒 장바구니 로드 + DB 반영 + 자동 보정 (핵심)
 =========================================================== */
 async function getCart() {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
@@ -193,7 +193,7 @@ async function getCart() {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
 
-    // ✅ bundle_enabled가 DB에서도 못 찾으면 기존 로직대로 true (fallback)
+    // ✅ bundle_enabled가 DB에서도 못 찾으면 true fallback
     if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
       item.bundle_enabled = true;
     }
@@ -213,6 +213,7 @@ async function loadCart() {
   const listArea = document.getElementById("cartList");
   const totalArea = document.getElementById("cartTotal");
 
+  // ✅ 헤더 총액 배지 업데이트
   updateCartTotalBadge();
 
   if (cart.length === 0) {
@@ -234,14 +235,9 @@ async function loadCart() {
 
     const unitText = `단품 ${formatWon(item.unitPrice)}`;
 
-    let bundleText = "";
-    if (isComputerItem(item)) {
-      bundleText = " (묶음 제외 - 컴퓨터/노트북)";
-    } else if (item?.bundle_enabled === false) {
-      bundleText = " (묶음 제외 - 관리자 설정)";
-    } else {
-      bundleText = " (묶음 적용)";
-    }
+    // ✅ 문구 단순화: 2종만 표시
+    const bundleOk = isBundleEnabledItem(item);
+    const bundleText = bundleOk ? " (묶음 적용 ✅)" : " (묶음 제외 ❌)";
 
     const currentSumText = `현재 합계: <b>${formatWon(itemTotal)}</b>`;
 
@@ -280,7 +276,6 @@ async function loadCart() {
 
 /* ===========================================================
    🔼 수량 증가/감소
-   - DB 반영된 bundle_enabled 기준으로 다시 계산
 =========================================================== */
 window.changeQty = async function (index, diff) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
@@ -296,8 +291,10 @@ window.changeQty = async function (index, diff) {
 
   await loadCart();
 
+  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
   updateCartTotalBadge();
+
   if (window.updateCartPreview) updateCartPreview();
 };
 
@@ -312,14 +309,15 @@ window.removeItem = async function (index) {
 
   await loadCart();
 
+  // ✅ 헤더 카운트/총액 같이 갱신
   if (window.updateCartCount) updateCartCount();
   updateCartTotalBadge();
+
   if (window.updateCartPreview) updateCartPreview();
 };
 
 /* ===========================================================
    🧾 주문 페이지 이동
-   - 이동 전에도 DB bundle_enabled 반영 후 저장
 =========================================================== */
 document.getElementById("goOrder").addEventListener("click", async () => {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
@@ -334,6 +332,7 @@ document.getElementById("goOrder").addEventListener("click", async () => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
 
+    // ✅ bundle_enabled fallback
     if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
       item.bundle_enabled = true;
     }
@@ -341,7 +340,10 @@ document.getElementById("goOrder").addEventListener("click", async () => {
     recalcItemTotal(item);
   });
 
+  // ✅ 최종 확정값 저장
   localStorage.setItem("cartItems", JSON.stringify(cart));
+
+  // ✅ 배지도 업데이트하고 이동
   updateCartTotalBadge();
 
   location.href = "order.html";
