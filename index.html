@@ -89,7 +89,6 @@
   .header-slogan{ display:none !important; }
   #wrap{ padding-top:170px !important; }
 }
-
 </style>
 </head>
 
@@ -109,7 +108,7 @@
     </div>
 
     <div class="header-slogan">
-      외국인을 위한
+      대한민국 번개
       <span class="lightning-svg">
         <svg viewBox="0 0 24 24">
           <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
@@ -139,9 +138,9 @@
   <section id="today-deal"></section>
 
   <section class="bank-info-box">
-    <div class="bank-icon">🌍</div>
+    <div class="bank-icon">🛒</div>
     <div class="bank-text">
-      <div class="bank-label">외국인 전용 구매 안내</div>
+      <div class="bank-label">구매 · 결제 안내</div>
       <div class="bank-value">
         <span class="highlight-red">NO CARD REQUIRED</span> · 카드 없이 구매 가능<br>
         <span class="highlight-red">Cash Transfer OK</span> · 입금 확인 후 즉시 배송
@@ -182,6 +181,41 @@
   border-radius: 16px;
 }
 
+/* ✅ 쿠폰 오버레이 */
+.dealer-coupon-overlay {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: 88%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  display: none;
+}
+
+.dealer-coupon-overlay .coupon-title {
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0.95;
+  margin-bottom: 6px;
+}
+
+.dealer-coupon-overlay .coupon-code {
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.dealer-coupon-overlay .coupon-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
 /* 상단 X */
 .dealer-close-x {
   position: absolute;
@@ -195,10 +229,10 @@
   font-size: 18px;
   font-weight: 900;
   cursor: pointer;
-  z-index: 20;
+  z-index: 40;
 }
 
-/* 하단 Close 버튼 (이미지 위 투명 클릭 영역) */
+/* 하단 Close 버튼 */
 .dealer-close-bottom {
   position: absolute;
   bottom: 6%;
@@ -219,65 +253,269 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-/* ⭐ hover 효과 */
 .dealer-lang-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 25px rgba(0,0,0,0.25);
 }
-
 .lang-en { left: 0%;  width: 25%; }
 .lang-vi { left: 25%; width: 25%; }
 .lang-th { left: 50%; width: 25%; }
 .lang-id { left: 75%; width: 25%; }
+
+/* ✅ 복사 토스트 */
+#couponToast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 20000;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#couponToast.show { opacity: 1; }
 </style>
 
-<div id="dealer-popup">
+<div id="dealer-popup" style="display:none;">
   <div class="dealer-popup-wrap" id="dealerWrap">
-    <!-- 상단 X -->
     <button class="dealer-close-x" onclick="dealerClosePopup()">×</button>
 
-    <img
-      id="dealerPopupImg"
-      class="dealer-popup-img"
-      src="images/dealer_popup_select.png"
-      alt="Dealer Popup"
-    >
+    <div id="dealerCoupon" class="dealer-coupon-overlay" onclick="dealerCopyCoupon()">
+      <div class="coupon-title" id="couponTitle">🎁 쿠폰</div>
+      <div class="coupon-code" id="couponCode">WELCOME10</div>
+      <div class="coupon-sub" id="couponSub">Tap to copy</div>
+    </div>
 
-    <!-- 언어 선택 -->
+    <img id="dealerPopupImg" class="dealer-popup-img"
+      src="images/dealer_popup_select.png" alt="Dealer Popup">
+
     <div class="dealer-lang-btn lang-en" onclick="dealerChangeLang('en')"></div>
     <div class="dealer-lang-btn lang-vi" onclick="dealerChangeLang('vi')"></div>
     <div class="dealer-lang-btn lang-th" onclick="dealerChangeLang('th')"></div>
     <div class="dealer-lang-btn lang-id" onclick="dealerChangeLang('id')"></div>
 
-    <!-- 하단 Close (첫 화면 전용) -->
     <div class="dealer-close-bottom" onclick="dealerClosePopup()"></div>
   </div>
 </div>
 
+<div id="couponToast">✅ Copied!</div>
+
 <script>
+const POPUP_CONFIG_KEY = "dealer_popup_config";
+const POPUP_SEEN_KEY = "dealer_popup_seen";
+
+const defaultDealerPopupConfig = {
+  enabled: false,
+  startDate: "2025-01-01",
+  endDate: "2026-12-31",
+  showOncePerDay: true,
+  storageKey: POPUP_SEEN_KEY,
+  defaultImage: "images/dealer_popup_select.png",
+  langImages: {
+    en: "images/dealer_popup_en.png",
+    vi: "images/dealer_popup_vi.png",
+    th: "images/dealer_popup_th.png",
+    id: "images/dealer_popup_id.png"
+  },
+  clickLink: "",
+  coupon: {
+    enabled: false,
+    title: "🎁 Coupon",
+    code: "WELCOME10",
+    sub: "Tap to copy",
+    position: "bottom",
+    fontSize: 20,
+    bg: true,
+    textColor: "#ffffff",
+    bgColor: "rgba(0,0,0,0.78)"
+  }
+};
+
+function loadDealerPopupConfig() {
+  try {
+    const raw = localStorage.getItem(POPUP_CONFIG_KEY);
+    if (!raw) return { ...defaultDealerPopupConfig };
+    const parsed = JSON.parse(raw);
+
+    return {
+      ...defaultDealerPopupConfig,
+      ...parsed,
+      langImages: { ...defaultDealerPopupConfig.langImages, ...(parsed.langImages || {}) },
+      coupon: { ...defaultDealerPopupConfig.coupon, ...(parsed.coupon || {}) },
+      storageKey: POPUP_SEEN_KEY
+    };
+  } catch (e) {
+    return { ...defaultDealerPopupConfig };
+  }
+}
+
+let dealerPopupConfig = loadDealerPopupConfig();
 let dealerPopupClosed = false;
+
+function dealerIsWithinPeriod() {
+  const now = new Date();
+  const start = new Date(dealerPopupConfig.startDate + "T00:00:00");
+  const end = new Date(dealerPopupConfig.endDate + "T23:59:59");
+  return now >= start && now <= end;
+}
+
+function dealerGetTodayKey() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function dealerShouldShowPopup() {
+  if (!dealerPopupConfig.enabled) return false;
+  if (!dealerIsWithinPeriod()) return false;
+
+  if (dealerPopupConfig.showOncePerDay) {
+    const seen = localStorage.getItem(dealerPopupConfig.storageKey);
+    const today = dealerGetTodayKey();
+    if (seen === today) return false;
+  }
+  return true;
+}
+
+function dealerMarkSeen() {
+  if (dealerPopupConfig.showOncePerDay) {
+    localStorage.setItem(dealerPopupConfig.storageKey, dealerGetTodayKey());
+  }
+}
+
+function dealerOpenPopup() {
+  const popup = document.getElementById("dealer-popup");
+  if (!popup) return;
+  popup.style.display = "flex";
+  dealerMarkSeen();
+}
 
 function dealerClosePopup() {
   dealerPopupClosed = true;
-
-  const popup = document.getElementById('dealer-popup');
-  if (popup) popup.remove();
+  const popup = document.getElementById("dealer-popup");
+  if (popup) popup.style.display = "none";
 }
 
 function dealerChangeLang(lang) {
   if (dealerPopupClosed) return;
-
-  const img = document.getElementById('dealerPopupImg');
+  const img = document.getElementById("dealerPopupImg");
   if (!img) return;
 
-  img.src = 'images/dealer_popup_' + lang + '.png';
+  const nextImg = dealerPopupConfig.langImages[lang];
+  img.src = nextImg ? nextImg : dealerPopupConfig.defaultImage;
 
-  document.querySelectorAll('.dealer-lang-btn').forEach(el => el.remove());
-
-  const closeBottom = document.querySelector('.dealer-close-bottom');
+  document.querySelectorAll(".dealer-lang-btn").forEach(el => el.remove());
+  const closeBottom = document.querySelector(".dealer-close-bottom");
   if (closeBottom) closeBottom.remove();
 }
+
+function dealerBindClickLink() {
+  if (!dealerPopupConfig.clickLink) return;
+
+  const wrap = document.getElementById("dealerWrap");
+  if (!wrap) return;
+
+  wrap.style.cursor = "pointer";
+  wrap.addEventListener("click", (e) => {
+    const target = e.target;
+
+    if (target && target.classList && target.classList.contains("dealer-close-x")) return;
+    if (target && target.classList && target.classList.contains("dealer-lang-btn")) return;
+    if (target && (target.id === "dealerCoupon" || target.closest("#dealerCoupon"))) return;
+
+    window.open(dealerPopupConfig.clickLink, "_blank");
+  });
+}
+
+function dealerApplyCouponOverlay() {
+  const c = dealerPopupConfig.coupon || {};
+  const box = document.getElementById("dealerCoupon");
+  if (!box) return;
+
+  if (!c.enabled) {
+    box.style.display = "none";
+    return;
+  }
+
+  box.style.display = "block";
+
+  const titleEl = document.getElementById("couponTitle");
+  const codeEl = document.getElementById("couponCode");
+  const subEl = document.getElementById("couponSub");
+
+  if (titleEl) titleEl.textContent = c.title || "🎁 Coupon";
+  if (codeEl) {
+    codeEl.textContent = c.code || "WELCOME10";
+    codeEl.style.fontSize = (Number(c.fontSize) || 20) + "px";
+  }
+  if (subEl) subEl.textContent = c.sub || "Tap to copy";
+
+  box.style.color = c.textColor || "#fff";
+  box.style.background = c.bg ? (c.bgColor || "rgba(0,0,0,0.78)") : "transparent";
+
+  box.style.top = "";
+  box.style.bottom = "";
+  box.style.transform = "translateX(-50%)";
+
+  const pos = (c.position || "bottom").toLowerCase();
+  if (pos === "top") box.style.top = "12px";
+  else if (pos === "middle") {
+    box.style.top = "50%";
+    box.style.transform = "translate(-50%, -50%)";
+  } else box.style.bottom = "14px";
+}
+
+async function dealerCopyCoupon() {
+  const c = dealerPopupConfig.coupon || {};
+  const code = (c.code || "").trim();
+  if (!code) return;
+
+  try {
+    await navigator.clipboard.writeText(code);
+    showCouponToast("✅ Copied: " + code);
+  } catch (e) {
+    const t = document.createElement("textarea");
+    t.value = code;
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand("copy");
+    document.body.removeChild(t);
+    showCouponToast("✅ Copied: " + code);
+  }
+}
+
+let couponToastTimer = null;
+function showCouponToast(text) {
+  const toast = document.getElementById("couponToast");
+  if (!toast) return;
+  toast.textContent = text || "✅ Copied!";
+  toast.classList.add("show");
+
+  clearTimeout(couponToastTimer);
+  couponToastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1400);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  dealerPopupConfig = loadDealerPopupConfig();
+
+  const img = document.getElementById("dealerPopupImg");
+  if (img) img.src = dealerPopupConfig.defaultImage;
+
+  dealerBindClickLink();
+  dealerApplyCouponOverlay();
+
+  if (dealerShouldShowPopup()) dealerOpenPopup();
+});
 </script>
 <!-- ✅ DEALER POPUP END -->
 

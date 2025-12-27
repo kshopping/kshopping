@@ -32,6 +32,218 @@
 
   <!-- ✅ 관리자 JS (절대경로로 수정됨) -->
   <script type="module" src="/js/admin.js"></script>
+
+  <!-- ✅ 팝업 관리용 스타일 (admin.css 건드리지 않고 여기서 추가) -->
+  <style>
+    .popup-admin-wrap {
+      max-width: 960px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .popup-admin-wrap h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+    .popup-admin-subtitle{
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .popup-admin-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 16px;
+    }
+    .popup-admin-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .popup-admin-row label {
+      font-weight: 800;
+      font-size: 13px;
+      color: #222;
+    }
+    .popup-admin-row input,
+    .popup-admin-row select {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .popup-admin-row input:focus,
+    .popup-admin-row select:focus {
+      border-color: #ff4d4f;
+      box-shadow: 0 0 0 3px rgba(255,77,79,0.12);
+    }
+
+    .popup-admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .popup-admin-actions button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .btn-primary { background:#ff4d4f; color:#fff; }
+    .btn-secondary { background:#222; color:#fff; }
+    .btn-ghost { background:#f2f2f2; color:#111; }
+    .btn-warn { background:#ffe2e2; color:#a00000; }
+
+    .popup-admin-tip {
+      margin-top: 12px;
+      padding: 12px;
+      background: #fff8e6;
+      border: 1px solid #ffe2a8;
+      border-radius: 10px;
+      color: #7a4b00;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .popup-admin-preview {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px dashed #ddd;
+      border-radius: 12px;
+      background: #fafafa;
+      font-size: 13px;
+      color: #333;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .popup-admin-switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .popup-admin-switch input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #ff4d4f;
+    }
+
+    .upload-inline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .upload-inline input[type="file"]{
+      padding: 8px;
+      border: 1px dashed #ddd;
+      border-radius: 10px;
+      background: #fff;
+      width: 100%;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.45;
+    }
+
+    .img-preview-box{
+      margin-top: 8px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+    }
+    .img-preview-box img{
+      width: 100%;
+      max-width: 360px;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .compression-box{
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .compression-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .compression-row input[type="range"]{
+      width: 240px;
+    }
+    .badge{
+      display:inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #111;
+      color:#fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .section-title{
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed #eee;
+      font-size: 15px;
+      font-weight: 900;
+      color: #111;
+    }
+
+    .coupon-preview {
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid #eee;
+      padding: 12px;
+      background: #fff;
+    }
+    .coupon-preview .box{
+      border-radius: 14px;
+      padding: 12px 14px;
+      text-align: center;
+      font-weight: 900;
+      user-select: none;
+    }
+    .coupon-preview .title{
+      font-size: 13px;
+      font-weight: 900;
+      opacity: 0.95;
+      margin-bottom: 6px;
+    }
+    .coupon-preview .code{
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+    .coupon-preview .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 980px) {
+      .popup-admin-grid { grid-template-columns: 1fr; }
+      .compression-row input[type="range"]{ width: 100%; }
+    }
+  </style>
 </head>
 
 <body>
@@ -49,6 +261,9 @@
     <button class="menu-btn" onclick="showPage('printed')">출력된 주문</button>
     <button class="menu-btn" onclick="showPage('account')">계좌 정보</button>
     <button class="menu-btn" onclick="showPage('detailImages')">상세 이미지 관리</button>
+
+    <!-- ✅ NEW: 팝업 관리 메뉴 -->
+    <button class="menu-btn" onclick="openPopupAdminPage()">📣 팝업 관리</button>
   </div>
 
   <!-- 메인 영역 -->
@@ -59,6 +274,666 @@
     </div>
   </div>
 
+  <!-- ✅ 팝업 관리 기능 스크립트 (admin.js와 충돌 없이 독립 실행) -->
+  <script>
+    /* =========================
+       팝업 운영 설정 저장 키
+    ========================== */
+    const POPUP_CONFIG_KEY = "dealer_popup_config";
+    const POPUP_SEEN_KEY = "dealer_popup_seen"; // index.html과 동일
+
+    /* =========================
+       ✅ 자동 압축 기본값
+    ========================== */
+    const imageCompressionConfig = {
+      targetKB: 300,
+      maxWidth: 900,
+      quality: 0.82
+    };
+
+    /* =========================
+       기본 설정값 (초기값)
+    ========================== */
+    const defaultPopupConfig = {
+      enabled: false,
+      startDate: "2025-01-01",
+      endDate: "2026-12-31",
+      showOncePerDay: true,
+      storageKey: POPUP_SEEN_KEY,
+
+      defaultImage: "images/dealer_popup_select.png",
+      langImages: {
+        en: "images/dealer_popup_en.png",
+        vi: "images/dealer_popup_vi.png",
+        th: "images/dealer_popup_th.png",
+        id: "images/dealer_popup_id.png"
+      },
+      clickLink: "",
+
+      coupon: {
+        enabled: false,
+        title: "🎁 Coupon",
+        code: "WELCOME10",
+        sub: "Tap to copy",
+        position: "bottom",   // top/middle/bottom
+        fontSize: 20,
+        bg: true,
+        textColor: "#ffffff",
+        bgColor: "rgba(0,0,0,0.78)"
+      }
+    };
+
+    function loadPopupConfig() {
+      try {
+        const raw = localStorage.getItem(POPUP_CONFIG_KEY);
+        if (!raw) return structuredClone(defaultPopupConfig);
+        const parsed = JSON.parse(raw);
+
+        const merged = {
+          ...structuredClone(defaultPopupConfig),
+          ...parsed,
+          langImages: {
+            ...structuredClone(defaultPopupConfig.langImages),
+            ...(parsed.langImages || {})
+          },
+          coupon: {
+            ...structuredClone(defaultPopupConfig.coupon),
+            ...(parsed.coupon || {})
+          }
+        };
+
+        // storageKey는 고정
+        merged.storageKey = POPUP_SEEN_KEY;
+        return merged;
+      } catch (e) {
+        return structuredClone(defaultPopupConfig);
+      }
+    }
+
+    function savePopupConfig(cfg) {
+      localStorage.setItem(POPUP_CONFIG_KEY, JSON.stringify(cfg));
+    }
+
+    function resetPopupConfig() {
+      localStorage.removeItem(POPUP_CONFIG_KEY);
+    }
+
+    function clearSeenToday() {
+      localStorage.removeItem(POPUP_SEEN_KEY);
+    }
+
+    /* =========================
+       ✅ 이미지 로드 (파일 -> HTMLImageElement)
+    ========================== */
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = (e) => {
+          URL.revokeObjectURL(url);
+          reject(e);
+        };
+        img.src = url;
+      });
+    }
+
+    function canvasToDataURL(canvas, quality) {
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    function dataURLSizeKB(dataURL) {
+      const base64 = dataURL.split(",")[1] || "";
+      const bytes = Math.ceil((base64.length * 3) / 4);
+      return Math.round(bytes / 1024);
+    }
+
+    async function compressImageToDataURL(file, opts) {
+      const { targetKB, maxWidth, quality } = opts;
+
+      const img = await loadImageFromFile(file);
+
+      let w = img.width;
+      let h = img.height;
+
+      if (w > maxWidth) {
+        const ratio = maxWidth / w;
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, w, h);
+
+      let q = quality;
+      let dataURL = canvasToDataURL(canvas, q);
+      let sizeKB = dataURLSizeKB(dataURL);
+
+      let tries = 0;
+      while (sizeKB > targetKB && tries < 12) {
+        q = Math.max(0.45, q - 0.05);
+        dataURL = canvasToDataURL(canvas, q);
+        sizeKB = dataURLSizeKB(dataURL);
+        tries++;
+      }
+
+      return { dataURL, sizeKB, width: w, height: h, quality: q };
+    }
+
+    /* =========================
+       팝업 관리 페이지 렌더
+    ========================== */
+    function openPopupAdminPage() {
+      const main = document.getElementById("main-area");
+      if (!main) return;
+
+      const cfg = loadPopupConfig();
+
+      main.innerHTML = `
+        <div class="popup-admin-wrap">
+          <h2>📣 팝업 관리 (운영자 모드)</h2>
+          <div class="popup-admin-subtitle">
+            ✅ 여기서 저장하면 <b>메인(index.html) 팝업에 즉시 반영</b>됩니다.<br>
+            ✅ 이미지 업로드는 <b>자동 압축(리사이즈+품질조절)</b>되어 저장됩니다.
+          </div>
+
+          <div class="popup-admin-tip">
+            <b>운영 TIP</b><br>
+            - 이벤트 시작: 팝업 ON + 기간 설정 + 쿠폰 ON + 저장<br>
+            - 이벤트 종료: 팝업 OFF + 저장 (팝업은 남아있고 안 뜸)<br>
+            - 테스트: "오늘 다시 뜨게(테스트)" 누르고 메인 새로고침
+          </div>
+
+          <div class="compression-box">
+            <div class="compression-row">
+              <span class="badge">압축 설정</span>
+              <span class="small-note">목표 용량(KB):</span>
+              <input type="range" id="targetKBRange" min="120" max="600" step="10" value="${imageCompressionConfig.targetKB}">
+              <b id="targetKBText">${imageCompressionConfig.targetKB} KB</b>
+            </div>
+            <div class="compression-row">
+              <span class="small-note">최대 가로(px):</span>
+              <input type="range" id="maxWidthRange" min="600" max="1400" step="50" value="${imageCompressionConfig.maxWidth}">
+              <b id="maxWidthText">${imageCompressionConfig.maxWidth}px</b>
+            </div>
+            <div class="small-note">
+              ✅ 추천값: <b>300KB / 900px</b> (팝업 선명 + 빠름)
+            </div>
+          </div>
+
+          <div class="popup-admin-grid">
+            <div class="popup-admin-row">
+              <label>팝업 ON/OFF</label>
+              <div class="popup-admin-switch">
+                <input type="checkbox" id="pop_enabled" ${cfg.enabled ? "checked" : ""}>
+                <span>${cfg.enabled ? "ON" : "OFF"}</span>
+              </div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>하루 1번만 표시</label>
+              <div class="popup-admin-switch">
+                <input type="checkbox" id="pop_once" ${cfg.showOncePerDay ? "checked" : ""}>
+                <span>${cfg.showOncePerDay ? "ON" : "OFF"}</span>
+              </div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>시작일 (YYYY-MM-DD)</label>
+              <input id="pop_start" value="${cfg.startDate}">
+            </div>
+
+            <div class="popup-admin-row">
+              <label>종료일 (YYYY-MM-DD)</label>
+              <input id="pop_end" value="${cfg.endDate}">
+            </div>
+
+            <!-- ✅ 기본 이미지 -->
+            <div class="popup-admin-row" style="grid-column: 1 / -1;">
+              <label>기본 팝업 이미지 URL</label>
+              <input id="pop_img_default" value="${escapeHtml(cfg.defaultImage)}">
+              <div class="upload-inline">
+                <input type="file" id="file_default" accept="image/*">
+                <button class="btn-ghost" type="button" onclick="handleUpload('default')">업로드(자동압축)</button>
+              </div>
+              <div class="img-preview-box" id="preview_default"></div>
+              <div class="small-note" id="info_default"></div>
+            </div>
+
+            <!-- ✅ 언어별 이미지 -->
+            <div class="popup-admin-row">
+              <label>EN 이미지 URL</label>
+              <input id="pop_img_en" value="${escapeHtml(cfg.langImages.en)}">
+              <div class="upload-inline">
+                <input type="file" id="file_en" accept="image/*">
+                <button class="btn-ghost" type="button" onclick="handleUpload('en')">업로드(자동압축)</button>
+              </div>
+              <div class="img-preview-box" id="preview_en"></div>
+              <div class="small-note" id="info_en"></div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>VI 이미지 URL</label>
+              <input id="pop_img_vi" value="${escapeHtml(cfg.langImages.vi)}">
+              <div class="upload-inline">
+                <input type="file" id="file_vi" accept="image/*">
+                <button class="btn-ghost" type="button" onclick="handleUpload('vi')">업로드(자동압축)</button>
+              </div>
+              <div class="img-preview-box" id="preview_vi"></div>
+              <div class="small-note" id="info_vi"></div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>TH 이미지 URL</label>
+              <input id="pop_img_th" value="${escapeHtml(cfg.langImages.th)}">
+              <div class="upload-inline">
+                <input type="file" id="file_th" accept="image/*">
+                <button class="btn-ghost" type="button" onclick="handleUpload('th')">업로드(자동압축)</button>
+              </div>
+              <div class="img-preview-box" id="preview_th"></div>
+              <div class="small-note" id="info_th"></div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>ID 이미지 URL</label>
+              <input id="pop_img_id" value="${escapeHtml(cfg.langImages.id)}">
+              <div class="upload-inline">
+                <input type="file" id="file_id" accept="image/*">
+                <button class="btn-ghost" type="button" onclick="handleUpload('id')">업로드(자동압축)</button>
+              </div>
+              <div class="img-preview-box" id="preview_id"></div>
+              <div class="small-note" id="info_id"></div>
+            </div>
+
+            <div class="popup-admin-row" style="grid-column: 1 / -1;">
+              <label>팝업 클릭 이동 링크 (선택)</label>
+              <input id="pop_link" placeholder="https://k-shopping.shop/event.html" value="${escapeHtml(cfg.clickLink || "")}">
+              <div class="small-note">※ 입력하면 팝업 이미지 클릭 시 새 창으로 이동합니다.</div>
+            </div>
+          </div>
+
+          <div class="section-title">🎁 쿠폰 오버레이 설정</div>
+
+          <div class="popup-admin-grid">
+            <div class="popup-admin-row">
+              <label>쿠폰 표시 ON/OFF</label>
+              <div class="popup-admin-switch">
+                <input type="checkbox" id="coupon_enabled" ${cfg.coupon.enabled ? "checked" : ""}>
+                <span>${cfg.coupon.enabled ? "ON" : "OFF"}</span>
+              </div>
+              <div class="small-note">※ ON이면 팝업 이미지 위에 쿠폰이 뜨고, 클릭하면 자동 복사됩니다.</div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>쿠폰 위치</label>
+              <select id="coupon_position">
+                <option value="top" ${cfg.coupon.position === "top" ? "selected" : ""}>상단</option>
+                <option value="middle" ${cfg.coupon.position === "middle" ? "selected" : ""}>중앙</option>
+                <option value="bottom" ${cfg.coupon.position === "bottom" ? "selected" : ""}>하단</option>
+              </select>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>쿠폰 제목 (예: 🎁 Coupon / 🎁 쿠폰)</label>
+              <input id="coupon_title" value="${escapeHtml(cfg.coupon.title)}">
+            </div>
+
+            <div class="popup-admin-row">
+              <label>쿠폰 코드 (복사될 값)</label>
+              <input id="coupon_code" value="${escapeHtml(cfg.coupon.code)}">
+            </div>
+
+            <div class="popup-admin-row" style="grid-column: 1 / -1;">
+              <label>쿠폰 안내 문구 (예: Tap to copy)</label>
+              <input id="coupon_sub" value="${escapeHtml(cfg.coupon.sub)}">
+            </div>
+
+            <div class="popup-admin-row">
+              <label>코드 글자 크기</label>
+              <input type="range" id="coupon_fontsize" min="14" max="34" step="1" value="${Number(cfg.coupon.fontSize) || 20}">
+              <div class="small-note"><b id="coupon_fontsize_text">${Number(cfg.coupon.fontSize) || 20}px</b></div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>배경 박스 ON/OFF</label>
+              <div class="popup-admin-switch">
+                <input type="checkbox" id="coupon_bg" ${cfg.coupon.bg ? "checked" : ""}>
+                <span>${cfg.coupon.bg ? "ON" : "OFF"}</span>
+              </div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>텍스트 색상</label>
+              <input id="coupon_textColor" value="${escapeHtml(cfg.coupon.textColor || "#ffffff")}">
+              <div class="small-note">예: #ffffff</div>
+            </div>
+
+            <div class="popup-admin-row">
+              <label>배경 색상 (RGBA 추천)</label>
+              <input id="coupon_bgColor" value="${escapeHtml(cfg.coupon.bgColor || "rgba(0,0,0,0.78)")}">
+              <div class="small-note">예: rgba(0,0,0,0.78)</div>
+            </div>
+          </div>
+
+          <div class="coupon-preview" id="couponPreview">
+            <div class="small-note" style="margin-bottom:8px;"><b>미리보기</b> (저장 없이도 즉시 확인 가능)</div>
+            <div class="box" id="couponPreviewBox">
+              <div class="title" id="couponPreviewTitle">🎁 Coupon</div>
+              <div class="code" id="couponPreviewCode">WELCOME10</div>
+              <div class="sub" id="couponPreviewSub">Tap to copy</div>
+            </div>
+          </div>
+
+          <div class="popup-admin-actions">
+            <button class="btn-primary" onclick="popupAdminSave()">💾 저장</button>
+            <button class="btn-secondary" onclick="popupAdminPreview()">👀 설정 JSON 미리보기</button>
+            <button class="btn-ghost" onclick="popupAdminClearSeen()">🔁 오늘 다시 뜨게(테스트)</button>
+            <button class="btn-ghost" onclick="popupAdminReset()">♻️ 설정 초기화</button>
+            <button class="btn-warn" onclick="popupAdminHardReset()">🧨 팝업+쿠폰 전체 초기화(주의)</button>
+          </div>
+
+          <div class="popup-admin-preview" id="popupPreviewBox">여기에 현재 설정 JSON이 표시됩니다.</div>
+        </div>
+      `;
+
+      bindCompressionControls();
+      bindToggleRerender();
+      bindCouponLivePreview();
+      popupAdminPreview();
+      renderImagePreviews();
+      refreshCouponPreview();
+    }
+
+    /* =========================
+       HTML escape (input value 안전)
+    ========================== */
+    function escapeHtml(str){
+      if(str === null || str === undefined) return "";
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("\"","&quot;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    function bindCompressionControls(){
+      const targetRange = document.getElementById("targetKBRange");
+      const widthRange = document.getElementById("maxWidthRange");
+      const targetText = document.getElementById("targetKBText");
+      const widthText = document.getElementById("maxWidthText");
+
+      if(targetRange){
+        targetRange.addEventListener("input", ()=>{
+          imageCompressionConfig.targetKB = Number(targetRange.value);
+          if(targetText) targetText.textContent = imageCompressionConfig.targetKB + " KB";
+        });
+      }
+      if(widthRange){
+        widthRange.addEventListener("input", ()=>{
+          imageCompressionConfig.maxWidth = Number(widthRange.value);
+          if(widthText) widthText.textContent = imageCompressionConfig.maxWidth + "px";
+        });
+      }
+    }
+
+    /* =========================
+       토글 변경 시 페이지 재랜더 (ON/OFF 글자 반영)
+    ========================== */
+    function bindToggleRerender(){
+      const ids = ["pop_enabled","pop_once","coupon_enabled","coupon_bg"];
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){
+          el.addEventListener("change", ()=> openPopupAdminPage());
+        }
+      });
+    }
+
+    /* =========================
+       쿠폰 미리보기 실시간 반영
+    ========================== */
+    function bindCouponLivePreview(){
+      const fs = document.getElementById("coupon_fontsize");
+      if(fs){
+        fs.addEventListener("input", ()=>{
+          const t = document.getElementById("coupon_fontsize_text");
+          if(t) t.textContent = fs.value + "px";
+          refreshCouponPreview();
+        });
+      }
+
+      const liveIds = [
+        "coupon_title","coupon_code","coupon_sub",
+        "coupon_position","coupon_textColor","coupon_bgColor"
+      ];
+      liveIds.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){
+          el.addEventListener("input", refreshCouponPreview);
+          el.addEventListener("change", refreshCouponPreview);
+        }
+      });
+    }
+
+    function refreshCouponPreview(){
+      const cfg = popupAdminGetForm();
+
+      const box = document.getElementById("couponPreviewBox");
+      const title = document.getElementById("couponPreviewTitle");
+      const code = document.getElementById("couponPreviewCode");
+      const sub = document.getElementById("couponPreviewSub");
+
+      if(!box || !title || !code || !sub) return;
+
+      title.textContent = cfg.coupon.title || "🎁 Coupon";
+      code.textContent = cfg.coupon.code || "WELCOME10";
+      sub.textContent = cfg.coupon.sub || "Tap to copy";
+      code.style.fontSize = (Number(cfg.coupon.fontSize) || 20) + "px";
+
+      box.style.color = cfg.coupon.textColor || "#fff";
+      if(cfg.coupon.bg){
+        box.style.background = cfg.coupon.bgColor || "rgba(0,0,0,0.78)";
+      }else{
+        box.style.background = "transparent";
+        box.style.border = "1px dashed #ddd";
+      }
+
+      // 위치 프리뷰 느낌만 (실제는 index에서 적용)
+      const pos = (cfg.coupon.position || "bottom").toLowerCase();
+      const parent = document.getElementById("couponPreview");
+      if(parent){
+        parent.style.borderColor = "#eee";
+        parent.style.boxShadow = "none";
+        if(pos === "top") parent.style.background = "#fff";
+        if(pos === "middle") parent.style.background = "#fff";
+        if(pos === "bottom") parent.style.background = "#fff";
+      }
+
+      // ON/OFF 표시
+      const wrap = document.getElementById("couponPreview");
+      if(wrap){
+        wrap.style.opacity = cfg.coupon.enabled ? "1" : "0.4";
+      }
+    }
+
+    /* =========================
+       폼 -> 설정 객체
+    ========================== */
+    function popupAdminGetForm() {
+      const enabled = document.getElementById("pop_enabled")?.checked || false;
+      const showOncePerDay = document.getElementById("pop_once")?.checked || false;
+
+      const startDate = (document.getElementById("pop_start")?.value || "").trim();
+      const endDate = (document.getElementById("pop_end")?.value || "").trim();
+
+      const defaultImage = (document.getElementById("pop_img_default")?.value || "").trim();
+      const en = (document.getElementById("pop_img_en")?.value || "").trim();
+      const vi = (document.getElementById("pop_img_vi")?.value || "").trim();
+      const th = (document.getElementById("pop_img_th")?.value || "").trim();
+      const id = (document.getElementById("pop_img_id")?.value || "").trim();
+
+      const clickLink = (document.getElementById("pop_link")?.value || "").trim();
+
+      // 쿠폰 설정
+      const couponEnabled = document.getElementById("coupon_enabled")?.checked || false;
+      const couponTitle = (document.getElementById("coupon_title")?.value || "").trim();
+      const couponCode = (document.getElementById("coupon_code")?.value || "").trim();
+      const couponSub = (document.getElementById("coupon_sub")?.value || "").trim();
+      const couponPosition = (document.getElementById("coupon_position")?.value || "bottom").trim();
+      const couponFontSize = Number(document.getElementById("coupon_fontsize")?.value || 20);
+      const couponBg = document.getElementById("coupon_bg")?.checked || false;
+      const couponTextColor = (document.getElementById("coupon_textColor")?.value || "#ffffff").trim();
+      const couponBgColor = (document.getElementById("coupon_bgColor")?.value || "rgba(0,0,0,0.78)").trim();
+
+      return {
+        enabled,
+        startDate,
+        endDate,
+        showOncePerDay,
+        storageKey: POPUP_SEEN_KEY,
+        defaultImage,
+        langImages: { en, vi, th, id },
+        clickLink,
+        coupon: {
+          enabled: couponEnabled,
+          title: couponTitle || "🎁 Coupon",
+          code: couponCode || "WELCOME10",
+          sub: couponSub || "Tap to copy",
+          position: couponPosition || "bottom",
+          fontSize: couponFontSize || 20,
+          bg: couponBg,
+          textColor: couponTextColor || "#ffffff",
+          bgColor: couponBgColor || "rgba(0,0,0,0.78)"
+        }
+      };
+    }
+
+    function popupAdminSave() {
+      const cfg = popupAdminGetForm();
+      savePopupConfig(cfg);
+      alert("✅ 저장 완료! 메인(index.html)에서 새로고침하면 즉시 반영됩니다.");
+      popupAdminPreview();
+      renderImagePreviews();
+      refreshCouponPreview();
+    }
+
+    function popupAdminPreview() {
+      const cfg = popupAdminGetForm();
+      const box = document.getElementById("popupPreviewBox");
+      if (!box) return;
+      box.textContent = JSON.stringify(cfg, null, 2);
+    }
+
+    function popupAdminClearSeen() {
+      clearSeenToday();
+      alert("✅ 오늘 표시 기록 삭제 완료!\n이제 메인(index.html) 새로고침하면 팝업이 다시 뜰 수 있습니다.");
+    }
+
+    function popupAdminReset() {
+      const ok = confirm("정말 설정을 초기화할까요?\n(저장된 팝업 설정이 기본값으로 돌아갑니다)");
+      if (!ok) return;
+      resetPopupConfig();
+      alert("✅ 초기화 완료! 기본값으로 돌아갔습니다.");
+      openPopupAdminPage();
+    }
+
+    function popupAdminHardReset(){
+      const ok = confirm("⚠️ 주의!\n팝업 설정 + 오늘표시기록까지 전부 삭제합니다.\n정말 진행할까요?");
+      if(!ok) return;
+      resetPopupConfig();
+      clearSeenToday();
+      alert("✅ 전체 초기화 완료!");
+      openPopupAdminPage();
+    }
+
+    /* =========================
+       ✅ 업로드 처리: 선택한 파일 → 자동 압축 → 입력칸 자동 반영
+    ========================== */
+    async function handleUpload(type) {
+      try {
+        const fileInput = document.getElementById(`file_${type}`);
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+          alert("업로드할 이미지를 선택하세요!");
+          return;
+        }
+
+        const file = fileInput.files[0];
+
+        // 브라우저 부담 방지
+        const hardLimitBytes = 12 * 1024 * 1024; // 12MB
+        if (file.size > hardLimitBytes) {
+          alert("⚠️ 이미지 파일이 너무 큽니다.\n12MB 이하로 줄여서 업로드해주세요!");
+          return;
+        }
+
+        const infoBox = document.getElementById(`info_${type}`);
+        if(infoBox) infoBox.textContent = "⏳ 이미지 압축 중...";
+
+        const result = await compressImageToDataURL(file, imageCompressionConfig);
+
+        if (type === "default") {
+          document.getElementById("pop_img_default").value = result.dataURL;
+        } else {
+          document.getElementById(`pop_img_${type}`).value = result.dataURL;
+        }
+
+        renderImagePreviews();
+
+        if(infoBox){
+          infoBox.innerHTML = `✅ 압축 완료: <b>${result.sizeKB}KB</b> / ${result.width}x${result.height}px / 품질 ${result.quality.toFixed(2)}`;
+        }
+
+        alert("✅ 업로드(자동압축) 완료!\n이제 '저장'을 누르면 팝업 이미지로 적용됩니다.");
+      } catch (e) {
+        alert("❌ 업로드 실패! 다시 시도해주세요.");
+      }
+    }
+
+    /* =========================
+       ✅ 이미지 미리보기 렌더
+    ========================== */
+    function renderImagePreviews() {
+      const defaultUrl = (document.getElementById("pop_img_default")?.value || "").trim();
+      const enUrl = (document.getElementById("pop_img_en")?.value || "").trim();
+      const viUrl = (document.getElementById("pop_img_vi")?.value || "").trim();
+      const thUrl = (document.getElementById("pop_img_th")?.value || "").trim();
+      const idUrl = (document.getElementById("pop_img_id")?.value || "").trim();
+
+      renderOnePreview("preview_default", defaultUrl);
+      renderOnePreview("preview_en", enUrl);
+      renderOnePreview("preview_vi", viUrl);
+      renderOnePreview("preview_th", thUrl);
+      renderOnePreview("preview_id", idUrl);
+    }
+
+    function renderOnePreview(containerId, url) {
+      const box = document.getElementById(containerId);
+      if (!box) return;
+
+      if (!url) {
+        box.innerHTML = `<div class="small-note">미리보기 없음</div>`;
+        return;
+      }
+
+      box.innerHTML = `
+        <img src="${url}" alt="preview" onerror="this.style.display='none';">
+        <div class="small-note">✅ 적용됨</div>
+      `;
+    }
+  </script>
+
 </body>
 </html>
+
+
+
 
