@@ -136,6 +136,69 @@
 <script type="module" src="./js/order.js"></script>
 
 <script>
+  /* ===========================================================
+     ✅ 주문 요약: 묶음가격(totalPrice) 반영 + 컴퓨터 제외 보정
+  =========================================================== */
+
+  function safeNumber(v, fallback = 0) {
+    const n = Number(v);
+    return isNaN(n) ? fallback : n;
+  }
+
+  function formatWon(n) {
+    if (n === null || n === undefined || isNaN(n)) return "-";
+    return Number(n).toLocaleString("ko-KR") + "원";
+  }
+
+  function isComputerItem(item) {
+    const excludeCategories = ["노트북", "컴퓨터", "데스크탑", "전자기기", "PC"];
+    const excludeKeywords = [
+      "노트북", "laptop", "notebook", "macbook",
+      "hp", "lenovo", "asus", "dell", "msi", "acer",
+      "ssd", "ram", "cpu", "i5", "i7", "i9", "ryzen",
+      "그래픽", "gpu", "rtx", "gtx"
+    ];
+
+    const cat = (item?.category || "").toLowerCase();
+    const name = (item?.name || "").toLowerCase();
+
+    const matchCategory = excludeCategories.some(c => cat.includes(c.toLowerCase()));
+    const matchKeyword = excludeKeywords.some(k => name.includes(k.toLowerCase()));
+
+    return matchCategory || matchKeyword;
+  }
+
+  function calcBundlePrice(unitPrice, qty) {
+    const ratio2 = 19900 / 13900;
+    const ratio3 = 26900 / 13900;
+
+    const u = safeNumber(unitPrice, 0);
+    const q = Math.max(1, safeNumber(qty, 1));
+
+    if (q === 1) return Math.round(u);
+    if (q === 2) return Math.round(u * ratio2);
+    if (q === 3) return Math.round(u * ratio3);
+
+    const addPrice = 7900;
+    return Math.round(u * ratio3) + (q - 3) * addPrice;
+  }
+
+  function recalcItemTotal(item) {
+    const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
+    const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
+
+    item.unitPrice = unitPrice;
+    item.qty = qty;
+
+    if (isComputerItem(item)) {
+      item.bundleApplied = false;
+      item.totalPrice = Math.round(unitPrice * qty);
+    } else {
+      item.bundleApplied = true;
+      item.totalPrice = calcBundlePrice(unitPrice, qty);
+    }
+  }
+
   function loadOrderSummary() {
     const items = JSON.parse(localStorage.getItem("cartItems") || "[]");
     const area = document.getElementById("order-items");
@@ -147,25 +210,41 @@
       return;
     }
 
+    // ✅ 주문 직전 안전 보정
+    items.forEach(item => {
+      if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
+      if (item.qty === undefined) item.qty = 1;
+
+      // totalPrice가 없거나 0이면 재계산
+      if (item.totalPrice === undefined || safeNumber(item.totalPrice, 0) <= 0) {
+        recalcItemTotal(item);
+      }
+    });
+
+    // ✅ 보정된 장바구니 저장
+    localStorage.setItem("cartItems", JSON.stringify(items));
+
     let html = "";
     let total = 0;
     let qty = 0;
 
     items.forEach((item) => {
-      const itemTotal = item.price * item.qty;
+      const itemTotal = safeNumber(item.totalPrice ?? 0, 0);
       total += itemTotal;
-      qty += item.qty;
+      qty += safeNumber(item.qty, 0);
+
+      const bundleText = isComputerItem(item) ? "묶음 제외" : "묶음 적용";
 
       html += `
         <div class="order-item">
-          <span>${item.name} x ${item.qty}</span>
-          <span>${itemTotal.toLocaleString()}원</span>
+          <span>${item.name} x ${item.qty} <span style="font-size:12px; color:#888;">(${bundleText})</span></span>
+          <span>${formatWon(itemTotal)}</span>
         </div>
       `;
     });
 
     area.innerHTML = html;
-    totalArea.textContent = `총 ${qty}개 | 총 금액: ${total.toLocaleString()}원`;
+    totalArea.textContent = `총 ${qty}개 | 총 금액: ${formatWon(total)}`;
   }
 
   loadOrderSummary();

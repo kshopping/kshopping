@@ -35,6 +35,39 @@
           <div id="productSale" class="price-sale"></div>
       </div>
 
+      <!-- ✅ 추가: 수량 선택 + 묶음가격 안내 -->
+      <div class="qty-box" style="margin-top:14px; padding:12px; border:1px solid #eee; border-radius:12px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div style="font-weight:700;">수량 선택</div>
+
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button id="btnQtyMinus" type="button" style="width:36px; height:36px; border-radius:10px; border:1px solid #ddd; background:#fff; font-size:18px;">−</button>
+            <input id="qtyInput" type="number" min="1" value="1" style="width:60px; height:36px; text-align:center; border:1px solid #ddd; border-radius:10px;">
+            <button id="btnQtyPlus" type="button" style="width:36px; height:36px; border-radius:10px; border:1px solid #ddd; background:#fff; font-size:18px;">+</button>
+          </div>
+        </div>
+
+        <!-- ✅ 자동 계산 표시 -->
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:13px; color:#666;">
+            <span id="bundleHint"></span>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:12px; color:#666;">선택 수량 가격</div>
+            <div id="calcPriceText" style="font-size:20px; font-weight:800;">-</div>
+          </div>
+        </div>
+
+        <!-- ✅ 1/2/3개 가격표(참고) -->
+        <div id="tierTable" style="margin-top:10px; font-size:13px; color:#444; display:none;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <span id="tier1" style="padding:6px 10px; border-radius:10px; background:#f7f7f7;">1개: -</span>
+            <span id="tier2" style="padding:6px 10px; border-radius:10px; background:#f7f7f7;">2개: -</span>
+            <span id="tier3" style="padding:6px 10px; border-radius:10px; background:#f7f7f7;">3개: -</span>
+          </div>
+        </div>
+      </div>
+
       <div class="detail-buttons">
           <button id="btnAddCart" class="btn-add">🛒 장바구니 담기</button>
           <button id="btnGoHome" class="btn-main">🏠 메인으로 돌아가기</button>
@@ -42,7 +75,6 @@
 
       <!-- 🔥 상세 이미지 영역 -->
       <div id="detailImageWrap" class="detail-image-wrap">
-        <!-- ✅ 여기만 수정됨: class="detail-image" 추가 -->
         <img 
           id="detailImage" 
           class="detail-img detail-image"
@@ -57,4 +89,3 @@
 <script type="module" src="./js/detail.js"></script>
 </body>
 </html>
-
