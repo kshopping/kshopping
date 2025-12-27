@@ -382,69 +382,88 @@ body {
   background: #ffd48f;
 }
 
-/* ============================= ✅ MOBILE 최종 (웹 느낌 유지) ============================= */
+/* ============================= ✅✅✅ MOBILE 최종 고정 (스크롤/장바구니/결제안내 완전 해결) ============================= */
 @media (max-width: 768px) {
 
-  /* ✅ 전체 wrap 위 여백 */
-  #wrap { padding-top: 230px; } /* 기본값만 (실제는 JS가 자동 조정) */
+  /* ✅ (1) 좌우 스크롤 완전 차단 */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+  }
 
-  /* ✅ 헤더 안쪽: 장바구니가 겹치지 않게 우측 공간 확보 */
-  #fixed-header-inner {
-    flex-wrap: wrap !important;
-    align-items: flex-start !important;
-    padding-right: 74px !important; /* ✅ 우측 장바구니 공간 확보 */
+  #fixed-header, #wrap, #category-area {
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  /* ✅ 로고 영역: 너무 크지 않게만 축소 (웹 느낌 유지) */
-  .logo-icon { width: 28px !important; height: 28px !important; border-radius: 10px !important; }
-  .logo-icon svg { width: 16px !important; height: 22px !important; }
-  .logo-text { font-size: 23px !important; }
-  .logo-sub { font-size: 11px !important; }
+  /* ✅ 전체 wrap 위 여백 */
+  #wrap {
+    padding-top: 230px; /* 기본값만 (실제는 JS가 자동 조정) */
+  }
 
-  /* ✅ 로고 + 배지: “옆으로 유지” (내려가지 않게) */
+  /* ✅ 헤더 내부: 장바구니 공간 확보 (너무 과하지 않게) */
+  #fixed-header-inner {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    padding-right: 62px !important; /* ✅ 장바구니 자리 */
+    box-sizing: border-box !important;
+  }
+
+  /* ✅ (2) 로고가 너무 큰 문제 해결: 모바일에서는 더 줄이고, 서브텍스트 숨김 */
+  .logo-icon { width: 26px !important; height: 26px !important; border-radius: 9px !important; }
+  .logo-icon svg { width: 15px !important; height: 20px !important; }
+  .logo-text { font-size: 21px !important; line-height: 1 !important; }
+  .logo-sub { display: none !important; } /* ✅ 모바일은 숨김 (웹은 유지) */
+
+  /* ✅ 로고/배지 라인: 줄바꿈 최소화 + 폭 제한 */
   .brand-row {
-    flex-direction: row !important;
+    display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    flex-wrap: nowrap !important;   /* ✅ 아래로 떨어지지 않게 */
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
     width: 100% !important;
+    min-width: 0 !important;
   }
 
-  /* ✅ 배지: 줄바꿈 금지 + 살짝 작게 */
+  .logo-btn {
+    min-width: 0 !important;
+  }
+
+  /* ✅ 배지: 너무 길면 잘리지 않게 “안에서 말줄임” 처리 */
   .slogan-badge {
-    font-size: 12px !important;
-    padding: 6px 9px !important;
+    font-size: 11.5px !important;
+    padding: 6px 8px !important;
     white-space: nowrap !important;
+    max-width: 170px !important; /* ✅ 핵심: 배지 폭 제한 */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     flex: 0 0 auto !important;
-    max-width: none !important;
   }
 
-  /* ✅ 전화: 무조건 한 줄 유지 (2줄 방지) */
+  /* ✅ (3) 전화 줄 2줄 되는 문제: 폰트/패딩 축소 + 한 줄 고정 */
   .header-call {
     width: 100% !important;
-    flex-wrap: nowrap !important;  /* ✅ 핵심 */
-    gap: 8px !important;
-    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
     white-space: nowrap !important;
     overflow: hidden !important;
+    font-size: 12px !important;
   }
 
   .call-link {
-    padding: 6px 9px !important;
+    padding: 5px 8px !important;
     font-size: 12px !important;
     margin-top: 0 !important;
-    border-radius: 999px !important;
   }
 
-  /* ✅ 장바구니: 오른쪽 안 보이는 문제 해결 */
+  /* ✅ 장바구니: 반드시 화면 안에 보이게 */
   #top-menu {
     position: fixed !important;
-    top: calc(12px + env(safe-area-inset-top)) !important;
-    right: calc(12px + env(safe-area-inset-right)) !important;
+    top: calc(10px + env(safe-area-inset-top)) !important;
+    right: calc(10px + env(safe-area-inset-right)) !important;
     z-index: 10000000 !important;
-    display: flex !important;
-    align-items: center !important;
     transform: none !important;
   }
 
@@ -452,42 +471,56 @@ body {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    background: #ffffff !important;
-    color: #111 !important;
-    border: 1px solid rgba(0,0,0,0.08) !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.12) !important;
-    border-radius: 16px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    padding: 8px 10px !important;
-    font-size: 16px !important;
   }
 
-  #cartCount {
-    display: inline-block !important;
-    min-width: 14px !important;
-    min-height: 14px !important;
-  }
-
-  /* ✅ 카테고리: 2줄 유지 + 잘림 방지 */
+  /* ✅ 카테고리: 잘림 방지 + 2줄 유지 */
   #category-area {
     width: 100% !important;
     padding: 10px 10px !important;
     gap: 6px !important;
     flex-wrap: wrap !important;
     justify-content: flex-start !important;
-    box-sizing: border-box !important;
     overflow: visible !important;
     border-radius: 14px !important;
+    box-sizing: border-box !important;
   }
 
   .category-btn {
     padding: 6px 12px !important;
     font-size: 13px !important;
     border-radius: 18px !important;
+  }
+
+  /* ✅ 결제안내 박스: 문구가 블럭 밖으로 튀는 문제 해결 */
+  .bank-info-box {
+    padding: 10px 12px !important;
+    margin: 14px 0 18px !important;
+    align-items: flex-start !important;
+    box-sizing: border-box !important;
+  }
+
+  .bank-text {
+    white-space: normal !important;        /* ✅ 줄바꿈 허용 */
+    overflow-wrap: anywhere !important;    /* ✅ 영어 문구 튐 방지 */
+    word-break: keep-all !important;
+    text-align: left !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+  }
+
+  .bank-label,
+  .bank-value {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: keep-all !important;
+    font-size: 13px !important;
   }
 
   /* ✅ 배너 제거 */
@@ -498,7 +531,7 @@ body {
     padding: 0 !important;
   }
 
-  /* ✅ 팝업이 헤더보다 항상 위 */
+  /* ✅ 팝업/헤더 우선순위 */
   #dealer-popup { z-index: 20000000 !important; }
   #fixed-header { z-index: 999999 !important; }
 }
