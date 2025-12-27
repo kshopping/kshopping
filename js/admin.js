@@ -93,10 +93,13 @@ function calcOrderTotalByItems(items) {
 }
 
 /* ===========================================================
-   페이지 전환
+   페이지 전환 (✅ 전역 등록 + 안정화)
 =========================================================== */
-window.showPage = function (page) {
-  $("main-area").innerHTML = "";
+function showPage(page) {
+  const main = $("main-area");
+  if (!main) return;
+
+  main.innerHTML = "";
 
   if (page === "products") loadProductPage();
   if (page === "categories") loadCategoryPage();
@@ -105,7 +108,19 @@ window.showPage = function (page) {
   if (page === "printed") loadPrintedPage();
   if (page === "account") loadAccountPage();
   if (page === "detailImages") loadDetailImagesPage();
-};
+}
+
+// ✅ 핵심: module에서도 onclick에서 바로 찾을 수 있도록 전역 등록
+window.showPage = showPage;
+
+// ✅ 첫 진입 기본 페이지 설정 (원하면 변경 가능)
+document.addEventListener("DOMContentLoaded", () => {
+  // admin.html에서 이미 showPage 호출을 해도 되지만,
+  // 혹시 초기 페이지가 비어있을 경우를 대비해 기본 1회 호출
+  if ($("main-area") && $("main-area").innerHTML.trim() === "") {
+    showPage("products");
+  }
+});
 
 /* ===========================================================
    ✅ 상품 관리 (일시 품절 + 묶음 ON/OFF 토글 추가)
@@ -133,8 +148,8 @@ async function loadProductPage() {
         <td>${p.id}</td>
         <td><img src="${p.image_url}" class="img-thumb"></td>
         <td>${p.name}</td>
-        <td>${p.price_original.toLocaleString()}원</td>
-        <td>${p.price_sale.toLocaleString()}원</td>
+        <td>${(p.price_original ?? 0).toLocaleString()}원</td>
+        <td>${(p.price_sale ?? 0).toLocaleString()}원</td>
         <td>${catMap[p.category_id] ?? "없음"}</td>
         <td>${stateText}</td>
         <td>
@@ -230,7 +245,7 @@ async function loadCategoryPage() {
 
   const { data: cats } = await supabase.from("categories").select("*");
 
-  const rows = cats
+  const rows = (cats ?? [])
     .map(
       (c) => `
       <tr>
@@ -310,7 +325,7 @@ async function loadBannerPage() {
 
   const { data: banners } = await supabase.from("banners").select("*").order("id", { ascending: false });
 
-  const rows = banners
+  const rows = (banners ?? [])
     .map(
       (b) => `
       <tr>
@@ -386,7 +401,8 @@ async function loadOrderPage() {
     return alert("주문 목록을 불러오지 못했습니다.");
   }
 
-  const rows = (orders ??)
+  // ✅ 핵심 수정: (orders ??) → (orders ?? [])
+  const rows = (orders ?? [])
     .map((o) => {
       const items = (o.items ?? []).map(it => ({ ...it }));
       const { total, totalQty } = calcOrderTotalByItems(items);
@@ -460,7 +476,7 @@ window.printOrder = async function (orderId) {
 
   const items = (o.items ?? []).map(it => ({ ...it }));
   const { total, items: fixedItems } = calcOrderTotalByItems(items);
-  const finalTotal = total; // ✅ 절대 ceil100 다시 하지 않음
+  const finalTotal = total;
 
   const popup = window.open("", "_blank");
 
@@ -660,7 +676,7 @@ window.exportByPeriod = async function (type) {
     orders.forEach((o) => {
       const items = (o.items ?? []).map(it => ({ ...it }));
       const { total, totalQty, items: fixedItems } = calcOrderTotalByItems(items);
-      const finalTotal = total; // ✅ 절대 ceil100 다시 하지 않음
+      const finalTotal = total;
 
       const itemText = fixedItems
         .map((i) => `${i.name}(${i.qty}개 / ${Number(i.totalPrice || 0).toLocaleString()}원)`)
@@ -705,7 +721,7 @@ async function loadAccountPage() {
 
   const { data: accounts } = await supabase.from("account_info").select("*");
 
-  const rows = accounts
+  const rows = (accounts ?? [])
     .map(
       (a) => `
       <tr>
@@ -780,7 +796,7 @@ async function loadDetailImagesPage() {
     return alert("상품 목록을 불러오지 못했습니다.");
   }
 
-  const rows = products
+  const rows = (products ?? [])
     .map(
       (p) => `
     <tr>

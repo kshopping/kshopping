@@ -653,9 +653,6 @@
       refreshCouponPreview();
     }
 
-    /* =========================
-       HTML escape (input value 안전)
-    ========================== */
     function escapeHtml(str){
       if(str === null || str === undefined) return "";
       return String(str)
@@ -685,9 +682,6 @@
       }
     }
 
-    /* =========================
-       토글 변경 시 페이지 재랜더 (ON/OFF 글자 반영)
-    ========================== */
     function bindToggleRerender(){
       const ids = ["pop_enabled","pop_once","coupon_enabled","coupon_bg"];
       ids.forEach(id=>{
@@ -698,9 +692,6 @@
       });
     }
 
-    /* =========================
-       쿠폰 미리보기 실시간 반영
-    ========================== */
     function bindCouponLivePreview(){
       const fs = document.getElementById("coupon_fontsize");
       if(fs){
@@ -747,27 +738,12 @@
         box.style.border = "1px dashed #ddd";
       }
 
-      // 위치 프리뷰 느낌만 (실제는 index에서 적용)
-      const pos = (cfg.coupon.position || "bottom").toLowerCase();
-      const parent = document.getElementById("couponPreview");
-      if(parent){
-        parent.style.borderColor = "#eee";
-        parent.style.boxShadow = "none";
-        if(pos === "top") parent.style.background = "#fff";
-        if(pos === "middle") parent.style.background = "#fff";
-        if(pos === "bottom") parent.style.background = "#fff";
-      }
-
-      // ON/OFF 표시
       const wrap = document.getElementById("couponPreview");
       if(wrap){
         wrap.style.opacity = cfg.coupon.enabled ? "1" : "0.4";
       }
     }
 
-    /* =========================
-       폼 -> 설정 객체
-    ========================== */
     function popupAdminGetForm() {
       const enabled = document.getElementById("pop_enabled")?.checked || false;
       const showOncePerDay = document.getElementById("pop_once")?.checked || false;
@@ -783,7 +759,6 @@
 
       const clickLink = (document.getElementById("pop_link")?.value || "").trim();
 
-      // 쿠폰 설정
       const couponEnabled = document.getElementById("coupon_enabled")?.checked || false;
       const couponTitle = (document.getElementById("coupon_title")?.value || "").trim();
       const couponCode = (document.getElementById("coupon_code")?.value || "").trim();
@@ -855,9 +830,6 @@
       openPopupAdminPage();
     }
 
-    /* =========================
-       ✅ 업로드 처리: 선택한 파일 → 자동 압축 → 입력칸 자동 반영
-    ========================== */
     async function handleUpload(type) {
       try {
         const fileInput = document.getElementById(`file_${type}`);
@@ -868,8 +840,7 @@
 
         const file = fileInput.files[0];
 
-        // 브라우저 부담 방지
-        const hardLimitBytes = 12 * 1024 * 1024; // 12MB
+        const hardLimitBytes = 12 * 1024 * 1024;
         if (file.size > hardLimitBytes) {
           alert("⚠️ 이미지 파일이 너무 큽니다.\n12MB 이하로 줄여서 업로드해주세요!");
           return;
@@ -898,9 +869,6 @@
       }
     }
 
-    /* =========================
-       ✅ 이미지 미리보기 렌더
-    ========================== */
     function renderImagePreviews() {
       const defaultUrl = (document.getElementById("pop_img_default")?.value || "").trim();
       const enUrl = (document.getElementById("pop_img_en")?.value || "").trim();
@@ -933,7 +901,6 @@
 
 </body>
 </html>
-
 
 
 
