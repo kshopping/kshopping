@@ -1,6 +1,6 @@
 // /js/order.js
 // ✅ 주문페이지 전용 JS (장바구니 → 주문정보 입력 → 주문완료 저장)
-// ✅ 묶음가격(totalPrice) 반영 + 컴퓨터(노트북) 제외 규칙 포함
+// ✅ 묶음가격(totalPrice) 반영 + 컴퓨터(노트북) 제외 + bundle_enabled 제외 규칙 포함
 // ✅ orders 테이블 id(text) 자동생성이 없으므로 id를 직접 생성하여 저장
 // ✅ Supabase 저장 성공시에만 장바구니 삭제 + 완료페이지 이동 (주문 누락 방지)
 
@@ -48,6 +48,17 @@ function isComputerItem(item) {
 }
 
 /* ===========================================================
+   ✅ 묶음 적용 가능 여부 판별 (최종 규칙)
+   - 컴퓨터/노트북이면 무조건 제외
+   - bundle_enabled === false 면 제외
+=========================================================== */
+function isBundleEnabledItem(item) {
+  if (isComputerItem(item)) return false;
+  if (item?.bundle_enabled === false) return false;
+  return true;
+}
+
+/* ===========================================================
    ✅ 묶음가격 공식 계산 (고니 규칙 반영)
    1~3개: 비율 적용
    4개 이상: (3개-2개) 차액만큼 일률 증가
@@ -79,6 +90,7 @@ function calcBundlePrice(unitPrice, qty) {
 
 /* ===========================================================
    ✅ 아이템 totalPrice 재계산 (무조건 ceil100 확정값)
+   - 묶음 적용 여부는 isBundleEnabledItem(item) 기준
 =========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
@@ -87,10 +99,17 @@ function recalcItemTotal(item) {
   item.unitPrice = unitPrice;
   item.qty = qty;
 
-  if (isComputerItem(item)) {
+  // ✅ bundle_enabled 값이 없으면 true로 보정 (구버전 장바구니 대응)
+  if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
+    item.bundle_enabled = true;
+  }
+
+  const bundleOk = isBundleEnabledItem(item);
+
+  if (!bundleOk) {
     item.bundleApplied = false;
 
-    // ✅ 컴퓨터/노트북: 단가×수량 후 ceil100 확정값
+    // ✅ 묶음 제외: 단가×수량 후 ceil100 확정값
     item.totalPrice = ceil100(Math.round(unitPrice * qty));
   } else {
     item.bundleApplied = true;
@@ -146,6 +165,11 @@ async function handleSubmitOrder(e) {
   cartItems.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
+
+    // ✅ bundle_enabled 보정
+    if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
+      item.bundle_enabled = true;
+    }
 
     recalcItemTotal(item); // ✅ 무조건 재계산해서 확정값 통일
   });

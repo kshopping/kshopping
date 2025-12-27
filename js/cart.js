@@ -54,6 +54,17 @@ function isComputerItem(item) {
 }
 
 /* ===========================================================
+   ✅ 묶음 적용 가능 여부 판별 (최종 규칙)
+   - 컴퓨터/노트북이면 무조건 제외
+   - bundle_enabled === false 면 제외
+=========================================================== */
+function isBundleEnabledItem(item) {
+  if (isComputerItem(item)) return false;
+  if (item?.bundle_enabled === false) return false;
+  return true;
+}
+
+/* ===========================================================
    ✅ 묶음가격 공식 계산 (고니 규칙 반영)
    1~3개: 비율 적용
    4개 이상: (3개-2개) 차액만큼 일률 증가
@@ -85,6 +96,7 @@ function calcBundlePrice(unitPrice, qty) {
 
 /* ===========================================================
    ✅ 아이템 totalPrice 재계산 (무조건 ceil100 확정값)
+   - 묶음 적용 여부는 isBundleEnabledItem(item) 기준
 =========================================================== */
 function recalcItemTotal(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
@@ -93,10 +105,12 @@ function recalcItemTotal(item) {
   item.unitPrice = unitPrice;
   item.qty = qty;
 
-  if (isComputerItem(item)) {
+  const bundleOk = isBundleEnabledItem(item);
+
+  if (!bundleOk) {
     item.bundleApplied = false;
 
-    // ✅ 컴퓨터/노트북: 단가×수량 후 ceil100 확정값
+    // ✅ 묶음 제외: 단가×수량 후 ceil100 확정값
     item.totalPrice = ceil100(Math.round(unitPrice * qty));
   } else {
     item.bundleApplied = true;
@@ -107,6 +121,11 @@ function recalcItemTotal(item) {
 
   // ✅ 최종 확정값 저장
   item.totalPrice = ceil100(item.totalPrice);
+
+  // ✅ bundle_enabled 값이 없으면 기본 true로 보정
+  if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
+    item.bundle_enabled = true;
+  }
 }
 
 /* ===========================================================
@@ -118,6 +137,11 @@ function getCart() {
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
+
+    // ✅ bundle_enabled 값 없으면 true로 보정
+    if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
+      item.bundle_enabled = true;
+    }
 
     recalcItemTotal(item);
   });
@@ -155,7 +179,17 @@ function loadCart() {
     totalPrice += itemTotal;
 
     const unitText = `단품 ${formatWon(item.unitPrice)}`;
-    const bundleText = isComputerItem(item) ? " (묶음 제외)" : " (묶음 적용)";
+
+    // ✅ 안내 문구 최종 분기
+    let bundleText = "";
+    if (isComputerItem(item)) {
+      bundleText = " (묶음 제외 - 컴퓨터/노트북)";
+    } else if (item?.bundle_enabled === false) {
+      bundleText = " (묶음 제외 - 관리자 설정)";
+    } else {
+      bundleText = " (묶음 적용)";
+    }
+
     const currentSumText = `현재 합계: <b>${formatWon(itemTotal)}</b>`;
 
     html += `
@@ -197,6 +231,11 @@ function loadCart() {
 window.changeQty = function (index, diff) {
   let cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
   if (!cart[index]) return;
+
+  // ✅ bundle_enabled 보정
+  if (cart[index].bundle_enabled === undefined || cart[index].bundle_enabled === null) {
+    cart[index].bundle_enabled = true;
+  }
 
   cart[index].qty = Math.max(1, safeNumber(cart[index].qty, 1) + diff);
 
@@ -244,6 +283,12 @@ document.getElementById("goOrder").addEventListener("click", () => {
   cart.forEach(item => {
     if (item.unitPrice === undefined) item.unitPrice = safeNumber(item.price ?? 0, 0);
     if (item.qty === undefined) item.qty = 1;
+
+    // ✅ bundle_enabled 보정
+    if (item.bundle_enabled === undefined || item.bundle_enabled === null) {
+      item.bundle_enabled = true;
+    }
+
     recalcItemTotal(item);
   });
 

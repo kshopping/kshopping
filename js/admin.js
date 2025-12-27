@@ -5,19 +5,14 @@ import { supabase } from "./supabaseClient.js";
 =========================================================== */
 const $ = (id) => document.getElementById(id);
 
-/* ✅ 100원 단위 무조건 올림 (확정값) */
-function ceil100(price) {
-  return Math.ceil(Number(price || 0) / 100) * 100;
-}
-
 function safeNumber(v, fallback = 0) {
   const n = Number(v);
   return isNaN(n) ? fallback : n;
 }
 
-function formatWon(n) {
-  if (n === null || n === undefined || isNaN(n)) return "-";
-  return Number(n).toLocaleString("ko-KR") + "원";
+/* ✅ 100원 단위 무조건 올림 */
+function ceil100(price) {
+  return Math.ceil(Number(price || 0) / 100) * 100;
 }
 
 /* ✅ 컴퓨터(노트북) 제외 판별 (item 기준) */
@@ -39,7 +34,7 @@ function isComputerItem(item) {
   return matchCategory || matchKeyword;
 }
 
-/* ✅ 고니 규칙 묶음가격 계산 (fallback용) + ceil100 포함 */
+/* ✅ 고니 규칙 묶음가격 계산 (fallback용) */
 function calcBundlePrice(unitPrice, qty) {
   const ratio2 = 19900 / 13900;
   const ratio3 = 26900 / 13900;
@@ -64,15 +59,37 @@ function calcBundlePrice(unitPrice, qty) {
   return ceil100(result);
 }
 
-/* ✅ totalPrice가 없을 때만 쓰는 fallback 계산(표시용) */
+/* ✅ totalPrice가 없을 때만 쓰는 fallback 계산 */
 function calcFallbackTotalPrice(item) {
   const unitPrice = safeNumber(item.unitPrice ?? item.price ?? 0, 0);
   const qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
 
-  if (isComputerItem(item)) {
+  // ✅ 묶음 제외 조건: 컴퓨터/노트북 OR bundle_enabled=false
+  const bundleEnabled = item.bundle_enabled !== false; // undefined/null이면 true로 간주
+  const excluded = isComputerItem(item) || !bundleEnabled;
+
+  if (excluded) {
     return ceil100(Math.round(unitPrice * qty));
   }
   return calcBundlePrice(unitPrice, qty);
+}
+
+/* ✅ 주문 total 계산(최종 규칙) : sum(item.totalPrice) */
+function calcOrderTotalByItems(items) {
+  const safeItems = (items ?? []).map(it => ({ ...it }));
+
+  safeItems.forEach(item => {
+    const tp = safeNumber(item.totalPrice ?? 0, 0);
+    if (!tp || tp <= 0) item.totalPrice = calcFallbackTotalPrice(item);
+    else item.totalPrice = ceil100(tp);
+
+    item.qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
+  });
+
+  const total = safeItems.reduce((sum, i) => sum + safeNumber(i.totalPrice ?? 0, 0), 0);
+  const totalQty = safeItems.reduce((sum, i) => sum + safeNumber(i.qty ?? 0, 0), 0);
+
+  return { total, totalQty, items: safeItems };
 }
 
 /* ===========================================================
@@ -91,7 +108,7 @@ window.showPage = function (page) {
 };
 
 /* ===========================================================
-   상품 관리 (일시 품절 관리 추가)
+   ✅ 상품 관리 (일시 품절 + 묶음 ON/OFF 토글 추가)
 =========================================================== */
 async function loadProductPage() {
   const main = $("main-area");
@@ -106,6 +123,10 @@ async function loadProductPage() {
     .map((p) => {
       const stateText = p.sold_out ? "❌ 품절" : "✅ 판매중";
       const toggleText = p.sold_out ? "판매 재개" : "일시 품절";
+
+      // ✅ 묶음 ON/OFF 상태
+      const bundleOn = p.bundle_enabled !== false; // null/undefined 포함
+      const bundleText = bundleOn ? "✅ 묶음ON" : "❌ 묶음OFF";
 
       return `
       <tr>
@@ -122,6 +143,14 @@ async function loadProductPage() {
             data-state="${p.sold_out}">
             ${toggleText}
           </button>
+
+          <!-- ✅ 묶음 ON/OFF 토글 버튼 -->
+          <button class="btn gray js-toggle-bundle"
+            data-id="${p.id}"
+            data-bundle="${bundleOn}">
+            ${bundleText}
+          </button>
+
           <button class="btn blue js-edit" data-id="${p.id}">수정</button>
           <button class="btn red js-del" data-id="${p.id}">삭제</button>
         </td>
@@ -149,24 +178,40 @@ async function loadProductPage() {
     </table>
   `;
 
+  // 수정 버튼
   main.querySelectorAll(".js-edit").forEach((btn) => {
     btn.addEventListener("click", () => {
       window.editProduct(btn.dataset.id);
     });
   });
 
+  // 삭제 버튼
   main.querySelectorAll(".js-del").forEach((btn) => {
     btn.addEventListener("click", () => {
       window.deleteProduct(btn.dataset.id);
     });
   });
 
+  // ✅ 일시 품절 토글
   main.querySelectorAll(".js-toggle-sold").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       const current = btn.dataset.state === "true";
 
       await supabase.from("products").update({ sold_out: !current }).eq("id", id);
+
+      loadProductPage();
+    });
+  });
+
+  // ✅ 묶음 ON/OFF 토글
+  main.querySelectorAll(".js-toggle-bundle").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const current = btn.dataset.bundle === "true"; // 현재 ON 여부
+      const next = !current;
+
+      await supabase.from("products").update({ bundle_enabled: next }).eq("id", id);
 
       loadProductPage();
     });
@@ -341,13 +386,12 @@ async function loadOrderPage() {
     return alert("주문 목록을 불러오지 못했습니다.");
   }
 
-  const rows = (orders ?? [])
+  const rows = (orders ??)
     .map((o) => {
-      const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
+      const items = (o.items ?? []).map(it => ({ ...it }));
+      const { total, totalQty } = calcOrderTotalByItems(items);
 
       const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
-
-      const totalValue = o.total ?? o.total_price ?? o.totalPrice ?? 0;
 
       const dateRaw = o.created_at ?? o.createdAt ?? "";
       const dateText = dateRaw ? String(dateRaw).split("T")[0] : "";
@@ -357,8 +401,8 @@ async function loadOrderPage() {
         <td>${o.id ?? "-"}</td>
         <td>${o.name ?? "-"}</td>
         <td>${agreeText}</td>
-        <td>${Number(totalValue || 0).toLocaleString()}원</td>
-        <td>${qty}</td>
+        <td>${Number(total || 0).toLocaleString()}원</td>
+        <td>${totalQty}</td>
         <td>${dateText}</td>
         <td>
           <button class="btn blue js-order-print" data-id="${o.id}">출력</button>
@@ -386,24 +430,19 @@ async function loadOrderPage() {
 
   main.querySelectorAll(".js-order-print").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.printOrder(id);
+      window.printOrder(btn.dataset.id);
     });
   });
 
   main.querySelectorAll(".js-order-del").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.deleteOrder(id);
+      window.deleteOrder(btn.dataset.id);
     });
   });
 }
 
 /* ===========================================================
-   ✅ 주문 출력 기능 (금액 통일 완성 버전)
-   - 품목 금액: item.totalPrice (확정값)
-   - 총액: sum(item.totalPrice)
-   - totalPrice 없는 과거주문만 fallback 계산(ceil100 포함)
+   ✅ 주문 출력 기능 (금액 통일)
 =========================================================== */
 window.printOrder = async function (orderId) {
   if (!orderId) {
@@ -420,21 +459,8 @@ window.printOrder = async function (orderId) {
   }
 
   const items = (o.items ?? []).map(it => ({ ...it }));
-
-  // ✅ 품목별 확정값 totalPrice 확보 (없으면 fallback 계산)
-  items.forEach(item => {
-    const tp = safeNumber(item.totalPrice ?? 0, 0);
-    if (!tp || tp <= 0) {
-      item.totalPrice = calcFallbackTotalPrice(item); // 표시용
-    } else {
-      item.totalPrice = ceil100(tp);
-    }
-    item.qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
-  });
-
-  // ✅ 총액은 무조건 sum(item.totalPrice)
-  const totalByItems = items.reduce((sum, i) => sum + safeNumber(i.totalPrice ?? 0, 0), 0);
-  const finalTotal = ceil100(totalByItems);
+  const { total, items: fixedItems } = calcOrderTotalByItems(items);
+  const finalTotal = total; // ✅ 절대 ceil100 다시 하지 않음
 
   const popup = window.open("", "_blank");
 
@@ -459,16 +485,13 @@ window.printOrder = async function (orderId) {
       <h3>주문 내역</h3>
       <table>
         <tr><th>상품</th><th>수량</th><th>금액(확정)</th></tr>
-        ${items
-          .map(
-            (i) => `
+        ${fixedItems.map(i => `
           <tr>
             <td>${i.name ?? ""}</td>
             <td>${safeNumber(i.qty ?? 1, 1)}</td>
             <td>${Number(i.totalPrice || 0).toLocaleString()}원</td>
-          </tr>`
-          )
-          .join("")}
+          </tr>
+        `).join("")}
       </table>
 
       <h3>총액: ${Number(finalTotal || 0).toLocaleString()}원</h3>
@@ -480,7 +503,6 @@ window.printOrder = async function (orderId) {
 
   popup.document.close();
 
-  // ✅ printed 처리
   await supabase
     .from("orders")
     .update({
@@ -512,10 +534,11 @@ async function loadPrintedPage() {
 
   const rows = (printed ?? [])
     .map((o) => {
-      const qty = (o.items ?? []).reduce((t, i) => t + (i.qty ?? 0), 0);
+      const items = (o.items ?? []).map(it => ({ ...it }));
+      const { total, totalQty } = calcOrderTotalByItems(items);
+
       const agreeText = o.marketing_agree ? "✅ 동의" : "❌ 미동의";
 
-      const totalValue = o.total ?? o.total_price ?? o.totalPrice ?? 0;
       const printedAtRaw = o.printed_at ?? "";
       const printedDate = printedAtRaw ? String(printedAtRaw).split("T")[0] : "";
 
@@ -524,8 +547,8 @@ async function loadPrintedPage() {
         <td>${o.id ?? "-"}</td>
         <td>${o.name ?? "-"}</td>
         <td>${agreeText}</td>
-        <td>${Number(totalValue || 0).toLocaleString()}원</td>
-        <td>${qty}</td>
+        <td>${Number(total || 0).toLocaleString()}원</td>
+        <td>${totalQty}</td>
         <td>${printedDate}</td>
         <td><button class="btn red js-printed-del" data-id="${o.id}">삭제</button></td>
       </tr>`;
@@ -557,14 +580,13 @@ async function loadPrintedPage() {
 
   main.querySelectorAll(".js-printed-del").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.deleteOrder(id);
+      window.deleteOrder(btn.dataset.id);
     });
   });
 }
 
 /* ===========================================================
-   주문 삭제  ✅ 절대 안전 버전 (전체삭제 방지)
+   주문 삭제 (전체삭제 방지)
 =========================================================== */
 window.deleteOrder = async function (orderId) {
   if (!orderId) {
@@ -594,8 +616,7 @@ window.deleteOrder = async function (orderId) {
 };
 
 /* ===========================================================
-   XLSX 엑셀 저장 기능 (광고동의 포함 최종본)
-   ✅ 상품목록도 totalPrice 기반으로 저장되게 통일
+   XLSX 엑셀 저장 기능 (광고동의 포함)
 =========================================================== */
 window.exportByPeriod = async function (type) {
   const { data } = await supabase.from("orders").select("*").eq("printed", true);
@@ -638,21 +659,10 @@ window.exportByPeriod = async function (type) {
 
     orders.forEach((o) => {
       const items = (o.items ?? []).map(it => ({ ...it }));
+      const { total, totalQty, items: fixedItems } = calcOrderTotalByItems(items);
+      const finalTotal = total; // ✅ 절대 ceil100 다시 하지 않음
 
-      // ✅ totalPrice 확보(없으면 fallback)
-      items.forEach(item => {
-        const tp = safeNumber(item.totalPrice ?? 0, 0);
-        if (!tp || tp <= 0) item.totalPrice = calcFallbackTotalPrice(item);
-        else item.totalPrice = ceil100(tp);
-
-        item.qty = Math.max(1, safeNumber(item.qty ?? 1, 1));
-      });
-
-      const totalQty = items.reduce((t, i) => t + safeNumber(i.qty ?? 0, 0), 0);
-      const totalByItems = items.reduce((sum, i) => sum + safeNumber(i.totalPrice ?? 0, 0), 0);
-      const finalTotal = ceil100(totalByItems);
-
-      const itemText = items
+      const itemText = fixedItems
         .map((i) => `${i.name}(${i.qty}개 / ${Number(i.totalPrice || 0).toLocaleString()}원)`)
         .join(" / ");
 
