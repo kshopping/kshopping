@@ -8,7 +8,7 @@ body {
 #wrap {
   max-width: 1280px;
   margin: auto;
-  padding-top: 180px; /* ✅ 기본값 (실제는 JS가 자동 조정) */
+  padding-top: 180px;
 }
 
 /* ============================= 🌟 FIXED HEADER ============================= */
@@ -152,7 +152,7 @@ body {
   opacity: 1 !important;
 }
 
-/* ============================= 🌟 CATEGORY BAR ============================= */
+/* ============================= 🌟 CATEGORY BAR (정리 버전) ============================= */
 #category-area {
   display: flex;
   justify-content: center;
@@ -233,7 +233,7 @@ body {
   box-shadow: 0 14px 28px rgba(0,0,0,0.12);
 }
 
-/* ============================= ✅ 메인 상품 이미지 ============================= */
+/* ============================= ✅ 메인 상품 이미지 (안 잘리고 정렬 유지) ============================= */
 .product-card img {
   width: 100%;
   height: 220px;
@@ -269,13 +269,6 @@ body {
   font-weight: 800;
   color: #222;
   min-height: 44px;
-  text-align: center;
-  word-break: keep-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* 설명 */
@@ -382,114 +375,156 @@ body {
   background: #ffd48f;
 }
 
-/* ============================= ✅✅✅ MOBILE 최종 고정 (스크롤/장바구니/결제안내 완전 해결) ============================= */
+/* ============================= 🛒 CART 애니메이션 ============================= */
+@keyframes cartPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+#cartCount.pop {
+  animation: cartPop 0.35s ease-out;
+}
+
+@keyframes cartBounce {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  60% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+.cart-bounce {
+  animation: cartBounce 0.45s ease-out;
+}
+
+@keyframes cartShake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.cart-shake {
+  animation: cartShake 0.45s ease-in-out;
+}
+
+/* ============================= 📦 PRESS / GLOW EFFECTS ============================= */
+@keyframes cardPress {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+.card-press {
+  animation: cardPress 0.22s ease-out;
+}
+
+@keyframes btnGlow {
+  0% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
+  50% { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
+  100% { box-shadow: 0 0 0px rgba(255, 200, 0, 0); }
+}
+
+.btn-glow {
+  animation: btnGlow 0.45s ease-out;
+}
+
+/* ========================================= 🌟 혼합 슬라이더 공통 스타일 ========================================= */
+#banner-area .banner-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  border-radius: 16px;
+}
+
+#banner-area .banner-slide.active {
+  opacity: 1;
+  z-index: 5;
+}
+
+#fixed-header-inner {
+  align-items: center;
+}
+
+/* 로고 + 전화번호 묶음 */
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* 전화 주문 안내 */
+.header-call {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+.header-call span {
+  color: #ff4d4f;
+  font-weight: 700;
+}
+
+/* 📞 전화 클릭 영역 확장 (모바일/앱 필수) */
+.call-link {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 6px 10px;
+  color: #ff4d4f;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 6px;
+  background: rgba(255, 77, 79, 0.08);
+  pointer-events: auto;
+  z-index: 10;
+}
+
+/* ============================= ✅✅✅ MOBILE (예전 안정형 + 스크롤/결제안내 보정) ============================= */
 @media (max-width: 768px) {
 
-  /* ✅ (1) 좌우 스크롤 완전 차단 */
+  /* ✅ 좌우 스크롤 방지 (필수) */
   html, body {
     overflow-x: hidden !important;
     max-width: 100% !important;
   }
 
-  #fixed-header, #wrap, #category-area {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
   /* ✅ 전체 wrap 위 여백 */
-  #wrap {
-    padding-top: 230px; /* 기본값만 (실제는 JS가 자동 조정) */
+  #wrap { padding-top: 230px; }
+
+  /* ✅ 상품 그리드 */
+  #product-area {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 20px;
+  }
+  .product-card { padding: 12px; }
+  .product-buttons button {
+    font-size: 14px;
+    padding: 8px 0;
   }
 
-  /* ✅ 헤더 내부: 장바구니 공간 확보 (너무 과하지 않게) */
-  #fixed-header-inner {
-    flex-wrap: wrap !important;
-    align-items: flex-start !important;
-    padding-right: 62px !important; /* ✅ 장바구니 자리 */
-    box-sizing: border-box !important;
-  }
-
-  /* ✅ (2) 로고가 너무 큰 문제 해결: 모바일에서는 더 줄이고, 서브텍스트 숨김 */
-  .logo-icon { width: 26px !important; height: 26px !important; border-radius: 9px !important; }
-  .logo-icon svg { width: 15px !important; height: 20px !important; }
-  .logo-text { font-size: 21px !important; line-height: 1 !important; }
-  .logo-sub { display: none !important; } /* ✅ 모바일은 숨김 (웹은 유지) */
-
-  /* ✅ 로고/배지 라인: 줄바꿈 최소화 + 폭 제한 */
-  .brand-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-wrap: nowrap !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .logo-btn {
-    min-width: 0 !important;
-  }
-
-  /* ✅ 배지: 너무 길면 잘리지 않게 “안에서 말줄임” 처리 */
-  .slogan-badge {
-    font-size: 11.5px !important;
-    padding: 6px 8px !important;
-    white-space: nowrap !important;
-    max-width: 170px !important; /* ✅ 핵심: 배지 폭 제한 */
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* ✅ (3) 전화 줄 2줄 되는 문제: 폰트/패딩 축소 + 한 줄 고정 */
-  .header-call {
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    flex-wrap: nowrap !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    font-size: 12px !important;
-  }
-
-  .call-link {
-    padding: 5px 8px !important;
-    font-size: 12px !important;
-    margin-top: 0 !important;
-  }
-
-  /* ✅ 장바구니: 반드시 화면 안에 보이게 */
-  #top-menu {
-    position: fixed !important;
-    top: calc(10px + env(safe-area-inset-top)) !important;
-    right: calc(10px + env(safe-area-inset-right)) !important;
-    z-index: 10000000 !important;
-    transform: none !important;
-  }
-
-  #cartGoBtn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-width: 42px !important;
-    min-height: 42px !important;
-    padding: 8px 10px !important;
-    border-radius: 14px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-
-  /* ✅ 카테고리: 잘림 방지 + 2줄 유지 */
+  /* ✅ 카테고리 (예전 방식 유지) → 좌우스크롤 원인 제거한 버전 */
   #category-area {
     width: 100% !important;
-    padding: 10px 10px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    padding: 8px 10px !important;
     gap: 6px !important;
     flex-wrap: wrap !important;
+
     justify-content: flex-start !important;
-    overflow: visible !important;
-    border-radius: 14px !important;
+    align-items: center !important;
+
     box-sizing: border-box !important;
+    overflow-x: visible !important; /* ✅ 잘림 방지 */
+    border-radius: 14px !important;
   }
 
   .category-btn {
@@ -498,29 +533,24 @@ body {
     border-radius: 18px !important;
   }
 
-  /* ✅ 결제안내 박스: 문구가 블럭 밖으로 튀는 문제 해결 */
+  /* ✅ 은행 박스 (문구 튐 방지 핵심) */
   .bank-info-box {
-    padding: 10px 12px !important;
-    margin: 14px 0 18px !important;
-    align-items: flex-start !important;
+    padding: 8px 10px;
+    margin: 14px 0 18px;
     box-sizing: border-box !important;
   }
-
   .bank-text {
-    white-space: normal !important;        /* ✅ 줄바꿈 허용 */
-    overflow-wrap: anywhere !important;    /* ✅ 영어 문구 튐 방지 */
-    word-break: keep-all !important;
-    text-align: left !important;
-    font-size: 13px !important;
-    line-height: 1.35 !important;
-  }
-
-  .bank-label,
-  .bank-value {
+    font-size: 13px;
+    line-height: 1.25;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
     word-break: keep-all !important;
-    font-size: 13px !important;
+    text-align: center;
+  }
+  .bank-label, .bank-value {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: keep-all !important;
   }
 
   /* ✅ 배너 제거 */
@@ -531,7 +561,102 @@ body {
     padding: 0 !important;
   }
 
-  /* ✅ 팝업/헤더 우선순위 */
-  #dealer-popup { z-index: 20000000 !important; }
-  #fixed-header { z-index: 999999 !important; }
+  /* ✅ 헤더 줄바꿈 허용 */
+  #fixed-header-inner {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+  }
+
+  /* ✅ 왼쪽 로고/전화 */
+  .header-left {
+    width: auto !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  /* ✅ 슬로건 줄바꿈 */
+  .header-slogan {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    white-space: normal !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    margin: 6px 0 0 0 !important;
+    padding: 0 10px !important;
+  }
+
+  /* ✅ 모바일 전화 줄 */
+  .header-call {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 10000;
+    overflow: hidden !important;
+  }
+
+  .header-call .call-link {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ✅ 장바구니/메뉴 고정 (안 보이는 문제 해결: right 12px로 복귀) */
+  #top-menu {
+    position: fixed !important;
+    top: calc(12px + env(safe-area-inset-top)) !important;
+    right: calc(12px + env(safe-area-inset-right)) !important; /* ✅ 핵심 */
+    z-index: 10000000 !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  /* ✅ 장바구니 버튼 강제 표시 + 클릭 */
+  #cartGoBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    background: #ffffff !important;
+    color: #111 !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12) !important;
+    border-radius: 16px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    padding: 8px 10px !important;
+    font-size: 16px !important;
+  }
+
+  #cartCount {
+    display: inline-block !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
+  }
+
+  /* ✅ 관리자 버튼 숨김 */
+  #top-menu button[onclick*="admin.html"] {
+    display: none !important;
+  }
+
+  /* ✅ 팝업이 헤더보다 항상 위 */
+  #dealer-popup {
+    z-index: 20000000 !important;
+  }
+
+  /* ✅ 헤더도 충분히 위로 (하지만 팝업보단 낮음) */
+  #fixed-header {
+    z-index: 999999 !important;
+  }
 }
