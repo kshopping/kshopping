@@ -155,9 +155,13 @@ async function applyBundleEnabledToOrderItems(orderItems) {
 /* ===========================================================
    페이지 전환 (전역 등록)
 =========================================================== */
+let _currentAdminPage = ""; // ✅ 현재 페이지 추적 (삭제 후 올바른 목록 재렌더링용)
+
 function showPage(page) {
   const main = $("main-area");
   if (!main) return;
+
+  _currentAdminPage = page; // ✅ 현재 페이지 기록
 
   main.innerHTML = "";
 
@@ -667,7 +671,16 @@ window.deleteOrder = async function (orderId) {
   }
 
   alert("삭제 완료");
-  loadOrderPage();
+
+  // ✅ 핵심 수정: 현재 보고 있는 페이지에 맞게 해당 목록만 다시 불러오기
+  if (_currentAdminPage === "printed") {
+    loadPrintedPage();
+  } else if (_currentAdminPage === "orders") {
+    loadOrderPage();
+  } else {
+    // 혹시 다른 페이지에서 삭제가 호출되더라도 안전하게 주문페이지 갱신
+    loadOrderPage();
+  }
 };
 
 /* ===========================================================
