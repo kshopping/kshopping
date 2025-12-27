@@ -11,6 +11,7 @@
 #fixed-header-inner {
   display: flex;
   align-items: center;
+  position: relative; /* ✅ 슬로건 배지 중앙 absolute 기준 */
 }
 
 /* ============================= ✅✅✅ 1안 번개형 로고 업그레이드 (프로급) ============================= */
@@ -126,6 +127,17 @@
   fill: #ff4d4f;
 }
 
+/* ✅✅✅ PC에서만 “헤더 전체 기준” 중앙 배치 (로고/장바구니 영향 없음) */
+@media (min-width: 769px){
+  .slogan-badge{
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+}
+
 /* 전화/문의 (CTA 느낌) */
 .header-call {
   display: flex;
@@ -174,9 +186,51 @@
   .brand-row { gap: 10px; }
   .logo-text { font-size: 26px; }
   .slogan-badge {
+    display: none; /* ✅ 모바일에서는 안 나오게 유지 */
     font-size: 13px;
     padding: 7px 10px;
   }
+}
+
+/* ✅✅✅ 장바구니 총액 표시 영역 (PC 기본 유지) */
+#cartTotalPrice {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(0,0,0,0.82);
+  color: #fff;
+  line-height: 1;
+  display: none;
+  white-space: nowrap;
+  z-index: 999;
+}
+
+/* ✅✅✅ [핵심 수정] 모바일에서는 항상 잘 보이도록 FIXED로 변경 */
+@media (max-width: 768px){
+  #cartTotalPrice{
+    position: fixed; /* ✅ 모바일에서 absolute → fixed */
+    top: calc(env(safe-area-inset-top) + 58px); /* ✅ 헤더/노치 대응 */
+    right: 12px;
+    font-size: 11px;
+    padding: 7px 10px;
+    z-index: 99999;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+  }
+
+  /* ✅✅✅ [핵심 수정] 모바일에서도 bundle 문구 강제 표시 */
+  .bundle-text{
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+#top-menu{
+  position: relative;
 }
 </style>
 </head>
@@ -224,6 +278,10 @@
     <!-- ✅ RIGHT: 장바구니만 유지 / 관리자 버튼 완전 숨김 -->
     <div id="top-menu">
       <button id="cartGoBtn" class="cart-main-btn">🛒 <span id="cartCount"></span></button>
+
+      <!-- ✅✅✅ 장바구니 총액 표시 -->
+      <div id="cartTotalPrice"></div>
+
       <div id="cart-preview"></div>
     </div>
 
@@ -649,4 +707,3 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="./js/index.js"></script>
 </body>
 </html>
-

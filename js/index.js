@@ -29,6 +29,36 @@ if (cartDropdownBtn) {
 }
 
 /* ===========================================================
+✅✅✅ 장바구니 총액 표시 (아이콘 근처)
+=========================================================== */
+function updateCartTotalPrice() {
+  const cart = JSON.parse(localStorage.getItem("cartItems") || "[]");
+  const el = document.getElementById("cartTotalPrice");
+  if (!el) return;
+
+  if (!cart.length) {
+    el.style.display = "none";
+    el.textContent = "";
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => {
+    const p = Number(item.price || 0);
+    const q = Number(item.qty || 0);
+    return sum + p * q;
+  }, 0);
+
+  el.textContent = `총액 ${Number(total).toLocaleString()}원`;
+  el.style.display = "inline-flex";
+}
+window.updateCartTotalPrice = updateCartTotalPrice;
+
+/* ✅✅✅ 모바일에서 화면 회전/리사이즈 시에도 총액 표시 유지 */
+window.addEventListener("resize", () => {
+  updateCartTotalPrice();
+});
+
+/* ===========================================================
 🔥 혼합 슬라이더 (영상 + 이미지 자동전환)
 =========================================================== */
 let bannerIndex = 0;
@@ -105,6 +135,7 @@ async function loadCategories() {
 
 /* ===========================================================
 🔥 상품 로드 (✅ 일시 품절 대응)
+✅ 묶음시 추가할인 문구는 bundle_enabled ON 상품만 표시
 =========================================================== */
 async function loadProducts(categoryId = null, searchKeyword = null) {
   const area = document.getElementById("product-area");
@@ -145,6 +176,9 @@ async function loadProducts(categoryId = null, searchKeyword = null) {
         original > 0 ? Math.round((1 - sale / original) * 100) : 0;
       const soldOut = p.sold_out === true;
 
+      // ✅ 관리자에서 묶음 OFF면 false로 저장됨 → 문구 표시하지 않음
+      const bundleOn = p.bundle_enabled !== false;
+
       return `
       <div class="product-card ${soldOut ? "sold-out" : ""}">
         ${
@@ -160,6 +194,14 @@ async function loadProducts(categoryId = null, searchKeyword = null) {
         <div class="price-box">
           <div class="price-original">정상가 ${original.toLocaleString()}원</div>
           <div class="price-sale">파격 세일가 ${sale.toLocaleString()}원</div>
+
+          ${
+            bundleOn
+              ? `<div class="bundle-text" style="margin-top:6px; font-size:12px; font-weight:900; color:#ff4d4f;">
+                   ✅ 묶음시 추가할인
+                 </div>`
+              : ``
+          }
         </div>
         <div class="product-buttons">
           <button class="btn-add" ${
@@ -266,6 +308,9 @@ function updateCartCount() {
   el.textContent = count || "";
   el.classList.add("pop");
   setTimeout(() => el.classList.remove("pop"), 300);
+
+  // ✅✅✅ 총액도 같이 갱신
+  updateCartTotalPrice();
 }
 window.updateCartCount = updateCartCount;
 
@@ -287,6 +332,9 @@ function updateCartPreview() {
         )
         .join("")
     : "<p class='empty-cart'>비어있음</p>";
+
+  // ✅✅✅ 총액도 같이 갱신
+  updateCartTotalPrice();
 }
 window.updateCartPreview = updateCartPreview;
 
@@ -309,6 +357,7 @@ function addToCart(id, name, price, image) {
 
   updateCartCount();
   updateCartPreview();
+  updateCartTotalPrice();
   showToast("🛒 장바구니에 담았습니다!");
 }
 window.addToCart = addToCart;
@@ -345,3 +394,5 @@ loadTodayDeal();
 loadBankInfo();
 updateCartCount();
 updateCartPreview();
+updateCartTotalPrice();
+
