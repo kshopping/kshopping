@@ -224,7 +224,10 @@
       total += itemTotal;
       qty += safeNumber(item.qty, 0);
 
-      const bundleText = isComputerItem(item) ? "묶음 제외" : "묶음 적용";
+      // ✅ [수정된 부분] 최종 규칙 반영: 컴퓨터 OR bundle_enabled=false → 제외
+      const bundleText = (isComputerItem(item) || item?.bundle_enabled === false)
+        ? "묶음 제외 ❌"
+        : "묶음 적용 ✅";
 
       html += `
         <div class="order-item">
